@@ -1,0 +1,36 @@
+{
+  "name": "node-go-cqhttp-ts",
+  "version": "0.0.1",
+  "description": "go-cqhttp SDK for Node",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "./dist/**/*"
+  ],
+  "keywords": [
+    "websocket",
+    "qq-robot",
+    "cq-websocket",
+    "onebot11",
+    "typescript"
+  ],
+  "author": "huan_kong",
+  "repository": "https://github.com/huankong233/node-go-cqhttp-ts.git",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon",
+    "test": "tsx test.ts"
+  },
+  "dependencies": {
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@types/ws": "^8.5.10",
+    "nodemon": "^3.1.1",
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.5"
+  }
+}
