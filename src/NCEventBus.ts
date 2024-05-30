@@ -11,7 +11,7 @@ import type {
 import { EventEmitter } from 'events'
 import { logger } from './Utils.js'
 
-export class CQEventBus extends EventEmitter {
+export class NCEventBus extends EventEmitter {
   _events: { [key in keyof AllHandlers]?: Function[] | Function }
   debug: boolean
 
@@ -68,7 +68,7 @@ export class CQEventBus extends EventEmitter {
         this.meta_event(json)
         break
       default:
-        logger.warn('[node-go-cqhttp-ts]', '[eventBus]', `unknown post_type: ${post_type}`)
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown post_type: ${post_type}`)
         return false
     }
 
@@ -84,7 +84,7 @@ export class CQEventBus extends EventEmitter {
         return this.emit('message.group', json)
       default:
         if (this.debug) {
-          logger.warn('[node-go-cqhttp-ts]', '[eventBus]', `unknown message_type: ${messageType}`)
+          logger.warn('[node-napcat-ts]', '[eventBus]', `unknown message_type: ${messageType}`)
         }
         return false
     }
@@ -100,7 +100,7 @@ export class CQEventBus extends EventEmitter {
       default:
         if (this.debug) {
           logger.warn(
-            '[node-go-cqhttp-ts]',
+            '[node-napcat-ts]',
             '[eventBus]',
             `unknown message_sent_type: ${message_type}`
           )
@@ -131,32 +131,34 @@ export class CQEventBus extends EventEmitter {
       case 'notify':
         const sub_type = json['sub_type']
         switch (sub_type) {
-          case 'poke':
-            return this.emit(
-              'group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend',
-              json
-            )
-          case 'lucky_king':
-            return this.emit('notice.notify.lucky_king', json)
-          case 'honor':
-            return this.emit('notice.notify.honor', json)
+          // case 'poke':
+          //   return this.emit(
+          //     'group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend',
+          //     json
+          //   )
+          // case 'lucky_king':
+          //   return this.emit('notice.notify.lucky_king', json)
+          // case 'honor':
+          //   return this.emit('notice.notify.honor', json)
+          case 'title':
+            return this.emit('notice.notify.title', json)
           default:
             if (this.debug) {
-              logger.warn('[node-go-cqhttp-ts]', '[eventBus]', `unknown notify_type: ${sub_type}`)
+              logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notify_type: ${sub_type}`)
             }
             return false
         }
-      case 'group_card':
-        return this.emit('notice.group_card', json)
-      case 'offline_file':
-        return this.emit('notice.offline_file', json)
-      case 'client_status':
-        return this.emit('notice.client_status', json)
-      case 'essence':
-        return this.emit('notice.essence', json)
+      // case 'group_card':
+      //   return this.emit('notice.group_card', json)
+      // case 'offline_file':
+      //   return this.emit('notice.offline_file', json)
+      // case 'client_status':
+      //   return this.emit('notice.client_status', json)
+      // case 'essence':
+      //   return this.emit('notice.essence', json)
       default:
         if (this.debug) {
-          logger.warn('[node-go-cqhttp-ts]', '[eventBus]', `unknown notice_type: ${notice_type}`)
+          logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_type: ${notice_type}`)
         }
         return false
     }
@@ -171,7 +173,7 @@ export class CQEventBus extends EventEmitter {
         return this.emit('request.group', json)
       default:
         if (this.debug) {
-          logger.warn('[node-go-cqhttp-ts]', '[eventBus]', `unknown request_type: ${request_type}`)
+          logger.warn('[node-napcat-ts]', '[eventBus]', `unknown request_type: ${request_type}`)
         }
         return false
     }
@@ -188,7 +190,7 @@ export class CQEventBus extends EventEmitter {
       default:
         if (this.debug) {
           logger.warn(
-            '[node-go-cqhttp-ts]',
+            '[node-napcat-ts]',
             '[eventBus]',
             `unknown meta_event_type: ${meta_event_type}`
           )

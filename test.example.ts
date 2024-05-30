@@ -1,8 +1,8 @@
-import { CQWebsocket } from './src/index.js'
+import { NCWebsocket } from './src/index.js'
 
 const debug = true
 
-const bot = new CQWebsocket(
+const bot = new NCWebsocket(
   {
     protocol: 'ws',
     host: 'ws.example.com',

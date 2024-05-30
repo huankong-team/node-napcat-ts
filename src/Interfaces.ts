@@ -1,16 +1,16 @@
-export interface CQWebsocketOptionsBaseUrl {
+export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
   accessToken?: string
 }
 
-export interface CQWebsocketOptionsHost {
+export interface NCWebsocketOptionsHost {
   protocol: 'ws' | 'wss'
   host: string
   port: number
   accessToken?: string
 }
 
-export type CQWebsocketOptions = CQWebsocketOptionsBaseUrl | CQWebsocketOptionsHost
+export type NCWebsocketOptions = NCWebsocketOptionsBaseUrl | NCWebsocketOptionsHost
 
 // =====================================================================================
 
@@ -78,7 +78,6 @@ export interface ApiHandler {
 export interface Status {
   // 表示BOT是否在线
   online: boolean
-  // 锁定为 true
   good: true
 }
 
@@ -430,16 +429,17 @@ export interface NoticeHandler {
   'notice.group_upload': GroupUpload
   'notice.group_ban': GroupBan
   'notice.friend_add': FriendAdd
-  'notice.notify.poke.friend': NotifyPokeFriend
-  'notice.notify.poke.group': NotifyPokeGroup
-  'notice.notify.lucky_king': NotifyLuckyKing
-  'notice.notify.honor': NotifyHonor
+  // 'notice.notify.poke.friend': NotifyPokeFriend
+  // 'notice.notify.poke.group': NotifyPokeGroup
+  // 'notice.notify.lucky_king': NotifyLuckyKing
+  // 'notice.notify.honor': NotifyHonor
   'notice.notify.title': NotifyTitle
-  'notice.notify': NotifyPokeFriend | NotifyPokeGroup | NotifyLuckyKing | NotifyHonor | NotifyTitle
-  'notice.group_card': GroupCard
-  'notice.offline_file': OfflineFile
-  'notice.client_status': ClientStatus
-  'notice.essence': Essence
+  'notice.notify': NotifyTitle
+  // NotifyPokeFriend | NotifyPokeGroup | NotifyLuckyKing | NotifyHonor |
+  // 'notice.group_card': GroupCard
+  // 'notice.offline_file': OfflineFile
+  // 'notice.client_status': ClientStatus
+  // 'notice.essence': Essence
   notice:
     | FriendRecall
     | GroupRecall
@@ -449,15 +449,15 @@ export interface NoticeHandler {
     | GroupUpload
     | GroupBan
     | FriendAdd
-    | NotifyPokeFriend
-    | NotifyPokeGroup
-    | NotifyLuckyKing
-    | NotifyHonor
+    // | NotifyPokeFriend
+    // | NotifyPokeGroup
+    // | NotifyLuckyKing
+    // | NotifyHonor
     | NotifyTitle
-    | GroupCard
-    | OfflineFile
-    | ClientStatus
-    | Essence
+  // | GroupCard
+  // | OfflineFile
+  // | ClientStatus
+  // | Essence
 }
 
 export type AllHandlers = SocketHandler &
@@ -484,8 +484,6 @@ export type WSSendParam = {
   // ===================================好友信息==============================================
   get_stranger_info: { user_id: number; no_cache: boolean }
   get_friend_list: {}
-  // ===================================好友操作==============================================
-  delete_friend: { user_id: number }
   // ===================================消息==============================================
   send_private_msg: { user_id: number; group_id?: number; message: string; auto_escape?: boolean }
   send_group_msg: { group_id: number; message: string; auto_escape?: boolean }
@@ -522,11 +520,11 @@ export type WSSendParam = {
   get_record: { file: string }
   can_send_record: {}
   // ===================================处理==============================================
-  set_friend_add_request: { flag: string; approve?: boolean; remark?: string }
+  set_friend_add_request: { flag: string; approve: boolean; remark?: string }
   set_group_add_request: {
     flag: string
     sub_type: 'add' | 'invite'
-    approve?: boolean
+    approve: boolean
     reason?: string
   }
   // ===================================群信息==============================================
@@ -540,6 +538,22 @@ export type WSSendParam = {
   }
   get_group_system_msg: {}
   get_essence_msg_list: { group_id: number; pages: number }
+  // ===================================群设置==============================================
+  set_group_name: { group_id: number; group_name: string }
+  set_group_admin: { group_id: number; user_id: string; enable: boolean }
+  // ===================================群操作==============================================
+  set_group_ban: { group_id: number; user_id: number; duration: number }
+  set_group_whole_ban: { group_id: number; enable: boolean }
+  _send_group_notice: { group_id: number; content: string; image?: string }
+  _get_group_notice: { group_id: number }
+  set_group_kick: { group_id: number; user_id: number; reject_add_request?: boolean }
+  set_group_leave: { group_id: number; is_dismiss?: boolean }
+  // ===================================文件==============================================
+  upload_group_file: { group_id: number; file: string; name: string; folder: string }
+  // ===================================特殊API==============================================
+  get_version_info: {}
+  get_status: {}
+  download_file: { url: string; headers: string[] }
 }
 
 export interface HonorInfoList {
@@ -566,9 +580,9 @@ export type WSSendReturn = {
     user_id: number
     nickname: string
     remark: string
+    sex: 'male' | 'female' | 'unknown'
+    level: number
   }[]
-  // ===================================好友操作==============================================
-  delete_friend: {}
   // ===================================消息==============================================
   send_private_msg: { message_id: number }
   send_group_msg: { message_id: number }
@@ -773,4 +787,44 @@ export type WSSendReturn = {
       }[]
     }
   }
+  // ===================================群设置==============================================
+  set_group_name: {}
+  set_group_admin: {}
+  // ===================================群操作==============================================
+  set_group_ban: {}
+  set_group_whole_ban: {}
+  _send_group_notice: {}
+  _get_group_notice: {
+    sender_id: number
+    publish_time: number
+    message: {
+      text: string
+      image: { id: string; width: string; height: string }[]
+    }
+  }[]
+  set_group_kick: {}
+  set_group_leave: {}
+  // ===================================文件==============================================
+  upload_group_file: {}
+  // ===================================特殊API==============================================
+  get_version_info: {
+    app_name: string
+    protocol_version: string
+    app_version: string
+  }
+  get_status: {
+    online: true
+    good: true
+    stat: {
+      packet_received: number
+      packet_sent: number
+      message_received: number
+      message_sent: number
+      last_message_time: number
+      disconnect_times: number
+      lost_times: number
+      packet_lost: number
+    }
+  }
+  download_file: { file: string }
 }

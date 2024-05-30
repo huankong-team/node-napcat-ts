@@ -1,1 +1,1 @@
-export { CQWebsocket } from './CQWebsocketApi.js'
+export { NCWebsocketApi as NCWebsocket } from './NCWebsocketApi.js'

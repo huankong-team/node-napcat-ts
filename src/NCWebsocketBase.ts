@@ -1,19 +1,19 @@
 import { randomUUID } from 'crypto'
 import WebSocket, { type RawData } from 'ws'
-import { CQEventBus } from './CQEventBus.js'
 import type {
   APIRequest,
   AllHandlers,
-  CQWebsocketOptions,
   EventHandle,
+  NCWebsocketOptions,
   ResponseHandler,
   WSErrorRes,
   WSSendParam,
   WSSendReturn
 } from './Interfaces.js'
+import { NCEventBus } from './NCEventBus.js'
 import { logger } from './Utils.js'
 
-export class CQWebsocketBase {
+export class NCWebsocketBase {
   debug: boolean
 
   #baseUrl: string
@@ -21,29 +21,29 @@ export class CQWebsocketBase {
   #eventSocket?: WebSocket
   #apiSocket?: WebSocket
 
-  #eventBus: CQEventBus
+  #eventBus: NCEventBus
   #echoMap: Map<string, ResponseHandler>
 
-  constructor(CQWebsocketOptions: CQWebsocketOptions, debug = false) {
-    this.#accessToken = CQWebsocketOptions.accessToken ?? ''
+  constructor(NCWebsocketOptions: NCWebsocketOptions, debug = false) {
+    this.#accessToken = NCWebsocketOptions.accessToken ?? ''
 
-    if ('baseUrl' in CQWebsocketOptions) {
-      this.#baseUrl = CQWebsocketOptions.baseUrl
+    if ('baseUrl' in NCWebsocketOptions) {
+      this.#baseUrl = NCWebsocketOptions.baseUrl
     } else if (
-      'protocol' in CQWebsocketOptions &&
-      'host' in CQWebsocketOptions &&
-      'port' in CQWebsocketOptions
+      'protocol' in NCWebsocketOptions &&
+      'host' in NCWebsocketOptions &&
+      'port' in NCWebsocketOptions
     ) {
-      const { protocol, host, port } = CQWebsocketOptions
+      const { protocol, host, port } = NCWebsocketOptions
       this.#baseUrl = protocol + '://' + host + ':' + port
     } else {
       throw new Error(
-        'CQWebsocketOptions must contain either "protocol && host && port" or "baseUrl"'
+        'NCWebsocketOptions must contain either "protocol && host && port" or "baseUrl"'
       )
     }
 
     this.debug = debug
-    this.#eventBus = new CQEventBus(this.debug)
+    this.#eventBus = new NCEventBus(this.debug)
     this.#echoMap = new Map()
   }
 
@@ -115,13 +115,13 @@ export class CQWebsocketBase {
     try {
       json = JSON.parse(data.toString())
     } catch (error) {
-      logger.warn('[node-go-cqhttp-ts]', '[event]', 'failed to parse JSON')
+      logger.warn('[node-napcat-ts]', '[event]', 'failed to parse JSON')
       logger.dir(error)
       return
     }
 
     if (this.debug) {
-      logger.debug('[node-go-cqhttp-ts]', '[event]', 'receive data')
+      logger.debug('[node-napcat-ts]', '[event]', 'receive data')
       logger.dir(json)
     }
 
@@ -133,13 +133,13 @@ export class CQWebsocketBase {
     try {
       json = JSON.parse(data.toString())
     } catch (error) {
-      logger.warn('[node-go-cqhttp-ts]', '[api]', 'failed to parse JSON')
+      logger.warn('[node-napcat-ts]', '[api]', 'failed to parse JSON')
       logger.dir(error)
       return
     }
 
     if (this.debug) {
-      logger.debug('[node-go-cqhttp-ts]', '[api]', 'receive data')
+      logger.debug('[node-napcat-ts]', '[api]', 'receive data')
       logger.dir(json)
     }
 
