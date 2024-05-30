@@ -1,5 +1,5 @@
-import type { WSSendParam } from './Interfaces.ts'
-import { NCWebsocketBase } from './NCWebsocketBase.ts'
+import type { WSSendParam } from './Interfaces.js'
+import { NCWebsocketBase } from './NCWebsocketBase.js'
 
 export class NCWebsocketApi extends NCWebsocketBase {
   get_login_info(params: WSSendParam['get_login_info']) {
