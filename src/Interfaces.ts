@@ -1,3 +1,5 @@
+import type { Send } from './Structs.ts'
+
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
   accessToken?: string
@@ -500,16 +502,14 @@ export type WSSendParam = {
   get_forward_msg: { message_id: string }
   send_group_forward_msg: {
     group_id: number
-    // TODO: 替换为 CQNode类
-    messages: { type: 'node'; data: { content: string } }[]
+    messages: Send['node'][]
   }
   send_private_forward_msg: {
     user_id: number
-    // TODO: 替换为 CQNode类
-    messages: { type: 'node'; data: { content: string } }[]
+    messages: Send['node'][]
   }
   send_forward_msg: ({ group_id: number } | { user_id: number }) & {
-    messages: { type: 'node'; data: { content: string } }[]
+    messages: Send['node'][]
   }
   get_group_msg_history: { group_id: number; message_seq: number; count: number }
   // ===================================图片==============================================
