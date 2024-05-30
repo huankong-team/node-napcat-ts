@@ -1,1 +1,1 @@
-# node-go-cqhttp-ts
+# node-napcat-ts
