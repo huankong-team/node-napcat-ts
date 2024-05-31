@@ -2,16 +2,16 @@ import { type WSSendParam } from './Interfaces.js'
 import { NCWebsocketBase } from './NCWebsocketBase.js'
 
 export class NCWebsocketApi extends NCWebsocketBase {
-  get_login_info(params: WSSendParam['get_login_info']) {
-    return this.send('get_login_info', params)
+  get_login_info() {
+    return this.send('get_login_info', {})
   }
 
   get_stranger_info(params: WSSendParam['get_stranger_info']) {
     return this.send('get_stranger_info', params)
   }
 
-  get_friend_list(params: WSSendParam['get_friend_list']) {
-    return this.send('get_friend_list', params)
+  get_friend_list() {
+    return this.send('get_friend_list', {})
   }
 
   send_private_msg(params: WSSendParam['send_private_msg']) {
@@ -62,8 +62,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('get_image', params)
   }
 
-  can_send_image(params: WSSendParam['can_send_image']) {
-    return this.send('can_send_image', params)
+  can_send_image() {
+    return this.send('can_send_image', {})
   }
 
   ocr_image(params: WSSendParam['ocr_image']) {
@@ -74,8 +74,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('get_record', params)
   }
 
-  can_send_record(params: WSSendParam['can_send_record']) {
-    return this.send('can_send_record', params)
+  can_send_record() {
+    return this.send('can_send_record', {})
   }
 
   set_friend_add_request(params: WSSendParam['set_friend_add_request']) {
@@ -106,8 +106,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('get_group_honor_info', params)
   }
 
-  get_group_system_msg(params: WSSendParam['get_group_system_msg']) {
-    return this.send('get_group_system_msg', params)
+  get_group_system_msg() {
+    return this.send('get_group_system_msg', {})
   }
 
   get_essence_msg_list(params: WSSendParam['get_essence_msg_list']) {
@@ -150,12 +150,12 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('upload_group_file', params)
   }
 
-  get_version_info(params: WSSendParam['get_version_info']) {
-    return this.send('get_version_info', params)
+  get_version_info() {
+    return this.send('get_version_info', {})
   }
 
-  get_status(params: WSSendParam['get_status']) {
-    return this.send('get_status', params)
+  get_status() {
+    return this.send('get_status', {})
   }
 
   download_file(params: WSSendParam['download_file']) {
