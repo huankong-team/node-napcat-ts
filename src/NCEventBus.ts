@@ -1,11 +1,11 @@
-import type {
-  AllHandlers,
-  MessageHandler,
-  MessageSentHandler,
-  MetaEventHandler,
-  NoticeHandler,
-  RequestHandler,
-  WSReceiveHandler
+import {
+  type AllHandlers,
+  type MessageHandler,
+  type MessageSentHandler,
+  type MetaEventHandler,
+  type NoticeHandler,
+  type RequestHandler,
+  type WSReceiveHandler
 } from './Interfaces.js'
 
 import { EventEmitter } from 'events'

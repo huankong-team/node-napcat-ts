@@ -1,4 +1,4 @@
-import type { Send } from './Structs.js'
+import { type Send } from './Structs.js'
 
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
