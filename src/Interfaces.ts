@@ -484,7 +484,7 @@ export type WSSendParam = {
   // ===================================账号部分==============================================
   get_login_info: {}
   // ===================================好友信息==============================================
-  get_stranger_info: { user_id: number; no_cache: boolean }
+  get_stranger_info: { user_id: number; no_cache?: boolean }
   get_friend_list: {}
   // ===================================消息==============================================
   send_private_msg: { user_id: number; group_id?: number; message: string; auto_escape?: boolean }
