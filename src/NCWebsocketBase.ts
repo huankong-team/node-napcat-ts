@@ -143,6 +143,16 @@ export class NCWebsocketBase {
       logger.dir(json)
     }
 
+    const handler = this.#echoMap.get(json.echo)
+
+    if (handler) {
+      if (json.retcode === 0) {
+        handler.onSuccess(json)
+      } else {
+        handler.onFailure(json)
+      }
+    }
+
     this.#eventBus.emit('api.response', json)
   }
 
