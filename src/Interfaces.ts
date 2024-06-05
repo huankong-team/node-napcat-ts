@@ -511,7 +511,7 @@ export type EventHandle<T extends keyof AllHandlers> = (context: AllHandlers[T])
 
 export type WSSendParam = {
   // ===================================NAPCAT扩展==============================================
-  reboot_normal: { delay: number }
+  reboot_normal: { delay?: number }
   get_robot_uin_range: {}
   set_online_status: { status: number; extStatus: number; batteryStatus: number }
   get_friends_with_category: {}
@@ -530,7 +530,7 @@ export type WSSendParam = {
   del_group_file: { group_id: number; file_id: string }
   del_group_file_folder: { group_id: number; folder_id: string }
   // ===================================ONEBOT接口==============================================
-  reboot: { delay: number }
+  reboot: { delay?: number }
   send_like: { user_id: number; times: number }
   get_login_info: {}
   get_friend_list: {}
@@ -554,7 +554,7 @@ export type WSSendParam = {
   get_status: {}
   can_send_record: {}
   can_send_image: {}
-  set_group_kick: { group_id: number; user_id: number; reject_add_request: boolean }
+  set_group_kick: { group_id: number; user_id: number; reject_add_request?: boolean }
   set_group_ban: { group_id: number; user_id: number; duration: number }
   set_group_whole_ban: { group_id: number; enable?: boolean }
   set_group_admin: { group_id: number; user_id: number; enable?: boolean }
