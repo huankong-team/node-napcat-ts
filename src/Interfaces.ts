@@ -1,4 +1,4 @@
-import { type Send } from './Structs.js'
+import { Send } from './Structs.js'
 
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
@@ -77,19 +77,16 @@ export interface ApiHandler {
   api: APIRequest<keyof WSSendParam> | APISuccessResponse<keyof WSSendReturn> | APIErrorResponse
 }
 
-export interface Status {
-  // 表示BOT是否在线
-  online: boolean
-  good: true
-}
-
 // 心跳包
 export interface HeartBeat {
   time: number
   self_id: number
   post_type: 'meta_event'
   meta_event_type: 'heartbeat'
-  status: Status
+  status: {
+    online: boolean
+    good: true
+  }
   // 到下次的间隔
   interval: number
 }
@@ -109,19 +106,11 @@ export interface MetaEventHandler {
   meta_event: HeartBeat | LifeCycle
 }
 
-// 发送者信息
-export interface Sender {
-  user_id: number
-  nickname: string
-  card: string
-}
-
-export interface SenderGroup extends Sender {
-  role: 'owner' | 'admin' | 'member'
-}
+// =====================================================================================
 
 // 私聊消息
 export interface PrivateMessage {
+  message_format: 'string'
   time: number
   self_id: number
   user_id: number
@@ -129,7 +118,11 @@ export interface PrivateMessage {
   message_seq: number
   real_id: number
   message_type: 'private'
-  sender: Sender
+  sender: {
+    user_id: number
+    nickname: string
+    card: string
+  }
   raw_message: string
   font: number
   sub_type: 'friend'
@@ -139,6 +132,7 @@ export interface PrivateMessage {
 
 // 群消息
 export interface GroupMessage {
+  message_format: 'string'
   time: number
   self_id: number
   user_id: number
@@ -146,7 +140,12 @@ export interface GroupMessage {
   message_seq: number
   real_id: number
   message_type: 'group'
-  sender: SenderGroup
+  sender: {
+    user_id: number
+    nickname: string
+    card: string
+    role: 'owner' | 'admin' | 'member'
+  }
   raw_message: string
   font: number
   sub_type: 'normal'
@@ -161,7 +160,10 @@ export interface MessageHandler {
   message: PrivateMessage | GroupMessage
 }
 
+// =====================================================================================
+
 export interface PrivateMessageSelf {
+  message_format: 'string'
   time: number
   self_id: number
   user_id: number
@@ -169,7 +171,11 @@ export interface PrivateMessageSelf {
   message_seq: number
   real_id: number
   message_type: 'private'
-  sender: Sender
+  sender: {
+    user_id: number
+    nickname: string
+    card: string
+  }
   raw_message: string
   font: number
   sub_type: 'friend'
@@ -178,6 +184,7 @@ export interface PrivateMessageSelf {
 }
 
 export interface GroupMessageSelf {
+  message_format: 'string'
   self_id: number
   user_id: number
   time: number
@@ -185,7 +192,12 @@ export interface GroupMessageSelf {
   message_seq: number
   real_id: number
   message_type: 'group'
-  sender: SenderGroup
+  sender: {
+    user_id: number
+    nickname: string
+    card: string
+    role: 'owner' | 'admin' | 'member'
+  }
   raw_message: string
   font: number
   sub_type: 'normal'
@@ -199,6 +211,8 @@ export interface MessageSentHandler {
   'message_sent.group': GroupMessageSelf
   message_sent: PrivateMessageSelf | GroupMessageSelf
 }
+
+// =====================================================================================
 
 // 加群请求／邀请
 export interface RequestGroup {
@@ -229,6 +243,8 @@ export interface RequestHandler {
   'request.group': RequestGroup
   request: RequestGroup | RequestFriend
 }
+
+// =====================================================================================
 
 export interface FriendRecall {
   time: number
@@ -288,7 +304,6 @@ export interface GroupUpload {
   post_type: 'notice'
   notice_type: 'group_upload'
   group_id: number
-  operator_id: number
   user_id: number
   file: {
     id: string
@@ -382,6 +397,7 @@ export interface GroupCard {
   user_id: number
   card_new: string
   card_old: string
+  cardName: string
 }
 
 export interface OfflineFile {
@@ -397,16 +413,14 @@ export interface OfflineFile {
   }
 }
 
-export interface Device {
-  app_id: number
-  device: string
-  device_kind: string
-}
-
 export interface ClientStatus {
   post_type: 'notice'
   notice_type: 'client_status'
-  client: Device
+  client: {
+    app_id: number
+    device: string
+    device_kind: string
+  }
   online: boolean
 }
 
@@ -422,6 +436,17 @@ export interface Essence {
   message_id: number
 }
 
+export interface GroupMsgEmojiLike {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'group_msg_emoji_like'
+  group_id: number
+  user_id: number
+  meta_id: number
+  likes: { emoji_id: string; count: number }[]
+}
+
 export interface NoticeHandler {
   'notice.friend_recall': FriendRecall
   'notice.group_recall': GroupRecall
@@ -431,17 +456,18 @@ export interface NoticeHandler {
   'notice.group_upload': GroupUpload
   'notice.group_ban': GroupBan
   'notice.friend_add': FriendAdd
-  // 'notice.notify.poke.friend': NotifyPokeFriend
-  // 'notice.notify.poke.group': NotifyPokeGroup
+  'notice.notify.poke.friend': NotifyPokeFriend
+  'notice.notify.poke.group': NotifyPokeGroup
   // 'notice.notify.lucky_king': NotifyLuckyKing
   // 'notice.notify.honor': NotifyHonor
   'notice.notify.title': NotifyTitle
-  'notice.notify': NotifyTitle
-  // NotifyPokeFriend | NotifyPokeGroup | NotifyLuckyKing | NotifyHonor |
-  // 'notice.group_card': GroupCard
+  'notice.notify': NotifyTitle | NotifyPokeFriend | NotifyPokeGroup
+  //  | NotifyLuckyKing | NotifyHonor |
+  'notice.group_card': GroupCard
   // 'notice.offline_file': OfflineFile
   // 'notice.client_status': ClientStatus
   // 'notice.essence': Essence
+  'notice.group_msg_emoji_like': GroupMsgEmojiLike
   notice:
     | FriendRecall
     | GroupRecall
@@ -451,16 +477,19 @@ export interface NoticeHandler {
     | GroupUpload
     | GroupBan
     | FriendAdd
-    // | NotifyPokeFriend
-    // | NotifyPokeGroup
+    | NotifyPokeFriend
+    | NotifyPokeGroup
     // | NotifyLuckyKing
     // | NotifyHonor
     | NotifyTitle
-  // | GroupCard
-  // | OfflineFile
-  // | ClientStatus
-  // | Essence
+    | GroupCard
+    // | OfflineFile
+    // | ClientStatus
+    // | Essence
+    | GroupMsgEmojiLike
 }
+
+// =====================================================================================
 
 export type AllHandlers = SocketHandler &
   ApiHandler &
@@ -481,205 +510,261 @@ export type EventHandle<T extends keyof AllHandlers> = (context: AllHandlers[T])
 // =====================================================================================
 
 export type WSSendParam = {
-  // ===================================账号部分==============================================
+  // ===================================NAPCAT扩展==============================================
+  reboot_normal: { delay: number }
+  get_robot_uin_range: {}
+  set_online_status: { status: number; extStatus: number; batteryStatus: number }
+  get_friends_with_category: {}
+  // get_group_ignore_add_request: {}
+  set_qq_avatar: { file: string }
+  // get_config: {}
+  // set_config: {}
+  debug: { method: string; args: any[] }
+  get_file: { file_id: string }
+  forward_friend_single_msg: { message_id: number; user_id: number }
+  forward_group_single_msg: { message_id: number; group_id: number }
+  translate_en2zh: { words: string[] }
+  get_group_file_count: { group_id: number }
+  get_group_file_list: { group_id: number; start_index: number; file_count: number }
+  set_group_file_folder: { group_id: number; folder_name: string }
+  del_group_file: { group_id: number; file_id: string }
+  del_group_file_folder: { group_id: number; folder_id: string }
+  // ===================================ONEBOT接口==============================================
+  reboot: { delay: number }
+  send_like: { user_id: number; times: number }
   get_login_info: {}
-  // ===================================好友信息==============================================
-  get_stranger_info: { user_id: number; no_cache?: boolean }
   get_friend_list: {}
-  // ===================================消息==============================================
-  send_private_msg: { user_id: number; group_id?: number; message: string; auto_escape?: boolean }
-  send_group_msg: { group_id: number; message: string; auto_escape?: boolean }
-  send_msg: (
-    | { message_type: 'private'; user_id: number }
-    | { message_type: 'group'; group_id: number }
-  ) & {
-    message: string
-    auto_escape?: boolean
-  }
+  get_group_info: { group_id: number }
+  get_group_list: {}
+  get_group_member_info: { group_id: number; user_id: number; no_cache?: boolean }
+  get_group_member_list: { group_id: number; no_cache?: boolean }
   get_msg: { message_id: number }
+  send_msg: ({ user_id: number } | { group_id: number }) & {
+    message: string | Send['node'][]
+    auto_escape: boolean
+  }
+  send_group_msg: { message: string | Send['node'][]; auto_escape: boolean }
+  send_private_msg: { message: string | Send['node'][]; auto_escape: boolean }
   delete_msg: { message_id: number }
-  mark_msg_as_read: { message_id: number }
-  get_forward_msg: { message_id: string }
+  set_msg_emoji_like: { message_id: number; emoji_id: string }
+  set_group_add_request: { flag: string; approve?: boolean; reason?: string }
+  set_friend_add_request: { flag: string; approve?: boolean; remark?: string }
+  set_group_leave: { group_id: number; is_dismiss?: boolean }
+  get_version_info: {}
+  get_status: {}
+  can_send_record: {}
+  can_send_image: {}
+  set_group_kick: { group_id: number; user_id: number; reject_add_request: boolean }
+  set_group_ban: { group_id: number; user_id: number; duration: number }
+  set_group_whole_ban: { group_id: number; enable?: boolean }
+  set_group_admin: { group_id: number; user_id: number; enable?: boolean }
+  set_group_card: { group_id: number; user_id: number; card: string }
+  set_group_name: { group_id: number; group_name: string }
+  get_image: { file: string }
+  get_record: { file: string }
+  clean_cache: {}
+  get_cookies: { domain: string }
+  // ===================================GOCQHTTP扩展==============================================
+  '.handle_quick_operation':
+    | {
+        context: PrivateMessage
+        operation: { reply?: string; auto_escape?: boolean }
+      }
+    | {
+        context: GroupMessage
+        operation: {
+          reply?: string
+          auto_escape?: boolean
+          at_sender?: boolean
+          delete?: boolean
+          kick?: boolean
+          ban?: boolean
+          ban_duration?: number
+        }
+      }
+    | {
+        context: RequestFriend
+        operation: { approve?: boolean; remark?: string }
+      }
+    | {
+        context: RequestGroup
+        operation: { approve?: boolean; reason?: string }
+      }
+  get_group_honor_info: {
+    group_id: number
+    type: 'all' | 'talkative' | 'performer' | 'legend' | 'strong_newbie' | 'emotion'
+  }
+  get_essence_msg_list: { group_id: number; pages: number }
+  _send_group_notice: {
+    group_id: number
+    content: string
+    image?: string
+    pinned?: number
+    confirmRequired?: number
+  }
+  _get_group_notice: { group_id: number }
+  send_forward_msg: ({ user_id: number } | { group_id: number }) & {
+    message: Send['node'][]
+    auto_escape: boolean
+  }
   send_group_forward_msg: {
     group_id: number
-    messages: Send['node'][]
+    message: Send['node'][]
+    auto_escape: boolean
   }
   send_private_forward_msg: {
     user_id: number
-    messages: Send['node'][]
+    message: Send['node'][]
+    auto_escape: boolean
   }
-  send_forward_msg: ({ group_id: number } | { user_id: number }) & {
-    messages: Send['node'][]
+  get_stranger_info: { user_id: number }
+  mark_msg_as_read: { message_id: number }
+  get_guild_list: {}
+  mark_private_msg_as_read: { user_id: number }
+  mark_group_msg_as_read: { group_id: number }
+  upload_group_file: {
+    group_id: number
+    file: string
+    name: string
+    // folder?: string
+    folder_id?: string
+  }
+  download_file: ({ url: string } | { base64: string }) & {
+    thread_count: number
+    name: string
+    headers: string | string[]
   }
   get_group_msg_history: { group_id: number; message_seq: number; count: number }
-  // ===================================图片==============================================
-  get_image: { file: string }
-  can_send_image: {}
+  get_forward_msg: { messager_id: string }
+  get_friend_msg_history: { user_id: number; message_seq: number; count: number }
+  get_group_system_msg: { group_id: number }
+  get_online_clients: { no_cache?: boolean }
   ocr_image: { image: string }
-  // ===================================语音==============================================
-  get_record: { file: string }
-  can_send_record: {}
-  // ===================================处理==============================================
-  set_friend_add_request: { flag: string; approve: boolean; remark?: string }
-  set_group_add_request: {
-    flag: string
-    sub_type: 'add' | 'invite'
-    approve: boolean
-    reason?: string
-  }
-  // ===================================群信息==============================================
-  get_group_info: { group_id: number; no_cache?: boolean }
-  get_group_list: { no_cache?: boolean }
-  get_group_member_info: { group_id: number; user_id: number; no_cache?: boolean }
-  get_group_member_list: { group_id: number; no_cache?: boolean }
-  get_group_honor_info: {
-    group_id: number
-    type: 'talkative' | 'performer' | 'legend' | 'strong_newbie' | 'emotion' | 'all'
-  }
-  get_group_system_msg: {}
-  get_essence_msg_list: { group_id: number; pages: number }
-  // ===================================群设置==============================================
-  set_group_name: { group_id: number; group_name: string }
-  set_group_admin: { group_id: number; user_id: string; enable: boolean }
-  // ===================================群操作==============================================
-  set_group_ban: { group_id: number; user_id: number; duration: number }
-  set_group_whole_ban: { group_id: number; enable: boolean }
-  _send_group_notice: { group_id: number; content: string; image?: string }
-  _get_group_notice: { group_id: number }
-  set_group_kick: { group_id: number; user_id: number; reject_add_request?: boolean }
-  set_group_leave: { group_id: number; is_dismiss?: boolean }
-  // ===================================文件==============================================
-  upload_group_file: { group_id: number; file: string; name: string; folder: string }
-  // ===================================特殊API==============================================
-  get_version_info: {}
-  get_status: {}
-  download_file: { url: string; headers: string[] }
-}
-
-export interface HonorInfoList {
-  user_id: number
-  avatar: string
-  description: string
-  nickname: string
+  set_self_profile: { nick: string; longNick: string; sex: number }
 }
 
 export type WSSendReturn = {
-  // ===================================账号部分==============================================
-  get_login_info: { user_id: number; nickname: string }
-  // ===================================好友信息==============================================
-  get_stranger_info: {
-    user_id: number
-    nickname: string
-    sex: 'male' | 'female' | 'unknown'
-    age: number
-    qid: string
-    level: number
-    login_days: number
+  // ===================================NAPCAT扩展==============================================
+  reboot_normal: {}
+  get_robot_uin_range: { minUin: number; maxUin: number }[]
+  set_online_status: {}
+  get_friends_with_category: {
+    categoryId: number
+    categoryName: string
+    categoryMbCount: number
+    buddyList: {
+      uid: string
+      qid: string
+      uin: string
+      nick: string
+      remark: string
+      longNick: string
+      avatarUrl: string
+      birthday_year: number
+      birthday_month: number
+      birthday_day: number
+      sex: number
+      topTime: string
+      isBlock: boolean
+      isMsgDisturb: boolean
+      isSpecialCareOpen: boolean
+      isSpecialCareZone: boolean
+      ringId: string
+      status: number
+      qidianMasterFlag: number
+      qidianCrewFlag: number
+      qidianCrewFlag2: number
+      extStatus: number
+      categoryId: number
+      onlyChat: boolean
+      qzoneNotWatch: boolean
+      qzoneNotWatched: boolean
+      vipFlag: boolean
+      yearVipFlag: boolean
+      svipFlag: boolean
+      vipLevel: number
+      isZPlanCoupleOpen: boolean
+      zplanCoupleSceneId: number
+      teenagerFlag: number
+      studyFlag: number
+      pendantId: string
+    }[]
+  }[]
+  // get_group_ignore_add_request: {}
+  set_qq_avatar: {}
+  // get_config: {}
+  // set_config: {}
+  debug: any
+  get_file: { file: string; url: string; file_size: string; file_name: string; base64: string }
+  forward_friend_single_msg: {}
+  forward_group_single_msg: {}
+  translate_en2zh: string[]
+  get_group_file_count: { count: number }
+  get_group_file_list: {
+    FileList: (
+      | {
+          peerId: string
+          type: 1
+          folderInfo: null
+          fileInfo: {
+            fileModelId: string
+            fileId: string
+            fileName: string
+            fileSize: string
+            busId: number
+            uploadedSize: string
+            uploadTime: number
+            deadTime: number
+            modifyTime: number
+            downloadTimes: number
+            sha: string
+            sha3: string
+            md5: string
+            uploaderLocalPath: string
+            uploaderName: string
+            uploaderUin: string
+            parentFolderId: string
+            localPath: string
+            transStatus: number
+            transType: number
+            elementId: string
+            isFolder: false
+          }
+        }
+      | {
+          peerId: string
+          type: 2
+          folderInfo: {
+            folderId: string
+            parentFolderId: string
+            folderName: string
+            createTime: number
+            modifyTime: number
+            createUin: string
+            creatorName: string
+            totalFileCount: number
+            modifyUin: string
+            modifyName: string
+            usedSpace: string
+          }
+          fileInfo: null
+        }
+    )[]
   }
+  set_group_file_folder: {}
+  del_group_file: {}
+  del_group_file_folder: {}
+  // ===================================ONEBOT接口==============================================
+  reboot: {}
+  send_like: {}
+  get_login_info: { user_id: number; nickname: string }
   get_friend_list: {
     user_id: number
     nickname: string
     remark: string
-    sex: 'male' | 'female' | 'unknown'
+    sex: 'unknown' | 'male' | 'female'
     level: number
   }[]
-  // ===================================消息==============================================
-  send_private_msg: { message_id: number }
-  send_group_msg: { message_id: number }
-  send_msg: { message_id: number }
-  get_msg: (
-    | { message_type: 'private'; sender: Sender; sub_type: 'friend' }
-    | { message_type: 'group'; group_id: number; sender: SenderGroup; sub_type: 'normal' }
-  ) & {
-    message_id: number
-    real_id: number
-    message: string
-    raw_message: string
-  }
-  delete_msg: {}
-  mark_msg_as_read: {}
-  get_forward_msg: {
-    messages: ((
-      | {
-          message_type: 'private'
-          sub_type: 'friend'
-          sender: Sender
-        }
-      | {
-          message_type: 'group'
-          sub_type: 'normal'
-          group_id: number
-          sender: SenderGroup
-        }
-    ) & {
-      time: number
-      user_id: number
-      message_id: number
-      raw_message: string
-      font: number
-      post_type: 'message'
-      content: string
-    })[]
-  }
-  send_group_forward_msg: { message_id: number }
-  send_private_forward_msg: { message_id: number }
-  send_forward_msg: { message_id: number }
-  get_group_msg_history: {
-    messages: ((
-      | {
-          message_type: 'private'
-          sub_type: 'friend'
-          sender: Sender
-        }
-      | {
-          message_type: 'group'
-          sub_type: 'normal'
-          group_id: number
-          sender: SenderGroup
-        }
-    ) & {
-      time: number
-      user_id: number
-      message_id: number
-      raw_message: string
-      font: number
-      post_type: 'message'
-      message: string
-    })[]
-  }
-  // ===================================图片==============================================
-  get_image: { file: string; url: string; size: string; file_name: string }
-  can_send_image: { yes: boolean }
-  ocr_image: {
-    text: string
-    pt1: { x: string; y: string }
-    pt2: { x: string; y: string }
-    pt3: { x: string; y: string }
-    pt4: { x: string; y: string }
-    charBox: {
-      charText: string
-      charBox: {
-        pt1: { x: string; y: string }
-        pt2: { x: string; y: string }
-        pt3: { x: string; y: string }
-        pt4: { x: string; y: string }
-      }
-    }[]
-    score: string
-  }[]
-  // ===================================语音==============================================
-  get_record: {
-    file: string
-    url: string
-    file_size: string
-    file_name: string
-    base64: string
-  }
-  can_send_record: { yes: boolean }
-  // ===================================处理==============================================
-  set_friend_add_request: {}
-  set_group_add_request: {}
-  // ===================================群信息==============================================
   get_group_info: {
     group_id: number
     group_name: string
@@ -697,10 +782,10 @@ export type WSSendReturn = {
     user_id: number
     nickname: string
     card: string
-    sex: string
+    sex: 'unknown' | 'male' | 'female'
     age: number
     area: string
-    level: number
+    level: string
     qq_level: number
     join_time: number
     last_sent_time: number
@@ -709,18 +794,19 @@ export type WSSendReturn = {
     card_changeable: boolean
     is_robot: boolean
     shut_up_timestamp: number
-    role: 'owner' | 'admin' | 'member'
+    role: 'admin' | 'owner' | 'member'
     title: string
+    qage: number
   }
   get_group_member_list: {
     group_id: number
     user_id: number
     nickname: string
     card: string
-    sex: string
+    sex: 'unknown' | 'male' | 'female'
     age: number
     area: string
-    level: number
+    level: string
     qq_level: number
     join_time: number
     last_sent_time: number
@@ -729,23 +815,355 @@ export type WSSendReturn = {
     card_changeable: boolean
     is_robot: boolean
     shut_up_timestamp: number
-    role: 'owner' | 'admin' | 'member'
+    role: 'admin' | 'owner' | 'member'
     title: string
+    qage: number
   }[]
+  get_msg: (
+    | {
+        message_type: 'private'
+        sender: {
+          user_id: number
+          nickname: string
+          card: string
+        }
+        sub_type: 'friend'
+      }
+    | {
+        message_type: 'group'
+        group_id: number
+        sender: {
+          user_id: number
+          nickname: string
+          card: string
+          role: 'owner' | 'admin' | 'member'
+        }
+        sub_type: 'normal'
+      }
+  ) & {
+    self_id: number
+    user_id: number
+    time: number
+    message_id: number
+    message_seq: number
+    real_id: number
+    raw_message: string
+    font: number
+    message_format: 'string'
+    post_type: 'message'
+  }
+  send_msg: { message_id: number }
+  send_group_msg: { message_id: number }
+  send_private_msg: { message_id: number }
+  delete_msg: {}
+  set_msg_emoji_like: {}
+  set_group_add_request: {}
+  set_friend_add_request: {}
+  set_group_leave: {}
+  get_version_info: { app_name: 'NapCat.Onebot'; protocol_version: 'v11'; app_version: string }
+  get_status: {
+    online: boolean
+    good: true
+    stat: {
+      packet_received: number
+      packet_sent: number
+      message_received: number
+      message_sent: number
+      last_message_time: number
+      disconnect_times: number
+      lost_times: number
+      packet_lost: number
+    }
+  }
+  can_send_record: { yes: true }
+  can_send_image: { yes: true }
+  set_group_kick: {}
+  set_group_ban: {}
+  set_group_whole_ban: {}
+  set_group_admin: {}
+  set_group_card: {}
+  set_group_name: {}
+  get_image: { file: string; url: string; file_size: string; file_name: string; base64: string }
+  get_record: { file: string; url: string; file_size: string; file_name: string; base64: string }
+  clean_cache: {}
+  get_cookies: { cookies: string }
+  // ===================================GOCQHTTP扩展==============================================
+  '.handle_quick_operation': {}
   get_group_honor_info: {
-    group_id: number
-    current_talkative?: {
+    group_id: string
+    current_talkative: {
       user_id: number
       avatar: string
       nickname: string
       day_count: number
       description: string
     }
-    talkative_list?: HonorInfoList[]
-    performer_list?: HonorInfoList[]
-    legend_list?: HonorInfoList[]
-    emotion_list?: HonorInfoList[]
-    strong_newbie_list?: HonorInfoList[]
+    talkative_list: {
+      user_id: number
+      avatar: string
+      nickname: string
+      day_count: number
+      description: string
+    }[]
+    performer_list: {
+      user_id: number
+      avatar: string
+      nickname: string
+      day_count: number
+      description: string
+    }[]
+    legend_list: {
+      user_id: number
+      avatar: string
+      nickname: string
+      day_count: number
+      description: string
+    }[]
+    emotion_list: {
+      user_id: number
+      avatar: string
+      nickname: string
+      day_count: number
+      description: string
+    }[]
+    strong_newbie_list: {
+      user_id: number
+      avatar: string
+      nickname: string
+      day_count: number
+      description: string
+    }[]
+  }
+  get_essence_msg_list: {
+    retcode: 0
+    retmsg: 'success'
+    data: {
+      msg_list: {
+        group_code: string
+        msg_seq: number
+        msg_random: number
+        sender_uin: string
+        sender_nick: string
+        sender_time: number
+        add_digest_uin: string
+        add_digest_nick: string
+        add_digest_time: number
+        msg_content: (
+          | {
+              msg_type: 1
+              text: string
+            }
+          // | {
+          //     msg_type: 2
+          //   }
+          | {
+              msg_type: 3
+              image_url: string
+              image_thumbnail_url: string
+            }
+        )[]
+        can_be_removed: true
+      }[]
+      is_end: boolean
+      group_role: boolean
+      config_page_url: string
+    }
+  }
+  _send_group_notice: {}
+  _get_group_notice: {
+    sender_id: number
+    publish_time: number
+    message: {
+      text: string
+      image: {
+        id: string
+        height: string
+        width: string
+      }[]
+    }
+  }[]
+  send_forward_msg: {}
+  send_group_forward_msg: {}
+  send_private_forward_msg: {}
+  get_stranger_info: {
+    uid: string
+    qid: string
+    uin: string
+    nick: string
+    remark: string
+    longNick: string
+    avatarUrl: string
+    birthday_year: number
+    birthday_month: number
+    birthday_day: number
+    sex: 'unknown' | 'male' | 'female'
+    topTime: string
+    constellation: number
+    shengXiao: number
+    kBloodType: number
+    homeTown: string
+    makeFriendCareer: number
+    pos: string
+    eMail: string
+    phoneNum: string
+    college: string
+    country: string
+    province: string
+    city: string
+    postCode: string
+    address: string
+    isBlock: boolean
+    isSpecialCareOpen: boolean
+    isSpecialCareZone: boolean
+    ringId: string
+    regTime: number
+    interest: string
+    termType: number
+    labels: string[]
+    qqLevel: {
+      crownNum: number
+      sunNum: number
+      moonNum: number
+      starNum: number
+    }
+    isHideQQLevel: number
+    privilegeIcon: {
+      jumpUrl: string
+      openIconList: string[]
+      closeIconList: string[]
+    }
+    isHidePrivilegeIcon: number
+    photoWall: {
+      picList: string[]
+    }
+    vipFlag: boolean
+    yearVipFlag: boolean
+    svipFlag: boolean
+    vipLevel: number
+    status: number
+    qidianMasterFlag: number
+    qidianCrewFlag: number
+    qidianCrewFlag2: number
+    extStatus: number
+    recommendImgFlag: number
+    disableEmojiShortCuts: number
+    pendantId: string
+    user_id: number
+    nickname: string
+    age: number
+    login_days: number
+    level: number
+  }
+  mark_msg_as_read: {}
+  get_guild_list: {}
+  mark_private_msg_as_read: {}
+  mark_group_msg_as_read: {}
+  upload_group_file: {}
+  download_file: { file: string }
+  get_group_msg_history: {
+    messages: ((
+      | {
+          message_type: 'private'
+          sender: {
+            user_id: number
+            nickname: string
+            card: string
+          }
+          sub_type: 'friend'
+        }
+      | {
+          message_type: 'group'
+          group_id: number
+          sender: {
+            user_id: number
+            nickname: string
+            card: string
+            role: 'owner' | 'admin' | 'member'
+          }
+          sub_type: 'normal'
+        }
+    ) & {
+      self_id: number
+      user_id: number
+      time: number
+      message_id: number
+      message_seq: number
+      real_id: number
+      raw_message: string
+      font: number
+      message_format: 'string'
+      post_type: 'message'
+    })[]
+  }
+  get_forward_msg: {
+    messages: ((
+      | {
+          message_type: 'private'
+          sender: {
+            user_id: number
+            nickname: string
+            card: string
+          }
+          sub_type: 'friend'
+        }
+      | {
+          message_type: 'group'
+          group_id: number
+          sender: {
+            user_id: number
+            nickname: string
+            card: string
+            role: 'owner' | 'admin' | 'member'
+          }
+          sub_type: 'normal'
+        }
+    ) & {
+      self_id: number
+      user_id: number
+      time: number
+      message_id: number
+      message_seq: number
+      real_id: number
+      raw_message: string
+      font: number
+      message_format: 'string'
+      post_type: 'message'
+    })[]
+  }
+  get_friend_msg_history: {
+    messages: ((
+      | {
+          message_type: 'private'
+          sender: {
+            user_id: number
+            nickname: string
+            card: string
+          }
+          sub_type: 'friend'
+        }
+      | {
+          message_type: 'group'
+          group_id: number
+          sender: {
+            user_id: number
+            nickname: string
+            card: string
+            role: 'owner' | 'admin' | 'member'
+          }
+          sub_type: 'normal'
+        }
+    ) & {
+      self_id: number
+      user_id: number
+      time: number
+      message_id: number
+      message_seq: number
+      real_id: number
+      raw_message: string
+      font: number
+      message_format: 'string'
+      post_type: 'message'
+    })[]
   }
   get_group_system_msg: {
     invited_requests: {
@@ -768,63 +1186,24 @@ export type WSSendReturn = {
       actor: number
     }[]
   }
-  get_essence_msg_list: {
-    retcode: number
-    retmsg: string
-    data: {
-      msg_list?: {
-        group_code: string
-        msg_seq: number
-        msg_random: number
-        sender_uin: string
-        sender_nick: string
-        sender_time: number
-        add_digest_uin: string
-        add_digest_nick: string
-        add_digest_time: number
-        msg_content: { msg_type: number; text: string }[]
-        can_be_removed: boolean
-      }[]
-    }
-  }
-  // ===================================群设置==============================================
-  set_group_name: {}
-  set_group_admin: {}
-  // ===================================群操作==============================================
-  set_group_ban: {}
-  set_group_whole_ban: {}
-  _send_group_notice: {}
-  _get_group_notice: {
-    sender_id: number
-    publish_time: number
-    message: {
-      text: string
-      image: { id: string; width: string; height: string }[]
-    }
+  get_online_clients: { app_id: string; device_name: string; device_kind: string }[]
+  ocr_image: {
+    text: string
+    pt1: { x: string; y: string }
+    pt2: { x: string; y: string }
+    pt3: { x: string; y: string }
+    pt4: { x: string; y: string }
+    charBox: {
+      charText: string
+      charBox: {
+        pt1: { x: string; y: string }
+        pt2: { x: string; y: string }
+        pt3: { x: string; y: string }
+        pt4: { x: string; y: string }
+      }
+    }[]
+    score: string
   }[]
-  set_group_kick: {}
-  set_group_leave: {}
-  // ===================================文件==============================================
-  upload_group_file: {}
-  // ===================================特殊API==============================================
-  get_version_info: {
-    app_name: string
-    protocol_version: string
-    app_version: string
-  }
-  get_status: {
-    online: true
-    good: true
-    stat: {
-      packet_received: number
-      packet_sent: number
-      message_received: number
-      message_sent: number
-      last_message_time: number
-      disconnect_times: number
-      lost_times: number
-      packet_lost: number
-    }
-  }
-  download_file: { file: string }
+  // ==============
+  set_self_profile: { retcode: 0; retmsg: 'success'; data: {} }
 }

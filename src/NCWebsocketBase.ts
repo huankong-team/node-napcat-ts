@@ -14,7 +14,7 @@ import { NCEventBus } from './NCEventBus.js'
 import { logger } from './Utils.js'
 
 export class NCWebsocketBase {
-  debug: boolean
+  #debug: boolean
 
   #baseUrl: string
   #accessToken: string
@@ -42,8 +42,8 @@ export class NCWebsocketBase {
       )
     }
 
-    this.debug = debug
-    this.#eventBus = new NCEventBus(this.debug)
+    this.#debug = debug
+    this.#eventBus = new NCEventBus(this.#debug)
     this.#echoMap = new Map()
   }
 
@@ -120,7 +120,7 @@ export class NCWebsocketBase {
       return
     }
 
-    if (this.debug) {
+    if (this.#debug) {
       logger.debug('[node-napcat-ts]', '[event]', 'receive data')
       logger.dir(json)
     }
@@ -138,7 +138,7 @@ export class NCWebsocketBase {
       return
     }
 
-    if (this.debug) {
+    if (this.#debug) {
       logger.debug('[node-napcat-ts]', '[api]', 'receive data')
       logger.dir(json)
     }
@@ -172,7 +172,7 @@ export class NCWebsocketBase {
       echo
     }
 
-    if (this.debug) {
+    if (this.#debug) {
       logger.debug('[node-open-shamrock] send request')
       logger.dir(message)
     }
