@@ -131,11 +131,11 @@ export class NCEventBus extends EventEmitter {
       case 'notify':
         const sub_type = json['sub_type']
         switch (sub_type) {
-          // case 'poke':
-          //   return this.emit(
-          //     'group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend',
-          //     json
-          //   )
+          case 'poke':
+            return this.emit(
+              'group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend',
+              json
+            )
           // case 'lucky_king':
           //   return this.emit('notice.notify.lucky_king', json)
           // case 'honor':
@@ -148,14 +148,16 @@ export class NCEventBus extends EventEmitter {
             }
             return false
         }
-      // case 'group_card':
-      //   return this.emit('notice.group_card', json)
+      case 'group_card':
+        return this.emit('notice.group_card', json)
       // case 'offline_file':
       //   return this.emit('notice.offline_file', json)
       // case 'client_status':
       //   return this.emit('notice.client_status', json)
       // case 'essence':
       //   return this.emit('notice.essence', json)
+      case 'group_msg_emoji_like':
+        return this.emit('notice.group_msg_emoji_like', json)
       default:
         if (this.debug) {
           logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_type: ${notice_type}`)

@@ -23,6 +23,7 @@ export const CQ_TAG_JSON_REGEXP = /^\[CQ:json,data=(\{.*\})\]$/
  * CQ码转JSON
  */
 export function convertCQCodeToJSON(msg: string) {
+  msg = CQCodeUnescape(msg)
   let msgArr: string[] = []
   msg.split(SPLIT).forEach((value) => {
     if (value.at(0) !== '[' && value.at(value.length - 1) === ']' && msgArr.length > 0) {
