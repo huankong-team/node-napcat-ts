@@ -541,10 +541,10 @@ export type WSSendParam = {
   get_msg: { message_id: number }
   send_msg: ({ user_id: number } | { group_id: number }) & {
     message: string | Send['node'][]
-    auto_escape: boolean
+    auto_escape?: boolean
   }
-  send_group_msg: { group_id: number; message: string | Send['node'][]; auto_escape: boolean }
-  send_private_msg: { user_id: number; message: string | Send['node'][]; auto_escape: boolean }
+  send_group_msg: { group_id: number; message: string | Send['node'][]; auto_escape?: boolean }
+  send_private_msg: { user_id: number; message: string | Send['node'][]; auto_escape?: boolean }
   delete_msg: { message_id: number }
   set_msg_emoji_like: { message_id: number; emoji_id: string }
   set_group_add_request: { flag: string; approve?: boolean; reason?: string }
@@ -605,17 +605,17 @@ export type WSSendParam = {
   _get_group_notice: { group_id: number }
   send_forward_msg: ({ user_id: number } | { group_id: number }) & {
     message: Send['node'][]
-    auto_escape: boolean
+    auto_escape?: boolean
   }
   send_group_forward_msg: {
     group_id: number
     message: Send['node'][]
-    auto_escape: boolean
+    auto_escape?: boolean
   }
   send_private_forward_msg: {
     user_id: number
     message: Send['node'][]
-    auto_escape: boolean
+    auto_escape?: boolean
   }
   get_stranger_info: { user_id: number }
   mark_msg_as_read: { message_id: number }
