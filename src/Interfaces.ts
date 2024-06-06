@@ -543,8 +543,8 @@ export type WSSendParam = {
     message: string | Send['node'][]
     auto_escape: boolean
   }
-  send_group_msg: { message: string | Send['node'][]; auto_escape: boolean }
-  send_private_msg: { message: string | Send['node'][]; auto_escape: boolean }
+  send_group_msg: { group_id: number; message: string | Send['node'][]; auto_escape: boolean }
+  send_private_msg: { user_id: number; message: string | Send['node'][]; auto_escape: boolean }
   delete_msg: { message_id: number }
   set_msg_emoji_like: { message_id: number; emoji_id: string }
   set_group_add_request: { flag: string; approve?: boolean; reason?: string }
