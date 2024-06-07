@@ -443,7 +443,7 @@ export interface GroupMsgEmojiLike {
   notice_type: 'group_msg_emoji_like'
   group_id: number
   user_id: number
-  meta_id: number
+  message_id: number
   likes: { emoji_id: string; count: number }[]
 }
 
