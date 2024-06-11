@@ -1,3 +1,5 @@
+import { Receive } from './Structs.js'
+
 export const getTime = () => new Date().toLocaleString()
 
 export const logger = {
@@ -46,12 +48,17 @@ export function convertCQCodeToJSON(msg: string) {
     const data = Object.fromEntries(
       value.split(',').map((v) => {
         const index = v.indexOf('=')
-        return [v.slice(0, index), v.slice(index + 1)]
+        const key = v.slice(0, index)
+        let value: string | number = v.slice(index + 1)
+        if (!isNaN(parseInt(value))) {
+          value = parseInt(value)
+        }
+        return [key, value]
       })
     )
 
     return { type: tagName, data }
-  })
+  }) as unknown as Receive[keyof Receive]
 }
 
 interface CQCode {
