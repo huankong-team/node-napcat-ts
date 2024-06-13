@@ -58,7 +58,7 @@ export function convertCQCodeToJSON(msg: string) {
     )
 
     return { type: tagName, data }
-  }) as unknown as Receive[keyof Receive]
+  }) as Receive[keyof Receive][]
 }
 
 interface CQCode {
