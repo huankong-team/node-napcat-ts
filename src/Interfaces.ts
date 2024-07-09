@@ -1,4 +1,4 @@
-import { Send } from './Structs.js'
+import { Send, Receive } from './Structs.js'
 
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
@@ -126,7 +126,7 @@ export interface PrivateMessage {
   raw_message: string
   font: number
   sub_type: 'friend'
-  message: string
+  message: Receive[keyof Receive][]
   post_type: 'message'
 }
 
@@ -149,7 +149,7 @@ export interface GroupMessage {
   raw_message: string
   font: number
   sub_type: 'normal'
-  message: string
+  message: Receive[keyof Receive][]
   post_type: 'message'
   group_id: number
 }
@@ -179,7 +179,7 @@ export interface PrivateMessageSelf {
   raw_message: string
   font: number
   sub_type: 'friend'
-  message: string
+  message: Receive[keyof Receive][]
   post_type: 'message_sent'
 }
 
@@ -201,7 +201,7 @@ export interface GroupMessageSelf {
   raw_message: string
   font: number
   sub_type: 'normal'
-  message: string
+  message: Receive[keyof Receive][]
   post_type: 'message_sent'
   group_id: number
 }
@@ -540,11 +540,11 @@ export type WSSendParam = {
   get_group_member_list: { group_id: number; no_cache?: boolean }
   get_msg: { message_id: number }
   send_msg: ({ user_id: number } | { group_id: number }) & {
-    message: string | Send['node'][]
+    message: string | Send[keyof Send][]
     auto_escape?: boolean
   }
-  send_group_msg: { group_id: number; message: string | Send['node'][]; auto_escape?: boolean }
-  send_private_msg: { user_id: number; message: string | Send['node'][]; auto_escape?: boolean }
+  send_group_msg: { group_id: number; message: string | Send[keyof Send][]; auto_escape?: boolean }
+  send_private_msg: { user_id: number; message: string | Send[keyof Send][]; auto_escape?: boolean }
   delete_msg: { message_id: number }
   set_msg_emoji_like: { message_id: number; emoji_id: string }
   set_group_add_request: { flag: string; approve?: boolean; reason?: string }
@@ -828,6 +828,7 @@ export type WSSendReturn = {
           card: string
         }
         sub_type: 'friend'
+        message: Receive[keyof Receive][]
       }
     | {
         message_type: 'group'
@@ -839,6 +840,7 @@ export type WSSendReturn = {
           role: 'owner' | 'admin' | 'member'
         }
         sub_type: 'normal'
+        message: Receive[keyof Receive][]
       }
   ) & {
     self_id: number
@@ -851,6 +853,7 @@ export type WSSendReturn = {
     font: number
     message_format: 'string'
     post_type: 'message'
+    message: Receive[keyof Receive][]
   }
   send_msg: { message_id: number }
   send_group_msg: { message_id: number }

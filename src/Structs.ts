@@ -138,7 +138,7 @@ export interface Send {
   file: {
     type: 'file'
     data: {
-      path: string
+      file: string
     }
   }
 }
