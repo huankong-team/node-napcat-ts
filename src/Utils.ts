@@ -1,3 +1,5 @@
+import { Receive } from './Structs.js'
+
 export const getTime = () => new Date().toLocaleString()
 
 export const logger = {
@@ -23,7 +25,7 @@ export const CQ_TAG_JSON_REGEXP = /^\[CQ:json,data=(\{.*\})\]$/
  * CQ码转JSON
  */
 export function convertCQCodeToJSON(msg: string) {
-  msg = CQCodeUnescape(msg)
+  msg = CQCodeDecode(msg)
   let msgArr: string[] = []
   msg.split(SPLIT).forEach((value) => {
     if (value.at(0) !== '[' && value.at(value.length - 1) === ']' && msgArr.length > 0) {
@@ -46,12 +48,17 @@ export function convertCQCodeToJSON(msg: string) {
     const data = Object.fromEntries(
       value.split(',').map((v) => {
         const index = v.indexOf('=')
-        return [v.slice(0, index), v.slice(index + 1)]
+        const key = v.slice(0, index)
+        let value: string | number = v.slice(index + 1)
+        if (!isNaN(parseInt(value))) {
+          value = parseInt(value)
+        }
+        return [key, value]
       })
     )
 
     return { type: tagName, data }
-  })
+  }) as Receive[keyof Receive][]
 }
 
 interface CQCode {
@@ -79,10 +86,18 @@ export function convertJSONToCQCode(json: CQCode | CQCode[]): string {
   }
 }
 
-export function CQCodeUnescape(str: string): string {
+export function CQCodeDecode(str: string): string {
   return str
     .replace(/&#44;/g, ',')
     .replace(/&#91;/g, '[')
     .replace(/&#93;/g, ']')
     .replace(/&amp;/g, '&')
+}
+
+export function CQCodeEncode(str: string): string {
+  return str
+    .replace(/,/g, '&#44;')
+    .replace(/\[/g, '&#91;')
+    .replace(/]/g, '&#93;')
+    .replace(/&/g, '&amp;')
 }

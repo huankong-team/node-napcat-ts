@@ -443,7 +443,7 @@ export interface GroupMsgEmojiLike {
   notice_type: 'group_msg_emoji_like'
   group_id: number
   user_id: number
-  meta_id: number
+  message_id: number
   likes: { emoji_id: string; count: number }[]
 }
 
@@ -511,6 +511,8 @@ export type EventHandle<T extends keyof AllHandlers> = (context: AllHandlers[T])
 
 export type WSSendParam = {
   // ===================================NAPCAT扩展==============================================
+  ArkShareGroup: { group_id: string } | { user_id: string; phoneNumber?: string }
+  ArkSharePeer: { group_id: string }
   reboot_normal: { delay?: number }
   get_robot_uin_range: {}
   set_online_status: { status: number; extStatus: number; batteryStatus: number }
@@ -641,10 +643,15 @@ export type WSSendParam = {
   get_online_clients: { no_cache?: boolean }
   ocr_image: { image: string }
   set_self_profile: { nick: string; longNick: string; sex: number }
+  // create_collection: {}
+  // get_collection_list: {}
+  set_self_longnick: { longNick: string }
 }
 
 export type WSSendReturn = {
   // ===================================NAPCAT扩展==============================================
+  ArkShareGroup: string
+  ArkSharePeer: string
   reboot_normal: {}
   get_robot_uin_range: { minUin: number; maxUin: number }[]
   set_online_status: {}
@@ -1204,6 +1211,8 @@ export type WSSendReturn = {
     }[]
     score: string
   }[]
-  // ==============
-  set_self_profile: { retcode: 0; retmsg: 'success'; data: {} }
+  set_self_profile: { result: 0; errMsg: '' }
+  // create_collection: {}
+  // get_collection_list: {}
+  set_self_longnick: { result: 0; errMsg: '' }
 }

@@ -11,7 +11,7 @@ import type {
   WSSendReturn
 } from './Interfaces.js'
 import { NCEventBus } from './NCEventBus.js'
-import { logger } from './Utils.js'
+import { CQCodeDecode, CQCodeEncode, logger } from './Utils.js'
 
 export class NCWebsocketBase {
   #debug: boolean
@@ -113,7 +113,7 @@ export class NCWebsocketBase {
   #eventMessage(data: RawData) {
     let json
     try {
-      json = JSON.parse(data.toString())
+      json = JSON.parse(CQCodeDecode(data.toString()))
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[event]', 'failed to parse JSON')
       logger.dir(error)
@@ -131,7 +131,7 @@ export class NCWebsocketBase {
   #apiMessage(data: RawData) {
     let json
     try {
-      json = JSON.parse(data.toString())
+      json = JSON.parse(CQCodeDecode(data.toString()))
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[api]', 'failed to parse JSON')
       logger.dir(error)
@@ -213,7 +213,7 @@ export class NCWebsocketBase {
           echo: ''
         })
       } else {
-        this.#apiSocket.send(JSON.stringify(message))
+        this.#apiSocket.send(CQCodeEncode(JSON.stringify(message)))
       }
     })
   }
@@ -257,6 +257,4 @@ export class NCWebsocketBase {
     this.#eventBus.emit(type, context)
     return this
   }
-
-  // ==================Api操作=============================
 }
