@@ -1,4 +1,4 @@
-import { Send, Receive } from './Structs.js'
+import { Receive, Send } from './Structs.js'
 
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
@@ -108,9 +108,20 @@ export interface MetaEventHandler {
 
 // =====================================================================================
 
-// 私聊消息
-export interface PrivateMessage {
+export type ArrayMessage = {
+  message_format: 'array'
+  message: Receive[keyof Receive][]
+}
+
+export type StringMessage = {
   message_format: 'string'
+  message: string
+}
+
+export type MessageType = StringMessage | ArrayMessage
+
+// 私聊消息
+export type PrivateMessage = {
   time: number
   self_id: number
   user_id: number
@@ -126,13 +137,11 @@ export interface PrivateMessage {
   raw_message: string
   font: number
   sub_type: 'friend'
-  message: Receive[keyof Receive][]
   post_type: 'message'
-}
+} & MessageType
 
 // 群消息
-export interface GroupMessage {
-  message_format: 'string'
+export type GroupMessage = {
   time: number
   self_id: number
   user_id: number
@@ -149,10 +158,9 @@ export interface GroupMessage {
   raw_message: string
   font: number
   sub_type: 'normal'
-  message: Receive[keyof Receive][]
   post_type: 'message'
   group_id: number
-}
+} & MessageType
 
 export interface MessageHandler {
   'message.private': PrivateMessage
@@ -162,8 +170,7 @@ export interface MessageHandler {
 
 // =====================================================================================
 
-export interface PrivateMessageSelf {
-  message_format: 'string'
+export type PrivateMessageSelf = {
   time: number
   self_id: number
   user_id: number
@@ -179,12 +186,10 @@ export interface PrivateMessageSelf {
   raw_message: string
   font: number
   sub_type: 'friend'
-  message: Receive[keyof Receive][]
   post_type: 'message_sent'
-}
+} & MessageType
 
-export interface GroupMessageSelf {
-  message_format: 'string'
+export type GroupMessageSelf = {
   self_id: number
   user_id: number
   time: number
@@ -201,10 +206,9 @@ export interface GroupMessageSelf {
   raw_message: string
   font: number
   sub_type: 'normal'
-  message: Receive[keyof Receive][]
   post_type: 'message_sent'
   group_id: number
-}
+} & MessageType
 
 export interface MessageSentHandler {
   'message_sent.private': PrivateMessageSelf
@@ -851,10 +855,8 @@ export type WSSendReturn = {
     real_id: number
     raw_message: string
     font: number
-    message_format: 'string'
     post_type: 'message'
-    message: Receive[keyof Receive][]
-  }
+  } & MessageType
   send_msg: { message_id: number }
   send_group_msg: { message_id: number }
   send_private_msg: { message_id: number }
@@ -1094,9 +1096,8 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      message_format: 'string'
       post_type: 'message'
-    })[]
+    } & MessageType)[]
   }
   get_forward_msg: {
     messages: ((
@@ -1129,9 +1130,8 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      message_format: 'string'
       post_type: 'message'
-    })[]
+    } & MessageType)[]
   }
   get_friend_msg_history: {
     messages: ((
@@ -1164,9 +1164,8 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      message_format: 'string'
       post_type: 'message'
-    })[]
+    } & MessageType)[]
   }
   get_group_system_msg: {
     invited_requests: {
