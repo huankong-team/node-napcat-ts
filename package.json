@@ -1,6 +1,6 @@
 {
   "name": "node-napcat-ts",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "napcat SDK for Node",
   "license": "MIT",
   "type": "module",
@@ -17,7 +17,16 @@
     "typescript",
     "napcat"
   ],
-  "author": "huan_kong",
+  "author": {
+    "name": "huankong233",
+    "url": "https://github.com/huankong233"
+  },
+  "contributors": [
+    {
+      "name": "kanocence",
+      "url": "https://github.com/kanocence"
+    }
+  ],
   "repository": "https://github.com/huankong233/node-napcat-ts.git",
   "scripts": {
     "build": "tsc",
