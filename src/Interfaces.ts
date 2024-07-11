@@ -832,7 +832,6 @@ export type WSSendReturn = {
           card: string
         }
         sub_type: 'friend'
-        message: Receive[keyof Receive][]
       }
     | {
         message_type: 'group'
@@ -844,7 +843,6 @@ export type WSSendReturn = {
           role: 'owner' | 'admin' | 'member'
         }
         sub_type: 'normal'
-        message: Receive[keyof Receive][]
       }
   ) & {
     self_id: number
