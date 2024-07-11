@@ -1,4 +1,4 @@
-import { Send } from './Structs.js'
+import { Receive, Send } from './Structs.js'
 
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
@@ -108,9 +108,20 @@ export interface MetaEventHandler {
 
 // =====================================================================================
 
-// 私聊消息
-export interface PrivateMessage {
+export type ArrayMessage = {
+  message_format: 'array'
+  message: Receive[keyof Receive][]
+}
+
+export type StringMessage = {
   message_format: 'string'
+  message: string
+}
+
+export type MessageType = StringMessage | ArrayMessage
+
+// 私聊消息
+export type PrivateMessage = {
   time: number
   self_id: number
   user_id: number
@@ -126,13 +137,11 @@ export interface PrivateMessage {
   raw_message: string
   font: number
   sub_type: 'friend'
-  message: string
   post_type: 'message'
-}
+} & MessageType
 
 // 群消息
-export interface GroupMessage {
-  message_format: 'string'
+export type GroupMessage = {
   time: number
   self_id: number
   user_id: number
@@ -149,10 +158,9 @@ export interface GroupMessage {
   raw_message: string
   font: number
   sub_type: 'normal'
-  message: string
   post_type: 'message'
   group_id: number
-}
+} & MessageType
 
 export interface MessageHandler {
   'message.private': PrivateMessage
@@ -162,8 +170,7 @@ export interface MessageHandler {
 
 // =====================================================================================
 
-export interface PrivateMessageSelf {
-  message_format: 'string'
+export type PrivateMessageSelf = {
   time: number
   self_id: number
   user_id: number
@@ -179,12 +186,10 @@ export interface PrivateMessageSelf {
   raw_message: string
   font: number
   sub_type: 'friend'
-  message: string
   post_type: 'message_sent'
-}
+} & MessageType
 
-export interface GroupMessageSelf {
-  message_format: 'string'
+export type GroupMessageSelf = {
   self_id: number
   user_id: number
   time: number
@@ -201,10 +206,9 @@ export interface GroupMessageSelf {
   raw_message: string
   font: number
   sub_type: 'normal'
-  message: string
   post_type: 'message_sent'
   group_id: number
-}
+} & MessageType
 
 export interface MessageSentHandler {
   'message_sent.private': PrivateMessageSelf
@@ -542,11 +546,11 @@ export type WSSendParam = {
   get_group_member_list: { group_id: number; no_cache?: boolean }
   get_msg: { message_id: number }
   send_msg: ({ user_id: number } | { group_id: number }) & {
-    message: string | Send['node'][]
+    message: string | Send[keyof Send][]
     auto_escape?: boolean
   }
-  send_group_msg: { group_id: number; message: string | Send['node'][]; auto_escape?: boolean }
-  send_private_msg: { user_id: number; message: string | Send['node'][]; auto_escape?: boolean }
+  send_group_msg: { group_id: number; message: string | Send[keyof Send][]; auto_escape?: boolean }
+  send_private_msg: { user_id: number; message: string | Send[keyof Send][]; auto_escape?: boolean }
   delete_msg: { message_id: number }
   set_msg_emoji_like: { message_id: number; emoji_id: string }
   set_group_add_request: { flag: string; approve?: boolean; reason?: string }
@@ -856,9 +860,8 @@ export type WSSendReturn = {
     real_id: number
     raw_message: string
     font: number
-    message_format: 'string'
     post_type: 'message'
-  }
+  } & MessageType
   send_msg: { message_id: number }
   send_group_msg: { message_id: number }
   send_private_msg: { message_id: number }
@@ -1098,9 +1101,8 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      message_format: 'string'
       post_type: 'message'
-    })[]
+    } & MessageType)[]
   }
   get_forward_msg: {
     messages: ((
@@ -1133,9 +1135,8 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      message_format: 'string'
       post_type: 'message'
-    })[]
+    } & MessageType)[]
   }
   get_friend_msg_history: {
     messages: ((
@@ -1168,9 +1169,8 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      message_format: 'string'
       post_type: 'message'
-    })[]
+    } & MessageType)[]
   }
   get_group_system_msg: {
     invited_requests: {
