@@ -230,7 +230,7 @@ export interface Send {
     type: 'node'
     data:
       | {
-          content: string
+          content: string | Send[keyof Send][]
         }
       | {
           id: number

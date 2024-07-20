@@ -113,7 +113,8 @@ export class NCWebsocketBase {
   #eventMessage(data: RawData) {
     let json
     try {
-      json = JSON.parse(CQCodeDecode(data.toString()))
+      json = JSON.parse(data.toString())
+      if (json.message_format === 'string') json.message = CQCodeDecode(json.message)
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[event]', 'failed to parse JSON')
       logger.dir(error)
@@ -131,7 +132,8 @@ export class NCWebsocketBase {
   #apiMessage(data: RawData) {
     let json
     try {
-      json = JSON.parse(CQCodeDecode(data.toString()))
+      json = JSON.parse(data.toString())
+      if (json.message_format === 'string') json.message = CQCodeDecode(json.message)
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[api]', 'failed to parse JSON')
       logger.dir(error)
@@ -213,7 +215,7 @@ export class NCWebsocketBase {
           echo: ''
         })
       } else {
-        this.#apiSocket.send(CQCodeEncode(JSON.stringify(message)))
+        this.#apiSocket.send(JSON.stringify(message))
       }
     })
   }
