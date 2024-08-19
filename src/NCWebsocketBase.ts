@@ -7,19 +7,20 @@ import type {
   NCWebsocketOptions,
   ResponseHandler,
   WSErrorRes,
+  WSReconnection,
   WSSendParam,
   WSSendReturn
 } from './Interfaces.js'
 import { NCEventBus } from './NCEventBus.js'
-import { CQCodeDecode, CQCodeEncode, logger } from './Utils.js'
+import { convertCQCodeToJSON, CQCodeDecode, logger } from './Utils.js'
 
 export class NCWebsocketBase {
   #debug: boolean
 
   #baseUrl: string
   #accessToken: string
-  #eventSocket?: WebSocket
-  #apiSocket?: WebSocket
+  #reconnection: WSReconnection
+  #socket?: WebSocket
 
   #eventBus: NCEventBus
   #echoMap: Map<string, ResponseHandler>
@@ -42,6 +43,10 @@ export class NCWebsocketBase {
       )
     }
 
+    // 整理重连参数
+    const { enable = true, attempts = 10, delay = 5000 } = NCWebsocketOptions.reconnection ?? {}
+    this.#reconnection = { enable, attempts, delay, nowAttempts: 1 }
+
     this.#debug = debug
     this.#eventBus = new NCEventBus(this.#debug)
     this.#echoMap = new Map()
@@ -50,13 +55,39 @@ export class NCWebsocketBase {
   // ==================WebSocket操作=============================
 
   connect() {
-    this.connectEvent()
-    this.connectApi()
+    this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
+    this.#socket = new WebSocket(`${this.#baseUrl}/event?access_token=${this.#accessToken}`)
+      .on('open', () => {
+        this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
+        this.#reconnection.nowAttempts = 1
+      })
+      .on('close', (code, reason) => {
+        this.#eventBus.emit('socket.close', {
+          code,
+          reason: reason.toString(),
+          reconnection: this.#reconnection
+        })
+        this.#socket = undefined
+        if (
+          this.#reconnection.enable &&
+          this.#reconnection.nowAttempts < this.#reconnection.attempts
+        ) {
+          this.#reconnection.nowAttempts++
+          setTimeout(this.reconnect.bind(this), this.#reconnection.delay)
+        }
+      })
+      .on('message', (data) => this.#message(data))
+      .on('error', (data: WSErrorRes) => {
+        data.reconnection = this.#reconnection
+        this.#eventBus.emit('socket.error', data)
+      })
   }
 
   disconnect() {
-    this.disconnectEvent()
-    this.disconnectApi()
+    if (this.#socket !== undefined) {
+      this.#socket.close(1000)
+      this.#socket = undefined
+    }
   }
 
   reconnect() {
@@ -64,98 +95,41 @@ export class NCWebsocketBase {
     this.connect()
   }
 
-  connectEvent() {
-    this.#eventBus.emit('socket.eventConnecting', undefined)
-    this.#eventSocket = new WebSocket(`${this.#baseUrl}/event?access_token=${this.#accessToken}`)
-      .on('open', () => this.#eventBus.emit('socket.eventOpen', undefined))
-      .on('close', (code, reason) => {
-        this.#eventBus.emit('socket.eventClose', {
-          code,
-          reason: reason.toString()
-        })
-        this.#eventSocket = undefined
-      })
-      .on('message', (data) => this.#eventMessage(data))
-      .on('error', (data: WSErrorRes) => this.#eventBus.emit('socket.eventError', data))
-  }
-
-  connectApi() {
-    this.#eventBus.emit('socket.apiConnecting', undefined)
-    this.#apiSocket = new WebSocket(`${this.#baseUrl}/api?access_token=${this.#accessToken}`)
-      .on('open', () => {
-        this.#eventBus.emit('socket.apiOpen', undefined)
-      })
-      .on('close', (code, reason) => {
-        this.#eventBus.emit('socket.apiClose', {
-          code,
-          reason: reason.toString()
-        })
-        this.#apiSocket = undefined
-      })
-      .on('message', (data) => this.#apiMessage(data))
-      .on('error', (data: WSErrorRes) => this.#eventBus.emit('socket.apiError', data))
-  }
-
-  disconnectEvent() {
-    if (this.#eventSocket !== undefined) {
-      this.#eventSocket.close(1000)
-      this.#eventSocket = undefined
-    }
-  }
-
-  disconnectApi() {
-    if (this.#apiSocket !== undefined) {
-      this.#apiSocket.close(1000)
-      this.#apiSocket = undefined
-    }
-  }
-
-  #eventMessage(data: RawData) {
+  #message(data: RawData) {
     let json
     try {
       json = JSON.parse(data.toString())
-      if (json.message_format === 'string') json.message = CQCodeDecode(json.message)
-    } catch (error) {
-      logger.warn('[node-napcat-ts]', '[event]', 'failed to parse JSON')
-      logger.dir(error)
-      return
-    }
-
-    if (this.#debug) {
-      logger.debug('[node-napcat-ts]', '[event]', 'receive data')
-      logger.dir(json)
-    }
-
-    this.#eventBus.parseMessage(json)
-  }
-
-  #apiMessage(data: RawData) {
-    let json
-    try {
-      json = JSON.parse(data.toString())
-      if (json.message_format === 'string') json.message = CQCodeDecode(json.message)
-    } catch (error) {
-      logger.warn('[node-napcat-ts]', '[api]', 'failed to parse JSON')
-      logger.dir(error)
-      return
-    }
-
-    if (this.#debug) {
-      logger.debug('[node-napcat-ts]', '[api]', 'receive data')
-      logger.dir(json)
-    }
-
-    const handler = this.#echoMap.get(json.echo)
-
-    if (handler) {
-      if (json.retcode === 0) {
-        handler.onSuccess(json)
-      } else {
-        handler.onFailure(json)
+      if (json.message_format === 'string') {
+        json = JSON.parse(CQCodeDecode(json))
+        json.message = convertCQCodeToJSON(json.message)
+        json.message_format = 'array'
       }
+    } catch (error) {
+      logger.warn('[node-napcat-ts]', '[socket]', 'failed to parse JSON')
+      logger.dir(error)
+      return
     }
 
-    this.#eventBus.emit('api.response', json)
+    if (this.#debug) {
+      logger.debug('[node-napcat-ts]', '[socket]', 'receive data')
+      logger.dir(json)
+    }
+
+    if (json.echo) {
+      const handler = this.#echoMap.get(json.echo)
+
+      if (handler) {
+        if (json.retcode === 0) {
+          this.#eventBus.emit('api.response.success', json)
+          handler.onSuccess(json)
+        } else {
+          this.#eventBus.emit('api.response.failure', json)
+          handler.onFailure(json)
+        }
+      }
+    } else {
+      this.#eventBus.parseMessage(json)
+    }
   }
 
   // ==================事件绑定=============================
@@ -165,7 +139,7 @@ export class NCWebsocketBase {
    * @param method API 端点
    * @param params 请求参数
    */
-  send<T extends keyof WSSendParam>(method: T, params: WSSendParam[T]): Promise<WSSendReturn[T]> {
+  send<T extends keyof WSSendParam>(method: T, params: WSSendParam[T]) {
     const echo = randomUUID({ disableEntropyCache: true })
 
     const message: APIRequest<T> = {
@@ -179,7 +153,7 @@ export class NCWebsocketBase {
       logger.dir(message)
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<WSSendReturn[T]>((resolve, reject) => {
       const onSuccess = (response: any) => {
         this.#echoMap.delete(echo)
         return resolve(response.data)
@@ -198,7 +172,7 @@ export class NCWebsocketBase {
 
       this.#eventBus.emit('api.preSend', message)
 
-      if (this.#apiSocket === undefined) {
+      if (this.#socket === undefined) {
         reject({
           status: 'failed',
           retcode: -1,
@@ -206,7 +180,7 @@ export class NCWebsocketBase {
           message: 'api socket is not connected',
           echo: ''
         })
-      } else if (this.#apiSocket.readyState === WebSocket.CLOSING) {
+      } else if (this.#socket.readyState === WebSocket.CLOSING) {
         reject({
           status: 'failed',
           retcode: -1,
@@ -215,7 +189,7 @@ export class NCWebsocketBase {
           echo: ''
         })
       } else {
-        this.#apiSocket.send(JSON.stringify(message))
+        this.#socket.send(JSON.stringify(message))
       }
     })
   }

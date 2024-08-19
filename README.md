@@ -1,12 +1,16 @@
 # node-napcat-ts
 
-安装:
+对于 `CQCode` 兼容性不会做保证,请尽快迁移到 `消息段` !!!
+
+## 使用
+
+### 安装
 
 ```bash
-npm i node-napcat-ts
+pnpm i node-napcat-ts
 ```
 
-开始使用:
+### 开始使用
 
 ```typescript
 import { NCWebsocket } from "node-napcat-ts"
