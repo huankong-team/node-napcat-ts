@@ -39,15 +39,13 @@ napcat.on("message", (msg) => {
 
 ## 文档
 
-可查看 `napcat` 的[文档](https://napneko.github.io/zh-CN/develop/api)
+有关部分:
 
-有在 `napcat` 文档中写明支持的事件基本都支持
+- `napcat` 的 [文档](https://napneko.github.io/zh-CN)
+- `go-cqhttp` 的 [文档](https://docs.go-cqhttp.org)
+- `onebot11` 的 [文档](https://github.com/botuniverse/onebot-11)
 
 ### 事件
-
-可参考 `go-cqhttp` 的[事件文档](https://docs.go-cqhttp.org/event/)
-
-可参考 `onebot11` 的[事件文档](https://github.com/botuniverse/onebot-11/blob/master/event/README.md)
 
 可用 `on` 监听到的相关事件
 
@@ -144,11 +142,7 @@ napcat.on("message", (msg) => {
 
 ### API
 
-可参考 `go-cqhttp` 的[Api 文档](https://docs.go-cqhttp.org/api)
-
-可参考 `onebot11` 的[Api 文档](https://github.com/botuniverse/onebot-11/blob/master/api/README.md)
-
-#### `send` - 基本方法 以下请求都是用这个方法发送的
+#### 可用方法
 
 ##### napcat扩展接口
 
