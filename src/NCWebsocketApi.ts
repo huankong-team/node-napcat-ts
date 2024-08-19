@@ -3,8 +3,8 @@ import { NCWebsocketBase } from './NCWebsocketBase.js'
 import { CQCodeEncode } from './Utils.js'
 
 export class NCWebsocketApi extends NCWebsocketBase {
-  reboot_normal(params: WSSendParam['reboot_normal']) {
-    return this.send('reboot_normal', params)
+  reboot_normal(params?: WSSendParam['reboot_normal']) {
+    return this.send('reboot_normal', params ?? {})
   }
 
   get_robot_uin_range() {
@@ -61,10 +61,6 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   del_group_file_folder(params: WSSendParam['del_group_file_folder']) {
     return this.send('del_group_file_folder', params)
-  }
-
-  reboot(params: WSSendParam['reboot']) {
-    return this.send('reboot', params)
   }
 
   send_like(params: WSSendParam['send_like']) {
@@ -248,10 +244,6 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('mark_msg_as_read', params)
   }
 
-  get_guild_list() {
-    return this.send('get_guild_list', {})
-  }
-
   mark_private_msg_as_read(params: WSSendParam['mark_private_msg_as_read']) {
     return this.send('mark_private_msg_as_read', params)
   }
@@ -294,5 +286,57 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   set_self_profile(params: WSSendParam['set_self_profile']) {
     return this.send('set_self_profile', params)
+  }
+
+  create_collections(params: WSSendParam['create_collection']) {
+    return this.send('create_collection', params)
+  }
+
+  get_collection_list(params: WSSendParam['get_collection_list']) {
+    return this.send('get_collection_list', params)
+  }
+
+  set_self_longnick(params: WSSendParam['set_self_longnick']) {
+    return this.send('set_self_longnick', params)
+  }
+
+  set_essence_msg(params: WSSendParam['set_essence_msg']) {
+    return this.send('set_essence_msg', params)
+  }
+
+  delete_essence_msg(params: WSSendParam['delete_essence_msg']) {
+    return this.send('delete_essence_msg', params)
+  }
+
+  get_recent_contact(params?: WSSendParam['get_recent_contact']) {
+    return this.send('get_recent_contact', params ?? {})
+  }
+
+  _mark_all_as_read() {
+    return this.send('_mark_all_as_read', {})
+  }
+
+  get_profile_like() {
+    return this.send('get_profile_like', {})
+  }
+
+  set_group_head(params: WSSendParam['set_group_head']) {
+    return this.send('set_group_head', params)
+  }
+
+  fetch_custom_face() {
+    return this.send('fetch_custom_face', {})
+  }
+
+  upload_private_file(params: WSSendParam['upload_private_file']) {
+    return this.send('upload_private_file', params)
+  }
+
+  fetch_emoji_like(params: WSSendParam['fetch_emoji_like']) {
+    return this.send('fetch_emoji_like', params)
+  }
+
+  set_input_status(params: WSSendParam['set_input_status']) {
+    return this.send('set_input_status', params)
   }
 }

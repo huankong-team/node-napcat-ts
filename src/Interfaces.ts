@@ -555,7 +555,7 @@ export type WSSendParam = {
   del_group_file: { group_id: number; file_id: string }
   del_group_file_folder: { group_id: number; folder_id: string }
   // ===================================ONEBOT接口==============================================
-  reboot: { delay?: number }
+  // reboot: { delay?: number }
   send_like: { user_id: number; times: number }
   get_login_info: {}
   get_friend_list: {}
@@ -644,7 +644,6 @@ export type WSSendParam = {
   }
   get_stranger_info: { user_id: number }
   mark_msg_as_read: { message_id: number }
-  get_guild_list: {}
   mark_private_msg_as_read: { user_id: number }
   mark_group_msg_as_read: { group_id: number }
   upload_group_file: {
@@ -666,9 +665,28 @@ export type WSSendParam = {
   get_online_clients: { no_cache?: boolean }
   ocr_image: { image: string }
   set_self_profile: { nick: string; longNick: string; sex: number }
-  // create_collection: {}
-  // get_collection_list: {}
+  create_collection: { type: string; brief: string }
+  get_collection_list: { category: number; count: number }
   set_self_longnick: { longNick: string }
+  set_essence_msg: { message_id: number }
+  delete_essence_msg: { message_id: number }
+  get_recent_contact: { count?: number }
+  _mark_all_as_read: {}
+  get_profile_like: {}
+  set_group_head: { file: string; groupCode: number }
+  fetch_custom_face: {}
+  upload_private_file: { user_id: number; file: string; name: string }
+  fetch_emoji_like: {
+    user_id?: string
+    group_id?: string
+    emojiId: string
+    emojiType: string
+    message_id: number
+    count?: number
+  }
+  // get_guild_service_profile: {}
+  // _set_model_show: {}
+  set_input_status: ({ group_id: string } | { user_id: string }) & { eventType: string }
 }
 
 export type WSSendReturn = {
@@ -785,7 +803,7 @@ export type WSSendReturn = {
   del_group_file: {}
   del_group_file_folder: {}
   // ===================================ONEBOT接口==============================================
-  reboot: {}
+  // reboot: {}
   send_like: {}
   get_login_info: { user_id: number; nickname: string }
   get_friend_list: {
@@ -879,7 +897,7 @@ export type WSSendReturn = {
     real_id: number
     raw_message: string
     font: number
-    post_type: 'message'
+    post_type: 'message' | 'message_sent'
   } & MessageType
   send_msg: { message_id: number }
   send_group_msg: { message_id: number }
@@ -1084,7 +1102,6 @@ export type WSSendReturn = {
     level: number
   }
   mark_msg_as_read: {}
-  get_guild_list: {}
   mark_private_msg_as_read: {}
   mark_group_msg_as_read: {}
   upload_group_file: {}
@@ -1120,7 +1137,7 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      post_type: 'message'
+      post_type: 'message' | 'message_sent'
     } & MessageType)[]
   }
   get_forward_msg: {
@@ -1154,7 +1171,7 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      post_type: 'message'
+      post_type: 'message' | 'message_sent'
     } & MessageType)[]
   }
   get_friend_msg_history: {
@@ -1188,7 +1205,7 @@ export type WSSendReturn = {
       real_id: number
       raw_message: string
       font: number
-      post_type: 'message'
+      post_type: 'message' | 'message_sent'
     } & MessageType)[]
   }
   get_group_system_msg: {
@@ -1231,7 +1248,88 @@ export type WSSendReturn = {
     score: string
   }[]
   set_self_profile: { result: 0; errMsg: '' }
-  // create_collection: {}
-  // get_collection_list: {}
+  create_collection: {}
+  get_collection_list: {}
   set_self_longnick: { result: 0; errMsg: '' }
+  set_essence_msg: { errCode: 0; errMsg: 'success' }
+  delete_essence_msg: { errCode: 0; errMsg: 'success' }
+  get_recent_contact: {
+    lastestMsg: (
+      | {
+          message_type: 'private'
+          sender: {
+            user_id: number
+            nickname: string
+            card: string
+          }
+          sub_type: 'friend'
+        }
+      | {
+          message_type: 'group'
+          group_id: number
+          sender: {
+            user_id: number
+            nickname: string
+            card: string
+            role: 'owner' | 'admin' | 'member'
+          }
+          sub_type: 'normal'
+        }
+    ) & {
+      self_id: number
+      user_id: number
+      time: number
+      raw_message: string
+      font: number
+      post_type: 'message_sent' | 'message'
+    } & MessageType
+    peerUin: string
+    remark: string
+    msgTime: string
+    chatType: number
+    msgId: string
+    sendNickName: string
+    sendMemberName: string
+    peerName: string
+  }[]
+  _mark_all_as_read: {}
+  get_profile_like: {
+    uid: string
+    src: number
+    latestTime: number
+    count: number
+    giftCount: number
+    customId: number
+    lastCharged: number
+    bAvailableCnt: number
+    bTodayVotedCnt: number
+    nick: string
+    gender: number
+    age: number
+    isFriend: boolean
+    isvip: boolean
+    isSvip: boolean
+    uin: number
+  }[]
+  set_group_head: {
+    result: 0
+    errMsg: 'success'
+  }
+  fetch_custom_face: string[]
+  upload_private_file: {}
+  fetch_emoji_like: {
+    result: number
+    errMsg: string
+    emojiLikesList: {
+      tinyId: string
+      nickName: string
+      headUrl: string
+    }[]
+    cookie: string
+    isLastPage: boolean
+    isFirstPage: boolean
+  }
+  // get_guild_service_profile: {}
+  // _set_model_show: {}
+  set_input_status: {}
 }
