@@ -1,12 +1,14 @@
 # node-napcat-ts
 
-安装:
+## 使用
+
+### 安装
 
 ```bash
-npm i node-napcat-ts
+pnpm i node-napcat-ts
 ```
 
-开始使用:
+### 开始使用
 
 ```typescript
 import { NCWebsocket } from 'node-napcat-ts'

@@ -3,6 +3,11 @@ import { Receive, Send } from './Structs.js'
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
   accessToken?: string
+  reconnection?: {
+    enable?: boolean
+    attempts?: number
+    delay?: number
+  }
 }
 
 export interface NCWebsocketOptionsHost {
@@ -10,6 +15,11 @@ export interface NCWebsocketOptionsHost {
   host: string
   port: number
   accessToken?: string
+  reconnection?: {
+    enable?: boolean
+    attempts?: number
+    delay?: number
+  }
 }
 
 export type NCWebsocketOptions = NCWebsocketOptionsBaseUrl | NCWebsocketOptionsHost
@@ -19,6 +29,7 @@ export type NCWebsocketOptions = NCWebsocketOptionsBaseUrl | NCWebsocketOptionsH
 export interface WSCloseRes {
   code: number
   reason: string
+  reconnection: WSReconnection
 }
 
 export interface WSErrorRes {
@@ -27,17 +38,21 @@ export interface WSErrorRes {
   syscall: string
   address: string
   port: number
+  reconnection: WSReconnection
+}
+
+export interface WSReconnection {
+  enable: boolean
+  attempts: number
+  delay: number
+  nowAttempts: number
 }
 
 export interface SocketHandler {
-  'socket.eventConnecting': void
-  'socket.apiConnecting': void
-  'socket.eventOpen': void
-  'socket.apiOpen': void
-  'socket.eventClose': WSCloseRes
-  'socket.apiClose': WSCloseRes
-  'socket.eventError': WSErrorRes
-  'socket.apiError': WSErrorRes
+  'socket.connecting': { reconnection: WSReconnection }
+  'socket.open': { reconnection: WSReconnection }
+  'socket.close': WSCloseRes
+  'socket.error': WSErrorRes
   socket: void | WSCloseRes | WSErrorRes
 }
 
@@ -66,13 +81,15 @@ export interface APIErrorResponse {
 }
 
 export interface ResponseHandler {
-  onSuccess: (response: APISuccessResponse<keyof WSSendParam>) => void
+  onSuccess: (response: APISuccessResponse<keyof WSSendReturn>) => void
   onFailure: (reason: APIErrorResponse) => void
   message: APIRequest<keyof WSSendParam>
 }
 
 export interface ApiHandler {
   'api.preSend': APIRequest<keyof WSSendParam>
+  'api.response.success': APISuccessResponse<keyof WSSendReturn>
+  'api.response.failure': APIErrorResponse
   'api.response': APISuccessResponse<keyof WSSendReturn> | APIErrorResponse
   api: APIRequest<keyof WSSendParam> | APISuccessResponse<keyof WSSendReturn> | APIErrorResponse
 }

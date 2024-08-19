@@ -191,6 +191,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
   }
 
   '.handle_quick_operation' = (params: WSSendParam['.handle_quick_operation']) => {
+    if ('reply' in params && typeof params.reply === 'string') {
+      params.reply = CQCodeEncode(params.reply)
+    }
     return this.send('.handle_quick_operation', params)
   }
 

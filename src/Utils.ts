@@ -1,7 +1,3 @@
-import { Receive } from './Structs.js'
-
-export const getTime = () => new Date().toLocaleString()
-
 export const logger = {
   log: (...args: any[]) => {
     console.log(`[${getTime()}]`, ...args)
@@ -17,72 +13,68 @@ export const logger = {
   }
 }
 
+export const getTime = () => new Date().toLocaleString()
+
 export const SPLIT = /(?=\[CQ:)|(?<=])/
 export const CQ_TAG_REGEXP = /^\[CQ:([a-z]+)(?:,([^\]]+))?]$/
-export const CQ_TAG_JSON_REGEXP = /^\[CQ:json,data=(\{.*\})\]$/
+
+interface Struct {
+  type: string
+  data: {
+    [k: string]: any
+  }
+}
 
 /**
  * CQ码转JSON
  */
-export function convertCQCodeToJSON(msg: string) {
-  msg = CQCodeDecode(msg)
-  let msgArr: string[] = []
-  msg.split(SPLIT).forEach((value) => {
-    if (value.at(0) !== '[' && value.at(value.length - 1) === ']' && msgArr.length > 0) {
-      msgArr[msgArr.length - 1] += value
-    } else {
-      msgArr.push(value)
-    }
-  })
+export function convertCQCodeToJSON(msg: string): Struct[] {
+  return CQCodeDecode(msg)
+    .split(SPLIT)
+    .map((tagStr) => {
+      const match = CQ_TAG_REGEXP.exec(tagStr)
+      if (match === null) return { type: 'text', data: { text: tagStr } }
 
-  return msgArr.map((tagStr) => {
-    const json = CQ_TAG_JSON_REGEXP.exec(tagStr)
-    if (json !== null) return { type: 'json', data: { data: json[1] } }
+      const [, tagName, value] = match
+      if (value === undefined) return { type: tagName, data: {} }
 
-    const match = CQ_TAG_REGEXP.exec(tagStr)
-    if (match === null) return { type: 'text', data: { text: tagStr } }
+      const data = Object.fromEntries(
+        value.split(',').map((item) => {
+          const [key, v] = item.split('=')
+          let value = {}
+          if (tagName === 'json') {
+            try {
+              value = JSON.parse(v)
+            } catch (error) {
+              value = v
+            }
+          } else {
+            const num = parseFloat(v)
+            value = !isNaN(num) ? num : v
+          }
+          return [key, value]
+        })
+      )
 
-    const [, tagName, value] = match
-    if (value === undefined) return { type: tagName, data: {} }
-
-    const data = Object.fromEntries(
-      value.split(',').map((v) => {
-        const index = v.indexOf('=')
-        const key = v.slice(0, index)
-        let value: string | number = v.slice(index + 1)
-        if (!isNaN(parseInt(value))) {
-          value = parseInt(value)
-        }
-        return [key, value]
-      })
-    )
-
-    return { type: tagName, data }
-  }) as Receive[keyof Receive][]
+      return { type: tagName, data }
+    })
 }
 
-interface CQCode {
-  type: string
-  data: {
-    [k: string]: string
-  }
+const _conver = (json: any) => {
+  if (json.type === 'text') return json.data.text
+  return `[CQ:${json.type}${Object.entries(json.data)
+    .map(([k, v]) => (v ? `,${k}=${v}` : ''))
+    .join('')}]`
 }
 
 /**
  * JSON转CQ码
  */
-export function convertJSONToCQCode(json: CQCode | CQCode[]): string {
-  const conver = (json: any) => {
-    if (json.type === 'text') return json.data.text
-    return `[CQ:${json.type}${Object.entries(json.data)
-      .map(([k, v]) => (v ? `,${k}=${v}` : ''))
-      .join('')}]`
-  }
-
+export function convertJSONToCQCode(json: Struct | Struct[]): string {
   if (Array.isArray(json)) {
-    return json.map((item) => conver(item)).join('')
+    return json.map((item) => _conver(item)).join('')
   } else {
-    return conver(json)
+    return _conver(json)
   }
 }
 

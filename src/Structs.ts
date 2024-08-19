@@ -238,7 +238,7 @@ export interface Send {
   }
 }
 
-export const CQ = {
+export const Structs = {
   text: function (data: Send['text']['data']): Send['text'] {
     return { type: 'text', data }
   },
