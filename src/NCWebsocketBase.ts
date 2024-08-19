@@ -12,7 +12,7 @@ import type {
   WSSendReturn
 } from './Interfaces.js'
 import { NCEventBus } from './NCEventBus.js'
-import { CQCodeDecode, logger } from './Utils.js'
+import { convertCQCodeToJSON, CQCodeDecode, logger } from './Utils.js'
 
 export class NCWebsocketBase {
   #debug: boolean
@@ -99,7 +99,11 @@ export class NCWebsocketBase {
     let json
     try {
       json = JSON.parse(data.toString())
-      if (json.message_format === 'string') json = JSON.parse(CQCodeDecode(json))
+      if (json.message_format === 'string') {
+        json = JSON.parse(CQCodeDecode(json))
+        json.message = convertCQCodeToJSON(json.message)
+        json.message_format = 'array'
+      }
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[socket]', 'failed to parse JSON')
       logger.dir(error)

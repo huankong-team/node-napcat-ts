@@ -35,6 +35,11 @@ bot.on('api.preSend', function (params) {
 bot.on('message', async (context) => {
   console.log('\n收到了一条信息')
   console.dir(context, { depth: null })
+  context.message.forEach((item) => {
+    if (item.type === 'text' && item.data.text === '233') {
+      bot.send_msg({ ...context, message: 'Ciallo～(∠・ω< )⌒☆' })
+    }
+  })
 })
 
 bot.on('notice', async (event) => {
@@ -45,10 +50,6 @@ bot.on('notice', async (event) => {
 bot.on('request', async (event) => {
   console.log('\n收到了一条请求')
   console.dir(event, { depth: null })
-})
-
-bot.on('api.response', (res) => {
-  res.data
 })
 
 bot.connect()

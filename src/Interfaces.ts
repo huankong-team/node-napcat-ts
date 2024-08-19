@@ -130,12 +130,14 @@ export type ArrayMessage = {
   message: Receive[keyof Receive][]
 }
 
-export type StringMessage = {
-  message_format: 'string'
-  message: string
-}
+// export type StringMessage = {
+//   message_format: 'string'
+//   message: string
+// }
 
-export type MessageType = StringMessage | ArrayMessage
+// StringMessage |
+
+export type MessageType = ArrayMessage
 
 // 私聊消息
 export type PrivateMessage = {
