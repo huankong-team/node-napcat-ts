@@ -104,6 +104,7 @@ export class NCWebsocketBase {
         json.message = convertCQCodeToJSON(json.message)
         json.message_format = 'array'
       }
+      json.raw_message = CQCodeDecode(json.raw_message)
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[socket]', 'failed to parse JSON')
       logger.dir(error)
