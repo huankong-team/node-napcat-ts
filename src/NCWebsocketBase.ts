@@ -99,12 +99,14 @@ export class NCWebsocketBase {
     let json
     try {
       json = JSON.parse(data.toString())
-      if (json.message_format === 'string') {
-        json = JSON.parse(CQCodeDecode(json))
-        json.message = convertCQCodeToJSON(json.message)
-        json.message_format = 'array'
+      if (json.post_type === 'message' || json.post_type === 'message_sent') {
+        if (json.message_format === 'string') {
+          json = JSON.parse(CQCodeDecode(json))
+          json.message = convertCQCodeToJSON(json.message)
+          json.message_format = 'array'
+        }
+        json.raw_message = CQCodeDecode(json.raw_message)
       }
-      json.raw_message = CQCodeDecode(json.raw_message)
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[socket]', 'failed to parse JSON')
       logger.dir(error)
