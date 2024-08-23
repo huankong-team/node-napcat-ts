@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto'
 import WebSocket, { type RawData } from 'ws'
 import type {
-  APIRequest,
   AllHandlers,
+  APIRequest,
   EventHandle,
   NCWebsocketOptions,
   ResponseHandler,
@@ -152,7 +152,7 @@ export class NCWebsocketBase {
     }
 
     if (this.#debug) {
-      logger.debug('[node-open-shamrock] send request')
+      logger.debug('[node-open-napcat] send request')
       logger.dir(message)
     }
 
