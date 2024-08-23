@@ -1,18 +1,18 @@
 export interface Receive {
   text: {
-    type: 'text'
+    type: "text"
     data: {
       text: string
     }
   }
   face: {
-    type: 'face'
+    type: "face"
     data: {
       id: number
     }
   }
   mface: {
-    type: 'mface'
+    type: "mface"
     data: {
       summary: string
       url: string
@@ -22,19 +22,19 @@ export interface Receive {
     }
   }
   at: {
-    type: 'at'
+    type: "at"
     data: {
-      qq: number | 'all'
+      qq: number | "all"
     }
   }
   reply: {
-    type: 'reply'
+    type: "reply"
     data: {
       id: number
     }
   }
   image: {
-    type: 'image'
+    type: "image"
     data: {
       file: string
       url: string
@@ -42,7 +42,7 @@ export interface Receive {
     }
   }
   record: {
-    type: 'record'
+    type: "record"
     data: {
       file: string
       path: string
@@ -50,7 +50,7 @@ export interface Receive {
     }
   }
   file: {
-    type: 'file'
+    type: "file"
     data: {
       file: string
       path: string | undefined
@@ -60,7 +60,7 @@ export interface Receive {
     }
   }
   video: {
-    type: 'video'
+    type: "video"
     data: {
       file: string
       path: string
@@ -70,16 +70,16 @@ export interface Receive {
     }
   }
   music: {
-    type: 'music'
+    type: "music"
     data: {
-      type: 'qq' | '163'
+      type: "qq" | "163"
       id: number
     }
   }
   customMusic: {
-    type: 'customMusic'
+    type: "customMusic"
     data: {
-      type: 'custom'
+      type: "custom"
       url: string
       audio: string
       title: string
@@ -88,31 +88,31 @@ export interface Receive {
     }
   }
   json: {
-    type: 'json'
+    type: "json"
     data: any & {
       config: { token: string }
     }
   }
   dice: {
-    type: 'dice'
+    type: "dice"
     data: {
       result: number
     }
   }
   rps: {
-    type: 'rps'
+    type: "rps"
     data: {
       result: number
     }
   }
   markdown: {
-    type: 'markdown'
+    type: "markdown"
     data: {
       content: string
     }
   }
   forward: {
-    type: 'forward'
+    type: "forward"
     data: {
       id: number
     }
@@ -121,31 +121,31 @@ export interface Receive {
 
 export interface Send {
   text: {
-    type: 'text'
+    type: "text"
     data: {
       text: string
     }
   }
   at: {
-    type: 'at'
+    type: "at"
     data: {
-      qq: number | 'all'
+      qq: number | "all"
     }
   }
   reply: {
-    type: 'reply'
+    type: "reply"
     data: {
       id: number
     }
   }
   face: {
-    type: 'face'
+    type: "face"
     data: {
       id: number
     }
   }
   mface: {
-    type: 'mface'
+    type: "mface"
     data: {
       emoji_id: string
       emoji_package_id: number
@@ -154,7 +154,7 @@ export interface Send {
     }
   }
   image: {
-    type: 'image'
+    type: "image"
     data: {
       file: string
       name?: string
@@ -163,14 +163,14 @@ export interface Send {
     }
   }
   file: {
-    type: 'file'
+    type: "file"
     data: {
       file: string
       name?: string
     }
   }
   video: {
-    type: 'video'
+    type: "video"
     data: {
       file: string
       name?: string
@@ -178,47 +178,47 @@ export interface Send {
     }
   }
   miniapp: {
-    type: 'miniapp'
+    type: "miniapp"
     data: any
   }
   record: {
-    type: 'record'
+    type: "record"
     data: {
       file: string
       name?: string
     }
   }
   json: {
-    type: 'json'
+    type: "json"
     data: any
   }
   dice: {
-    type: 'dice'
+    type: "dice"
     data: {
       result: number
     }
   }
   rps: {
-    type: 'rps'
+    type: "rps"
     data: {
       result: number
     }
   }
   markdown: {
-    type: 'markdown'
+    type: "markdown"
     data: {
       content: string
     }
   }
   music: {
-    type: 'music'
+    type: "music"
     data:
       | {
-          type: 'qq' | '163'
+          type: "qq" | "163"
           id: number
         }
       | {
-          type: 'custom'
+          type: "custom"
           url: string
           audio: string
           title: string
@@ -227,7 +227,7 @@ export interface Send {
         }
   }
   node: {
-    type: 'node'
+    type: "node"
     data:
       | {
           content: string | Send[keyof Send][]
@@ -239,52 +239,85 @@ export interface Send {
 }
 
 export const Structs = {
-  text: function (data: Send['text']['data']): Send['text'] {
-    return { type: 'text', data }
+  text: function (text: string): Send["text"] {
+    return {
+      type: "text",
+      data: {
+        text,
+      },
+    }
   },
-  at: function (data: Send['at']['data']): Send['at'] {
-    return { type: 'at', data }
+  at: function (qq: number | "all"): Send["at"] {
+    return {
+      type: "at",
+      data: {
+        qq,
+      },
+    }
   },
-  reply: function (data: Send['reply']['data']): Send['reply'] {
-    return { type: 'reply', data }
+  reply: function (id: number): Send["reply"] {
+    return {
+      type: "reply",
+      data: {
+        id,
+      },
+    }
   },
-  face: function (data: Send['face']['data']): Send['face'] {
-    return { type: 'face', data }
+  face: function (id: number): Send["face"] {
+    return {
+      type: "face",
+      data: {
+        id,
+      },
+    }
   },
-  mface: function (data: Send['mface']['data']): Send['mface'] {
-    return { type: 'mface', data }
+  mface: function (
+    summary: string,
+    emoji_id: string,
+    emoji_package_id: number,
+    key: string
+  ): Send["mface"] {
+    return {
+      type: "mface",
+      data: {
+        summary,
+        emoji_id,
+        emoji_package_id,
+        key,
+      },
+    }
   },
-  image: function (data: Send['image']['data']): Send['image'] {
-    return { type: 'image', data }
+  image: function (data: Send["image"]["data"]): Send["image"] {
+    return { type: "image", data }
   },
-  file: function (data: Send['file']['data']): Send['file'] {
-    return { type: 'file', data }
+  file: function (data: Send["file"]["data"]): Send["file"] {
+    return { type: "file", data }
   },
-  video: function (data: Send['video']['data']): Send['video'] {
-    return { type: 'video', data }
+  video: function (data: Send["video"]["data"]): Send["video"] {
+    return { type: "video", data }
   },
-  miniapp: function (data: Send['miniapp']['data']): Send['miniapp'] {
-    return { type: 'miniapp', data }
+  miniapp: function (data: Send["miniapp"]["data"]): Send["miniapp"] {
+    return { type: "miniapp", data }
   },
-  record: function (data: Send['record']['data']): Send['record'] {
-    return { type: 'record', data }
+  record: function (data: Send["record"]["data"]): Send["record"] {
+    return { type: "record", data }
   },
-  json: function (data: Send['json']['data']): Send['json'] {
-    return { type: 'json', data }
+  json: function (data: Send["json"]["data"]): Send["json"] {
+    return { type: "json", data }
   },
-  dice: function (data: Send['dice']['data']): Send['dice'] {
-    return { type: 'dice', data }
+  dice: function (data: Send["dice"]["data"]): Send["dice"] {
+    return { type: "dice", data }
   },
-  rps: function (data: Send['rps']['data']): Send['rps'] {
-    return { type: 'rps', data }
+  rps: function (data: Send["rps"]["data"]): Send["rps"] {
+    return { type: "rps", data }
   },
-  markdown: function (data: Send['markdown']['data']): Send['markdown'] {
-    return { type: 'markdown', data }
+  markdown: function (data: Send["markdown"]["data"]): Send["markdown"] {
+    return { type: "markdown", data }
   },
-  music: function (data: Send['music']['data']): Send['music'] {
-    return { type: 'music', data }
+  music: function (data: Send["music"]["data"]): Send["music"] {
+    return { type: "music", data }
   },
-  node: function (data: Send['node']['data']): Send['node'] {
-    return { type: 'node', data }
-  }
+  node: function (data: Send["node"]["data"]): Send["node"] {
+    return { type: "node", data }
+  },
 }
