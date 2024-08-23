@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto'
 import WebSocket, { type RawData } from 'ws'
 import type {
-  APIRequest,
   AllHandlers,
+  APIRequest,
   EventHandle,
   NCWebsocketOptions,
   ResponseHandler,
@@ -99,10 +99,13 @@ export class NCWebsocketBase {
     let json
     try {
       json = JSON.parse(data.toString())
-      if (json.message_format === 'string') {
-        json = JSON.parse(CQCodeDecode(json))
-        json.message = convertCQCodeToJSON(json.message)
-        json.message_format = 'array'
+      if (json.post_type === 'message' || json.post_type === 'message_sent') {
+        if (json.message_format === 'string') {
+          json = JSON.parse(CQCodeDecode(json))
+          json.message = convertCQCodeToJSON(json.message)
+          json.message_format = 'array'
+        }
+        json.raw_message = CQCodeDecode(json.raw_message)
       }
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[socket]', 'failed to parse JSON')
@@ -149,7 +152,7 @@ export class NCWebsocketBase {
     }
 
     if (this.#debug) {
-      logger.debug('[node-open-shamrock] send request')
+      logger.debug('[node-open-napcat] send request')
       logger.dir(message)
     }
 
