@@ -1,18 +1,18 @@
 export interface Receive {
   text: {
-    type: 'text'
+    type: "text"
     data: {
       text: string
     }
   }
   face: {
-    type: 'face'
+    type: "face"
     data: {
       id: number
     }
   }
   mface: {
-    type: 'mface'
+    type: "mface"
     data: {
       summary: string
       url: string
@@ -22,19 +22,19 @@ export interface Receive {
     }
   }
   at: {
-    type: 'at'
+    type: "at"
     data: {
-      qq: number | 'all'
+      qq: number | "all"
     }
   }
   reply: {
-    type: 'reply'
+    type: "reply"
     data: {
       id: number
     }
   }
   image: {
-    type: 'image'
+    type: "image"
     data: {
       file: string
       url: string
@@ -42,7 +42,7 @@ export interface Receive {
     }
   }
   record: {
-    type: 'record'
+    type: "record"
     data: {
       file: string
       path: string
@@ -50,7 +50,7 @@ export interface Receive {
     }
   }
   file: {
-    type: 'file'
+    type: "file"
     data: {
       file: string
       path: string | undefined
@@ -60,7 +60,7 @@ export interface Receive {
     }
   }
   video: {
-    type: 'video'
+    type: "video"
     data: {
       file: string
       path: string
@@ -70,16 +70,16 @@ export interface Receive {
     }
   }
   music: {
-    type: 'music'
+    type: "music"
     data: {
-      type: 'qq' | '163'
+      type: "qq" | "163"
       id: number
     }
   }
   customMusic: {
-    type: 'customMusic'
+    type: "customMusic"
     data: {
-      type: 'custom'
+      type: "custom"
       url: string
       audio: string
       title: string
@@ -88,31 +88,31 @@ export interface Receive {
     }
   }
   json: {
-    type: 'json'
+    type: "json"
     data: any & {
       config: { token: string }
     }
   }
   dice: {
-    type: 'dice'
+    type: "dice"
     data: {
       result: number
     }
   }
   rps: {
-    type: 'rps'
+    type: "rps"
     data: {
       result: number
     }
   }
   markdown: {
-    type: 'markdown'
+    type: "markdown"
     data: {
       content: string
     }
   }
   forward: {
-    type: 'forward'
+    type: "forward"
     data: {
       id: number
     }
@@ -121,31 +121,31 @@ export interface Receive {
 
 export interface Send {
   text: {
-    type: 'text'
+    type: "text"
     data: {
       text: string
     }
   }
   at: {
-    type: 'at'
+    type: "at"
     data: {
-      qq: number | 'all'
+      qq: number | "all"
     }
   }
   reply: {
-    type: 'reply'
+    type: "reply"
     data: {
       id: number
     }
   }
   face: {
-    type: 'face'
+    type: "face"
     data: {
       id: number
     }
   }
   mface: {
-    type: 'mface'
+    type: "mface"
     data: {
       emoji_id: string
       emoji_package_id: number
@@ -154,7 +154,7 @@ export interface Send {
     }
   }
   image: {
-    type: 'image'
+    type: "image"
     data: {
       file: string
       name?: string
@@ -163,14 +163,14 @@ export interface Send {
     }
   }
   file: {
-    type: 'file'
+    type: "file"
     data: {
       file: string
       name?: string
     }
   }
   video: {
-    type: 'video'
+    type: "video"
     data: {
       file: string
       name?: string
@@ -178,47 +178,47 @@ export interface Send {
     }
   }
   miniapp: {
-    type: 'miniapp'
+    type: "miniapp"
     data: any
   }
   record: {
-    type: 'record'
+    type: "record"
     data: {
       file: string
       name?: string
     }
   }
   json: {
-    type: 'json'
+    type: "json"
     data: any
   }
   dice: {
-    type: 'dice'
+    type: "dice"
     data: {
       result: number
     }
   }
   rps: {
-    type: 'rps'
+    type: "rps"
     data: {
       result: number
     }
   }
   markdown: {
-    type: 'markdown'
+    type: "markdown"
     data: {
       content: string
     }
   }
   music: {
-    type: 'music'
+    type: "music"
     data:
       | {
-          type: 'qq' | '163'
+          type: "qq" | "163"
           id: number
         }
       | {
-          type: 'custom'
+          type: "custom"
           url: string
           audio: string
           title: string
@@ -227,7 +227,7 @@ export interface Send {
         }
   }
   node: {
-    type: 'node'
+    type: "node"
     data:
       | {
           content: string | Send[keyof Send][]
@@ -239,52 +239,179 @@ export interface Send {
 }
 
 export const Structs = {
-  text: function (data: Send['text']['data']): Send['text'] {
-    return { type: 'text', data }
+  /**
+   * 发送文字消息
+   * @param text 要发送的文字
+   */
+  text: function (text: string): Send["text"] {
+    return {
+      type: "text",
+      data: { text },
+    }
   },
-  at: function (data: Send['at']['data']): Send['at'] {
-    return { type: 'at', data }
+  /**
+   * @某人
+   * @param qq at的QQ号
+   */
+  at: function (qq: number | "all"): Send["at"] {
+    return {
+      type: "at",
+      data: { qq },
+    }
   },
-  reply: function (data: Send['reply']['data']): Send['reply'] {
-    return { type: 'reply', data }
+  /**
+   * 回复消息
+   * @param id 回复的消息id
+   */
+  reply: function (id: number): Send["reply"] {
+    return {
+      type: "reply",
+      data: { id },
+    }
   },
-  face: function (data: Send['face']['data']): Send['face'] {
-    return { type: 'face', data }
+  /**
+   * 发送QQ表情
+   * @param id QQ 表情 ID
+   */
+  face: function (id: number): Send["face"] {
+    return {
+      type: "face",
+      data: { id },
+    }
   },
-  mface: function (data: Send['mface']['data']): Send['mface'] {
-    return { type: 'mface', data }
+  /**
+   *
+   * @param summary
+   * @param emoji_id
+   * @param emoji_package_id
+   * @param key
+   */
+  mface: function (
+    summary: string,
+    emoji_id: string,
+    emoji_package_id: number,
+    key: string
+  ): Send["mface"] {
+    return {
+      type: "mface",
+      data: { summary, emoji_id, emoji_package_id, key },
+    }
   },
-  image: function (data: Send['image']['data']): Send['image'] {
-    return { type: 'image', data }
+  /**
+   * 发送图片
+   * @param file 网络图片地址或者文件路径
+   * @param name 图片名
+   * @param summary
+   * @param subType
+   */
+  image: function (
+    file: string,
+    name?: string,
+    summary?: string,
+    subType?: number
+  ): Send["image"] {
+    return {
+      type: "image",
+      data: { file, name, summary, subType },
+    }
   },
-  file: function (data: Send['file']['data']): Send['file'] {
-    return { type: 'file', data }
+  /**
+   * 发文件
+   * @param file
+   * @param name
+   */
+  file: function (file: string, name?: string): Send["file"] {
+    return {
+      type: "file",
+      data: { file, name },
+    }
   },
-  video: function (data: Send['video']['data']): Send['video'] {
-    return { type: 'video', data }
+  /**
+   * 发视频
+   * @param file 网络视频地址或者文件路径
+   * @param name 视频名
+   * @param thumb
+   */
+  video: function (file: string, name?: string, thumb?: string): Send["video"] {
+    return { type: "video", data: { file, name, thumb } }
   },
-  miniapp: function (data: Send['miniapp']['data']): Send['miniapp'] {
-    return { type: 'miniapp', data }
+  /**
+   * 发小程序？
+   * @param data
+   */
+  miniapp: function (data: Send["miniapp"]["data"]): Send["miniapp"] {
+    return { type: "miniapp", data }
   },
-  record: function (data: Send['record']['data']): Send['record'] {
-    return { type: 'record', data }
+  /**
+   * 发语音
+   * @param file 发送语音的语音文件支持mp3、wav等多种音频格式直接发送
+   * @param name
+   */
+  record: function (file: string, name?: string): Send["record"] {
+    return { type: "record", data: { file, name } }
   },
-  json: function (data: Send['json']['data']): Send['json'] {
-    return { type: 'json', data }
+  /**
+   *  json消息 发送需要自行签名token
+   * @param data
+   */
+  json: function (data: Send["json"]["data"]): Send["json"] {
+    return { type: "json", data }
   },
-  dice: function (data: Send['dice']['data']): Send['dice'] {
-    return { type: 'dice', data }
+  /**
+   * 发送骰子魔法表情
+   * @param result 发送的骰子魔法表情结果？
+   */
+  dice: function (result: number): Send["dice"] {
+    return { type: "dice", data: { result } }
   },
-  rps: function (data: Send['rps']['data']): Send['rps'] {
-    return { type: 'rps', data }
+  /**
+   * 发送猜拳魔法
+   * @param result 发送的猜拳魔法表情结果？
+   */
+  rps: function (result: number): Send["rps"] {
+    return { type: "rps", data: { result } }
   },
-  markdown: function (data: Send['markdown']['data']): Send['markdown'] {
-    return { type: 'markdown', data }
+  /**
+   * ***不支持发送markdown***
+   * @param content
+   */
+  markdown: function (content: string): Send["markdown"] {
+    return { type: "markdown", data: { content } }
   },
-  music: function (data: Send['music']['data']): Send['music'] {
-    return { type: 'music', data }
+  /**
+   * 音乐分享
+   * @param type QQ音乐或网易云音乐QQ音乐传ID发送无须配置 其余需要配置签名服务器
+   * @param id 音乐id
+   */
+  music: function (type: "qq" | "163", id: number): Send["music"] {
+    return { type: "music", data: { type, id } }
   },
-  node: function (data: Send['node']['data']): Send['node'] {
-    return { type: 'node', data }
-  }
+  /**
+   * 分享非qq、网易云音乐
+   * @param type "custom"
+   * @param url 点击后跳转目标 URL
+   * @param audio 音乐 URL
+   * @param title 标题
+   * @param image 发送时可选，内容描述
+   * @param singer 发送时可选，图片 URL
+   * @returns
+   */
+  customMusic: function (
+    type: "custom",
+    url: string,
+    audio: string,
+    title: string,
+    image?: string,
+    singer?: string
+  ): Send["music"] {
+    return { type: "music", data: { type, url, audio, title, image, singer } }
+  },
+  /**
+   * 转发消息？
+   * @param data
+   * @returns
+   */
+  node: function (data: Send["node"]["data"]): Send["node"] {
+    return { type: "node", data }
+  },
 }

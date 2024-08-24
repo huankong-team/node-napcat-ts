@@ -252,8 +252,10 @@ import { Structs } from 'node-napcat-ts'
 napcat.send_msg({
   user_id: 10001,
   message: [
-    Structs.text({ text: '233' }),
-    Structs.image({ file: 'https://baidu.com', name: 'name~' })
+    Structs.text('123'),
+    Structs.at(1111111111),
+    Structs.reply(1111111111),
+    Structs.image('https://baidu.com','name.jgp')
   ]
 })
 ```
