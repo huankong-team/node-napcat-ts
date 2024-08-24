@@ -38,24 +38,7 @@ export function convertCQCodeToJSON(msg: string): Struct[] {
       const [, tagName, value] = match
       if (value === undefined) return { type: tagName, data: {} }
 
-      const data = Object.fromEntries(
-        value.split(',').map((item) => {
-          const [key, v] = item.split('=')
-          let value = {}
-          if (tagName === 'json') {
-            try {
-              value = JSON.parse(v)
-            } catch (error) {
-              value = v
-            }
-          } else {
-            const num = parseFloat(v)
-            value = !isNaN(num) ? num : v
-          }
-          return [key, value]
-        })
-      )
-
+      const data = Object.fromEntries(value.split(',').map((item) => item.split('=')))
       return { type: tagName, data }
     })
 }
