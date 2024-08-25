@@ -3,10 +3,6 @@ import { NCWebsocketBase } from './NCWebsocketBase.js'
 import { CQCodeEncode } from './Utils.js'
 
 export class NCWebsocketApi extends NCWebsocketBase {
-  reboot_normal(params?: WSSendParam['reboot_normal']) {
-    return this.send('reboot_normal', params ?? {})
-  }
-
   get_robot_uin_range() {
     return this.send('get_robot_uin_range', {})
   }
@@ -21,10 +17,6 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   set_qq_avatar(params: WSSendParam['set_qq_avatar']) {
     return this.send('set_qq_avatar', params)
-  }
-
-  debug(params: WSSendParam['debug']) {
-    return this.send('debug', params)
   }
 
   get_file(params: WSSendParam['get_file']) {
@@ -320,8 +312,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('get_profile_like', {})
   }
 
-  set_group_head(params: WSSendParam['set_group_head']) {
-    return this.send('set_group_head', params)
+  set_group_portrait(params: WSSendParam['set_group_portrait']) {
+    return this.send('set_group_portrait', params)
   }
 
   fetch_custom_face() {
@@ -338,5 +330,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   set_input_status(params: WSSendParam['set_input_status']) {
     return this.send('set_input_status', params)
+  }
+
+  _del_group_notice(params: WSSendParam['_del_group_notice']) {
+    return this.send('_del_group_notice', params)
   }
 }

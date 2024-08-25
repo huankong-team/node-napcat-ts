@@ -102,7 +102,7 @@ export interface HeartBeat {
   meta_event_type: 'heartbeat'
   status: {
     online: boolean
-    good: true
+    good: boolean
   }
   // 到下次的间隔
   interval: number
@@ -130,20 +130,13 @@ export type ArrayMessage = {
   message: Receive[keyof Receive][]
 }
 
-// export type StringMessage = {
-//   message_format: 'string'
-//   message: string
-// }
-
-// StringMessage |
-
 export type MessageType = ArrayMessage
 
 // 私聊消息
 export type PrivateMessage = {
-  time: number
   self_id: number
   user_id: number
+  time: number
   message_id: number
   message_seq: number
   real_id: number
@@ -161,9 +154,9 @@ export type PrivateMessage = {
 
 // 群消息
 export type GroupMessage = {
-  time: number
   self_id: number
   user_id: number
+  time: number
   message_id: number
   message_seq: number
   real_id: number
@@ -190,9 +183,9 @@ export interface MessageHandler {
 // =====================================================================================
 
 export type PrivateMessageSelf = {
-  time: number
   self_id: number
   user_id: number
+  time: number
   message_id: number
   message_seq: number
   real_id: number
@@ -242,12 +235,12 @@ export interface RequestGroup {
   time: number
   self_id: number
   post_type: 'request'
-  request_type: 'group'
-  sub_type: 'add' | 'invite'
   group_id: number
   user_id: number
+  request_type: 'group'
   comment: string
   flag: string
+  sub_type: 'add' | 'invite'
 }
 
 // 加好友请求
@@ -282,13 +275,14 @@ export interface GroupRecall {
   time: number
   self_id: number
   post_type: 'notice'
-  notice_type: 'group_recall'
   group_id: number
   user_id: number
+  notice_type: 'group_recall'
   operator_id: number
   message_id: number
 }
 
+// TODO: 收不到
 export interface GroupIncrease {
   time: number
   self_id: number
@@ -304,30 +298,30 @@ export interface GroupDecrease {
   time: number
   self_id: number
   post_type: 'notice'
+  group_id: number
+  user_id: number
   notice_type: 'group_decrease'
   sub_type: 'leave' | 'kick' | 'kick_me'
-  group_id: number
   operator_id: number
-  user_id: number
 }
 
 export interface GroupAdmin {
   time: number
   self_id: number
   post_type: 'notice'
-  notice_type: 'group_admin'
-  sub_type: 'set' | 'unset'
   group_id: number
   user_id: number
+  notice_type: 'group_admin'
+  sub_type: 'set' | 'unset'
 }
 
 export interface GroupUpload {
   time: number
   self_id: number
   post_type: 'notice'
-  notice_type: 'group_upload'
   group_id: number
   user_id: number
+  notice_type: 'group_upload'
   file: {
     id: string
     name: string
@@ -340,12 +334,12 @@ export interface GroupBan {
   time: number
   self_id: number
   post_type: 'notice'
-  notice_type: 'group_ban'
-  sub_type: 'ban' | 'lift_ban'
   group_id: number
-  operator_id: number
   user_id: number
+  notice_type: 'group_ban'
+  operator_id: number
   duration: number
+  sub_type: 'ban' | 'lift_ban'
 }
 
 export interface FriendAdd {
@@ -362,9 +356,12 @@ export interface NotifyPokeFriend {
   post_type: 'notice'
   notice_type: 'notify'
   sub_type: 'poke'
-  sender_id: number
-  user_id: number
   target_id: number
+  user_id: number
+  raw_info: [
+    { col: string; nm: string; type: 'qq'; uid: string },
+    { col: string; nm: string; tp: string; type: 'qq'; uid: string }
+  ]
 }
 
 export interface NotifyPokeGroup {
@@ -373,92 +370,31 @@ export interface NotifyPokeGroup {
   post_type: 'notice'
   notice_type: 'notify'
   sub_type: 'poke'
-  group_id: number
-  user_id: number
   target_id: number
-}
-
-export interface NotifyLuckyKing {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'notify'
-  sub_type: 'lucky_king'
+  user_id: number
   group_id: number
-  user_id: number
-  target_id: number
-}
-
-export interface NotifyHonor {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'notify'
-  sub_type: 'honor'
-  group_id: number
-  honor_type: 'talkative' | 'performer' | 'emotion'
-  user_id: number
-}
-
-export interface NotifyTitle {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'notify'
-  sub_type: 'title'
-  group_id: number
-  user_id: number
-  title: string
-}
-
-export interface GroupCard {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'group_card'
-  group_id: number
-  user_id: number
-  card_new: string
-  card_old: string
-  cardName: string
-}
-
-export interface OfflineFile {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'offline_file'
-  user_id: number
-  file: {
-    name: string
-    size: number
-    url: string
-  }
-}
-
-export interface ClientStatus {
-  post_type: 'notice'
-  notice_type: 'client_status'
-  client: {
-    app_id: number
-    device: string
-    device_kind: string
-  }
-  online: boolean
+  raw_info: [
+    { col: string; nm: string; type: 'qq'; uid: string },
+    { jp: string; src: string; type: 'img' },
+    { txt: string; type: 'nor' },
+    { col: string; nm: string; tp: string; type: 'qq'; uid: string },
+    { txt: string; type: 'nor' }
+  ]
 }
 
 export interface Essence {
   time: number
   self_id: number
   post_type: 'notice'
-  notice_type: 'essence'
-  sub_type: 'add' | 'delete'
   group_id: number
-  sender_id: number
-  operator_id: number
+  user_id: number
+  notice_type: 'essence'
   message_id: number
+  sender_id: number
+  sub_type: 'add' | 'delete'
 }
 
+// TODO: 收不到
 export interface GroupMsgEmojiLike {
   time: number
   self_id: number
@@ -481,15 +417,9 @@ export interface NoticeHandler {
   'notice.friend_add': FriendAdd
   'notice.notify.poke.friend': NotifyPokeFriend
   'notice.notify.poke.group': NotifyPokeGroup
-  // 'notice.notify.lucky_king': NotifyLuckyKing
-  // 'notice.notify.honor': NotifyHonor
-  'notice.notify.title': NotifyTitle
-  'notice.notify': NotifyTitle | NotifyPokeFriend | NotifyPokeGroup
-  //  | NotifyLuckyKing | NotifyHonor |
-  'notice.group_card': GroupCard
-  // 'notice.offline_file': OfflineFile
-  // 'notice.client_status': ClientStatus
-  // 'notice.essence': Essence
+  'notice.notify.poke': NotifyPokeFriend | NotifyPokeGroup
+  'notice.notify': NotifyPokeFriend | NotifyPokeGroup
+  'notice.essence': Essence
   'notice.group_msg_emoji_like': GroupMsgEmojiLike
   notice:
     | FriendRecall
@@ -502,13 +432,7 @@ export interface NoticeHandler {
     | FriendAdd
     | NotifyPokeFriend
     | NotifyPokeGroup
-    // | NotifyLuckyKing
-    // | NotifyHonor
-    | NotifyTitle
-    | GroupCard
-    // | OfflineFile
-    // | ClientStatus
-    // | Essence
+    | Essence
     | GroupMsgEmojiLike
 }
 
@@ -536,7 +460,7 @@ export type WSSendParam = {
   // ===================================NAPCAT扩展==============================================
   ArkShareGroup: { group_id: string } | { user_id: string; phoneNumber?: string }
   ArkSharePeer: { group_id: string }
-  reboot_normal: { delay?: number }
+  // reboot_normal: { delay?: number }
   get_robot_uin_range: {}
   set_online_status: { status: number; extStatus: number; batteryStatus: number }
   get_friends_with_category: {}
@@ -544,7 +468,7 @@ export type WSSendParam = {
   set_qq_avatar: { file: string }
   // get_config: {}
   // set_config: {}
-  debug: { method: string; args: any[] }
+  // debug: { method: string; args: any[] }
   get_file: { file_id: string }
   forward_friend_single_msg: { message_id: number; user_id: number }
   forward_group_single_msg: { message_id: number; group_id: number }
@@ -555,7 +479,7 @@ export type WSSendParam = {
   del_group_file: { group_id: number; file_id: string }
   del_group_file_folder: { group_id: number; folder_id: string }
   // ===================================ONEBOT接口==============================================
-  // reboot: { delay?: number }
+  // set_restart: { delay?: number }
   send_like: { user_id: number; times: number }
   get_login_info: {}
   get_friend_list: {}
@@ -673,8 +597,8 @@ export type WSSendParam = {
   get_recent_contact: { count?: number }
   _mark_all_as_read: {}
   get_profile_like: {}
-  set_group_head: { file: string; groupCode: number }
-  fetch_custom_face: {}
+  set_group_portrait: { file: string; groupCode: number }
+  fetch_custom_face: { count?: number }
   upload_private_file: { user_id: number; file: string; name: string }
   fetch_emoji_like: {
     user_id?: string
@@ -687,13 +611,14 @@ export type WSSendParam = {
   // get_guild_service_profile: {}
   // _set_model_show: {}
   set_input_status: ({ group_id: string } | { user_id: string }) & { eventType: string }
+  _del_group_notice: { group_id: number; feed_id: string }
 }
 
 export type WSSendReturn = {
   // ===================================NAPCAT扩展==============================================
   ArkShareGroup: string
   ArkSharePeer: string
-  reboot_normal: {}
+  // reboot_normal: {}
   get_robot_uin_range: { minUin: number; maxUin: number }[]
   set_online_status: {}
   get_friends_with_category: {
@@ -742,7 +667,7 @@ export type WSSendReturn = {
   set_qq_avatar: {}
   // get_config: {}
   // set_config: {}
-  debug: any
+  // debug: any
   get_file: { file: string; url: string; file_size: string; file_name: string; base64: string }
   forward_friend_single_msg: {}
   forward_group_single_msg: {}
@@ -803,7 +728,7 @@ export type WSSendReturn = {
   del_group_file: {}
   del_group_file_folder: {}
   // ===================================ONEBOT接口==============================================
-  // reboot: {}
+  // set_restart: {}
   send_like: {}
   get_login_info: { user_id: number; nickname: string }
   get_friend_list: {
@@ -1311,7 +1236,7 @@ export type WSSendReturn = {
     isSvip: boolean
     uin: number
   }[]
-  set_group_head: {
+  set_group_portrait: {
     result: 0
     errMsg: 'success'
   }
@@ -1332,4 +1257,5 @@ export type WSSendReturn = {
   // get_guild_service_profile: {}
   // _set_model_show: {}
   set_input_status: {}
+  _del_group_notice: {}
 }
