@@ -91,6 +91,12 @@ export interface Receive {
       result: string
     }
   }
+  markdown: {
+    type: 'markdown'
+    data: {
+      content: string
+    }
+  }
   forward: {
     type: 'forward'
     data: {
@@ -178,12 +184,6 @@ export interface Send {
   rps: {
     type: 'rps'
     data: {}
-  }
-  markdown: {
-    type: 'markdown'
-    data: {
-      content: string
-    }
   }
   music: {
     type: 'music'
@@ -322,14 +322,6 @@ export const Structs = {
    */
   rps: function (): Send['rps'] {
     return { type: 'rps', data: {} }
-  },
-  /**
-   * 发送 markdown
-   * @param content markdown内容
-   * @returns { type: 'markdown', data: { content } }
-   */
-  markdown: function (content: string): Send['markdown'] {
-    return { type: 'markdown', data: { content } }
   },
   /**
    * 音乐分享
