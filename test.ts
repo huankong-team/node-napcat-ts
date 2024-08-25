@@ -6,7 +6,7 @@ const bot = new NCWebsocket(
     host: 'localhost',
     port: 3001
   },
-  false
+  true
 )
 
 bot.on('socket.connecting', function (res) {
@@ -35,9 +35,17 @@ bot.on('api.preSend', function (params) {
 bot.on('message', async (context) => {
   console.log('\n收到了一条信息')
   console.dir(context, { depth: null })
-  context.message.forEach((item) => {
-    if (item.type === 'text' && item.data.text === '233') {
-      bot.send_msg({ ...context, message: 'Ciallo～(∠・ω< )⌒☆' })
+  context.message.forEach(async (item) => {
+    if (item.type !== 'text') return
+
+    if (item.data.text === '233') {
+      await bot.send_msg({ ...context, message: 'Ciallo～(∠・ω< )⌒☆' })
+    } else if (item.data.text.startsWith('!')) {
+      const arr = item.data.text.slice(1).split(' ')
+      const commandName: any = arr[0]
+      const args = JSON.parse(arr[1])
+      const res = await bot.send(commandName, args)
+      await bot.send_msg({ ...context, message: res })
     }
   })
 })
