@@ -284,7 +284,6 @@ export interface GroupRecall {
   message_id: number
 }
 
-// TODO: 收不到
 export interface GroupIncrease {
   time: number
   self_id: number
