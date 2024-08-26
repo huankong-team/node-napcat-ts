@@ -33,12 +33,14 @@ export interface WSCloseRes {
 }
 
 export interface WSErrorRes {
-  errno: number
-  code: string
-  syscall: string
-  address: string
-  port: number
   reconnection: WSReconnection
+  errors: {
+    errno: number
+    code: string
+    syscall: string
+    address: string
+    port: number
+  }[]
 }
 
 export interface WSReconnection {
