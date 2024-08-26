@@ -136,6 +136,13 @@ export class NCEventBus extends EventEmitter {
               'group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend',
               json
             )
+          case 'input_status':
+            return this.emit(
+              json.group_id !== 0
+                ? 'notice.notify.input_status.group'
+                : 'notice.notify.input_status.friend',
+              json
+            )
           default:
             if (this.debug) {
               logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notify_type: ${sub_type}`)

@@ -407,6 +407,30 @@ export interface GroupMsgEmojiLike {
   likes: { emoji_id: string; count: number }[]
 }
 
+export interface NotifyInputStatusGroup {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'notify'
+  sub_type: 'input_status'
+  status_text: string
+  event_type: number
+  user_id: number
+  group_id: number
+}
+
+export interface NotifyInputStatusFriend {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'notify'
+  sub_type: 'input_status'
+  status_text: string
+  event_type: number
+  user_id: number
+  group_id: 0
+}
+
 export interface NoticeHandler {
   'notice.friend_recall': FriendRecall
   'notice.group_recall': GroupRecall
@@ -416,10 +440,17 @@ export interface NoticeHandler {
   'notice.group_upload': GroupUpload
   'notice.group_ban': GroupBan
   'notice.friend_add': FriendAdd
+  'notice.notify.input_status.friend': NotifyInputStatusFriend
+  'notice.notify.input_status.group': NotifyInputStatusGroup
+  'notice.notify.input_status': NotifyInputStatusFriend | NotifyInputStatusGroup
   'notice.notify.poke.friend': NotifyPokeFriend
   'notice.notify.poke.group': NotifyPokeGroup
   'notice.notify.poke': NotifyPokeFriend | NotifyPokeGroup
-  'notice.notify': NotifyPokeFriend | NotifyPokeGroup
+  'notice.notify':
+    | NotifyPokeFriend
+    | NotifyPokeGroup
+    | NotifyInputStatusFriend
+    | NotifyInputStatusGroup
   'notice.essence': Essence
   'notice.group_msg_emoji_like': GroupMsgEmojiLike
   notice:
