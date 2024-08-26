@@ -1,12 +1,11 @@
 import { randomUUID } from 'crypto'
-import WebSocket, { type RawData } from 'ws'
+import WebSocket, { type Data } from 'isomorphic-ws'
 import type {
   AllHandlers,
   APIRequest,
   EventHandle,
   NCWebsocketOptions,
   ResponseHandler,
-  WSErrorRes,
   WSReconnection,
   WSSendParam,
   WSSendReturn
@@ -56,31 +55,32 @@ export class NCWebsocketBase {
 
   connect() {
     this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
-    this.#socket = new WebSocket(`${this.#baseUrl}/event?access_token=${this.#accessToken}`)
-      .on('open', () => {
-        this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
-        this.#reconnection.nowAttempts = 1
+    const socket = new WebSocket(`${this.#baseUrl}/event?access_token=${this.#accessToken}`)
+    socket.onopen = () => {
+      this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
+      this.#reconnection.nowAttempts = 1
+    }
+    socket.onclose = (event) => {
+      this.#eventBus.emit('socket.close', {
+        code: event.code,
+        reason: event.reason,
+        reconnection: this.#reconnection
       })
-      .on('close', (code, reason) => {
-        this.#eventBus.emit('socket.close', {
-          code,
-          reason: reason.toString(),
-          reconnection: this.#reconnection
-        })
-        this.#socket = undefined
-        if (
-          this.#reconnection.enable &&
-          this.#reconnection.nowAttempts < this.#reconnection.attempts
-        ) {
-          this.#reconnection.nowAttempts++
-          setTimeout(this.reconnect.bind(this), this.#reconnection.delay)
-        }
-      })
-      .on('message', (data) => this.#message(data))
-      .on('error', (data: WSErrorRes) => {
-        data.reconnection = this.#reconnection
-        this.#eventBus.emit('socket.error', data)
-      })
+      this.#socket = undefined
+      if (
+        this.#reconnection.enable &&
+        this.#reconnection.nowAttempts < this.#reconnection.attempts
+      ) {
+        this.#reconnection.nowAttempts++
+        setTimeout(this.reconnect.bind(this), this.#reconnection.delay)
+      }
+    }
+    socket.onmessage = (event) => this.#message(event.data)
+    socket.onerror = (event) => {
+      event.error.reconnection = this.#reconnection
+      this.#eventBus.emit('socket.error', event.error)
+    }
+    this.#socket = socket
   }
 
   disconnect() {
@@ -95,7 +95,7 @@ export class NCWebsocketBase {
     this.connect()
   }
 
-  #message(data: RawData) {
+  #message(data: Data) {
     let json
     try {
       json = JSON.parse(data.toString())

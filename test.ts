@@ -45,7 +45,7 @@ bot.on('message', async (context) => {
       const commandName: any = arr[0]
       const args = JSON.parse(arr[1])
       const res = await bot.send(commandName, args)
-      await bot.send_msg({ ...context, message: res })
+      await bot.send_msg({ ...context, message: JSON.stringify(res) })
     }
   })
 })
