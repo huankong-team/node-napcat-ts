@@ -26,6 +26,21 @@ export type NCWebsocketOptions = NCWebsocketOptionsBaseUrl | NCWebsocketOptionsH
 
 // =====================================================================================
 
+export interface WSReconnection {
+  enable: boolean
+  attempts: number
+  delay: number
+  nowAttempts: number
+}
+
+export interface WSConnecting {
+  reconnection: WSReconnection
+}
+
+export interface WSOpenRes {
+  reconnection: WSReconnection
+}
+
 export interface WSCloseRes {
   code: number
   reason: string
@@ -43,19 +58,12 @@ export interface WSErrorRes {
   }[]
 }
 
-export interface WSReconnection {
-  enable: boolean
-  attempts: number
-  delay: number
-  nowAttempts: number
-}
-
 export interface SocketHandler {
-  'socket.connecting': { reconnection: WSReconnection }
-  'socket.open': { reconnection: WSReconnection }
+  'socket.connecting': WSConnecting
+  'socket.open': WSOpenRes
   'socket.close': WSCloseRes
   'socket.error': WSErrorRes
-  socket: void | WSCloseRes | WSErrorRes
+  socket: WSConnecting | WSOpenRes | WSCloseRes | WSErrorRes
 }
 
 export interface APIRequest<T extends keyof WSSendParam> {

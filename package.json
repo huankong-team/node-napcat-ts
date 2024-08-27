@@ -1,6 +1,6 @@
 {
   "name": "node-napcat-ts",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "napcat SDK for Node",
   "license": "MIT",
   "type": "module",
