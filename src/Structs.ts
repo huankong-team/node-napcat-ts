@@ -227,24 +227,24 @@ export const Structs = {
    * @param qq at的QQ号
    * @returns { type: 'at', data: { qq } }
    */
-  at: function (qq: string | 'all'): Send['at'] {
-    return { type: 'at', data: { qq } }
+  at: function (qq: string | 'all' | number): Send['at'] {
+    return { type: 'at', data: { qq: qq.toString() } }
   },
   /**
    * 回复消息
    * @param id 回复的消息id
    * @returns { type: 'reply', data: { id } }
    */
-  reply: function (id: string): Send['reply'] {
-    return { type: 'reply', data: { id } }
+  reply: function (id: string | number): Send['reply'] {
+    return { type: 'reply', data: { id: id.toString() } }
   },
   /**
    * 发送QQ表情
    * @param id QQ 表情 ID
    * @returns { type: 'face', data: { id } }
    */
-  face: function (id: string): Send['face'] {
-    return { type: 'face', data: { id } }
+  face: function (id: string | number): Send['face'] {
+    return { type: 'face', data: { id: id.toString() } }
   },
   /**
    * 发送QQ表情包
@@ -256,11 +256,19 @@ export const Structs = {
    */
   mface: function (
     summary: string,
-    emoji_id: string,
-    emoji_package_id: string,
+    emoji_id: string | number,
+    emoji_package_id: string | number,
     key: string
   ): Send['mface'] {
-    return { type: 'mface', data: { summary, emoji_id, emoji_package_id, key } }
+    return {
+      type: 'mface',
+      data: {
+        summary,
+        emoji_id: emoji_id.toString(),
+        emoji_package_id: emoji_package_id.toString(),
+        key
+      }
+    }
   },
   /**
    * 发送图片
@@ -270,8 +278,13 @@ export const Structs = {
    * @param subType 图片类型
    * @returns { type: 'image', data: { file, name, summary, subType } }
    */
-  image: function (file: string, name?: string, summary?: string, subType?: string): Send['image'] {
-    return { type: 'image', data: { file, name, summary, subType } }
+  image: function (
+    file: string,
+    name?: string,
+    summary?: string,
+    subType?: string | number
+  ): Send['image'] {
+    return { type: 'image', data: { file, name, summary, subType: subType?.toString() } }
   },
   /**
    * 发文件
@@ -329,8 +342,8 @@ export const Structs = {
    * @param id 音乐id
    * @returns { type: 'music', data: { type, id } }
    */
-  music: function (type: 'qq' | '163', id: string): Send['music'] {
-    return { type: 'music', data: { type, id } }
+  music: function (type: 'qq' | '163', id: string | number): Send['music'] {
+    return { type: 'music', data: { type, id: id.toString() } }
   },
   /**
    * 分享非qq、网易云音乐 需要配置签名服务器
@@ -355,8 +368,8 @@ export const Structs = {
    * @param id 消息id
    * @returns { type: 'node', data: { id } }
    */
-  node: function (id: string): Send['node'] {
-    return { type: 'node', data: { id } }
+  node: function (id: string | number): Send['node'] {
+    return { type: 'node', data: { id: id.toString() } }
   },
   /**
    * 自定义转发消息节点
