@@ -4,12 +4,12 @@
 
 针对 `napcat` 开发的 `SDK`
 
-本SDK中所有 `api` 基于 `napcat-v2.2.12`
+本SDK中所有 `api` 基于 `napcat-v2.2.22`
 
 ## 📚 文档
 
 - [napcat 文档](https://napneko.github.io/) <= 遇到问题先看我
-- [node-napcat-ts 文档](https://blog.huankong.top/docs/node-napcat-ts/) <= 再看我
+- [node-napcat-ts 文档](https://blog.huankong.top/docs/node-napcat-ts/) <= 使用前先看我
 - [go-cqhttp 文档](https://docs.go-cqhttp.org/)
 - [onebot11 文档](https://github.com/botuniverse/onebot-11/)
 

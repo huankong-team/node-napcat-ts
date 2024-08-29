@@ -1,6 +1,6 @@
 {
   "name": "node-napcat-ts",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "napcat SDK for Node",
   "license": "MIT",
   "type": "module",
@@ -25,6 +25,10 @@
     {
       "name": "kanocence",
       "url": "https://github.com/kanocence"
+    },
+    {
+      "name": "jacksixth",
+      "url": "https://github.com/jacksixth"
     }
   ],
   "repository": "https://github.com/huankong233/node-napcat-ts.git",
