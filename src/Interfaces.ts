@@ -514,7 +514,12 @@ export type WSSendParam = {
   forward_group_single_msg: { message_id: number; group_id: number }
   translate_en2zh: { words: string[] }
   get_group_file_count: { group_id: number }
-  get_group_file_list: { group_id: number; start_index: number; file_count: number }
+  get_group_file_list: {
+    group_id: number
+    start_index: number
+    file_count: number
+    folder_id: number
+  }
   set_group_file_folder: { group_id: number; folder_name: string }
   del_group_file: { group_id: number; file_id: string }
   del_group_file_folder: { group_id: number; folder_id: string }
@@ -529,11 +534,11 @@ export type WSSendParam = {
   get_group_member_list: { group_id: number; no_cache?: boolean }
   get_msg: { message_id: number }
   send_msg: ({ user_id: number } | { group_id: number }) & {
-    message: string | Send[keyof Send][]
+    message: Send[keyof Send][]
     auto_escape?: boolean
   }
-  send_group_msg: { group_id: number; message: string | Send[keyof Send][]; auto_escape?: boolean }
-  send_private_msg: { user_id: number; message: string | Send[keyof Send][]; auto_escape?: boolean }
+  send_group_msg: { group_id: number; message: Send[keyof Send][]; auto_escape?: boolean }
+  send_private_msg: { user_id: number; message: Send[keyof Send][]; auto_escape?: boolean }
   delete_msg: { message_id: number }
   set_msg_emoji_like: { message_id: number; emoji_id: string }
   set_group_add_request: { flag: string; approve?: boolean; reason?: string }
@@ -557,12 +562,12 @@ export type WSSendParam = {
   '.handle_quick_operation':
     | {
         context: PrivateMessage
-        operation: { reply?: string; auto_escape?: boolean }
+        operation: { reply?: Send[keyof Send][]; auto_escape?: boolean }
       }
     | {
         context: GroupMessage
         operation: {
-          reply?: string
+          reply?: Send[keyof Send][]
           auto_escape?: boolean
           at_sender?: boolean
           delete?: boolean
@@ -583,7 +588,7 @@ export type WSSendParam = {
     group_id: number
     type: 'all' | 'talkative' | 'performer' | 'legend' | 'strong_newbie' | 'emotion'
   }
-  get_essence_msg_list: { group_id: number; pages: number }
+  get_essence_msg_list: { group_id: number }
   _send_group_notice: {
     group_id: number
     content: string
@@ -641,8 +646,6 @@ export type WSSendParam = {
   fetch_custom_face: { count?: number }
   upload_private_file: { user_id: number; file: string; name: string }
   fetch_emoji_like: {
-    user_id?: string
-    group_id?: string
     emojiId: string
     emojiType: string
     message_id: number
@@ -651,7 +654,8 @@ export type WSSendParam = {
   // get_guild_service_profile: {}
   // _set_model_show: {}
   set_input_status: ({ group_id: string } | { user_id: string }) & { eventType: string }
-  _del_group_notice: { group_id: number; feed_id: string }
+  _del_group_notice: { group_id: number; notice_id: string }
+  get_group_info_ex: { group_id: number }
 }
 
 export type WSSendReturn = {
@@ -947,40 +951,16 @@ export type WSSendReturn = {
     }[]
   }
   get_essence_msg_list: {
-    retcode: 0
-    retmsg: 'success'
-    data: {
-      msg_list: {
-        group_code: string
-        msg_seq: number
-        msg_random: number
-        sender_uin: string
-        sender_nick: string
-        sender_time: number
-        add_digest_uin: string
-        add_digest_nick: string
-        add_digest_time: number
-        msg_content: (
-          | {
-              msg_type: 1
-              text: string
-            }
-          // | {
-          //     msg_type: 2
-          //   }
-          | {
-              msg_type: 3
-              image_url: string
-              image_thumbnail_url: string
-            }
-        )[]
-        can_be_removed: true
-      }[]
-      is_end: boolean
-      group_role: boolean
-      config_page_url: string
-    }
-  }
+    msg_seq: number
+    msg_random: number
+    sender_id: number
+    sender_nick: string
+    operator_id: number
+    operator_nick: string
+    message_id: number
+    operator_time: number
+    content: Receive[keyof Receive][]
+  }[]
   _send_group_notice: {}
   _get_group_notice: {
     sender_id: number
@@ -1298,4 +1278,53 @@ export type WSSendReturn = {
   // _set_model_show: {}
   set_input_status: {}
   _del_group_notice: {}
+  get_group_info_ex: {
+    groupCode: string
+    resultCode: number
+    extInfo: {
+      groupInfoExtSeq: number
+      reserve: number
+      luckyWordId: string
+      lightCharNum: number
+      luckyWord: string
+      starId: number
+      essentialMsgSwitch: number
+      todoSeq: number
+      blacklistExpireTime: number
+      isLimitGroupRtc: number
+      companyId: number
+      hasGroupCustomPortrait: number
+      bindGuildId: string
+      groupOwnerId: {
+        memberUin: string
+        memberUid: string
+        memberQid: string
+      }
+      essentialMsgPrivilege: number
+      msgEventSeq: string
+      inviteRobotSwitch: number
+      gangUpId: string
+      qqMusicMedalSwitch: number
+      showPlayTogetherSwitch: number
+      groupFlagPro1: string
+      groupBindGuildIds: { guildIds: string[] }
+      viewedMsgDisappearTime: string
+      groupExtFlameData: {
+        switchState: number
+        state: number
+        dayNums: string[]
+        version: number
+        updateTime: string
+        isDisplayDayNum: false
+      }
+      groupBindGuildSwitch: number
+      groupAioBindGuildId: string
+      groupExcludeGuildIds: { guildIds: string[] }
+      fullGroupExpansionSwitch: number
+      fullGroupExpansionSeq: string
+      inviteRobotMemberSwitch: number
+      inviteRobotMemberExamine: number
+      groupSquareSwitch: number
+    }
+  }
 }

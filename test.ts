@@ -1,4 +1,4 @@
-import { NCWebsocket } from './src/index.js'
+import { NCWebsocket, Structs } from './src/index.js'
 
 const bot = new NCWebsocket(
   {
@@ -39,13 +39,13 @@ bot.on('message', async (context) => {
     if (item.type !== 'text') return
 
     if (item.data.text === '233') {
-      await bot.send_msg({ ...context, message: 'Ciallo～(∠・ω< )⌒☆' })
+      await bot.send_msg({ ...context, message: [Structs.text('Ciallo～(∠・ω< )⌒☆')] })
     } else if (item.data.text.startsWith('!')) {
       const arr = item.data.text.slice(1).split(' ')
       const commandName: any = arr[0]
       const args = JSON.parse(arr[1])
       const res = await bot.send(commandName, args)
-      await bot.send_msg({ ...context, message: JSON.stringify(res) })
+      await bot.send_msg({ ...context, message: [Structs.text(JSON.stringify(res))] })
     }
   })
 })

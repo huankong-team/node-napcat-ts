@@ -205,7 +205,7 @@ export interface Send {
     type: 'node'
     data:
       | {
-          content: string | Send[keyof Send][]
+          content: Send[keyof Send][]
         }
       | {
           id: string
@@ -376,7 +376,7 @@ export const Structs = {
    * @param content 消息内容
    * @returns { type: 'node', data: { content } }
    */
-  customNode: function (content: string | Send[keyof Send][]): Send['node'] {
+  customNode: function (content: Send[keyof Send][]): Send['node'] {
     return { type: 'node', data: { content } }
   }
 }

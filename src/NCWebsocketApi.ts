@@ -1,6 +1,5 @@
 import { WSSendParam } from './Interfaces.js'
 import { NCWebsocketBase } from './NCWebsocketBase.js'
-import { CQCodeEncode } from './Utils.js'
 
 export class NCWebsocketApi extends NCWebsocketBase {
   get_robot_uin_range() {
@@ -88,17 +87,14 @@ export class NCWebsocketApi extends NCWebsocketBase {
   }
 
   send_msg(params: WSSendParam['send_msg']) {
-    if (typeof params.message === 'string') params.message = CQCodeEncode(params.message)
     return this.send('send_msg', params)
   }
 
   send_group_msg(params: WSSendParam['send_group_msg']) {
-    if (typeof params.message === 'string') params.message = CQCodeEncode(params.message)
     return this.send('send_group_msg', params)
   }
 
   send_private_msg(params: WSSendParam['send_private_msg']) {
-    if (typeof params.message === 'string') params.message = CQCodeEncode(params.message)
     return this.send('send_private_msg', params)
   }
 
@@ -179,9 +175,6 @@ export class NCWebsocketApi extends NCWebsocketBase {
   }
 
   '.handle_quick_operation' = (params: WSSendParam['.handle_quick_operation']) => {
-    if ('reply' in params && typeof params.reply === 'string') {
-      params.reply = CQCodeEncode(params.reply)
-    }
     return this.send('.handle_quick_operation', params)
   }
 
@@ -202,29 +195,14 @@ export class NCWebsocketApi extends NCWebsocketBase {
   }
 
   send_forward_msg(params: WSSendParam['send_forward_msg']) {
-    params.message.map((msg) => {
-      if ('content' in msg.data && typeof msg.data.content === 'string') {
-        msg.data.content = CQCodeEncode(msg.data.content)
-      }
-    })
     return this.send('send_forward_msg', params)
   }
 
   send_group_forward_msg(params: WSSendParam['send_group_forward_msg']) {
-    params.message.map((msg) => {
-      if ('content' in msg.data && typeof msg.data.content === 'string') {
-        msg.data.content = CQCodeEncode(msg.data.content)
-      }
-    })
     return this.send('send_group_forward_msg', params)
   }
 
   send_private_forward_msg(params: WSSendParam['send_private_forward_msg']) {
-    params.message.map((msg) => {
-      if ('content' in msg.data && typeof msg.data.content === 'string') {
-        msg.data.content = CQCodeEncode(msg.data.content)
-      }
-    })
     return this.send('send_private_forward_msg', params)
   }
 
