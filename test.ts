@@ -43,7 +43,7 @@ bot.on('message', async (context) => {
     } else if (item.data.text.startsWith('!')) {
       const arr = item.data.text.slice(1).split(' ')
       const commandName: any = arr[0]
-      const args = JSON.parse(arr[1])
+      const args = JSON.parse(arr[1] ?? '{}')
       const res = await bot.send(commandName, args)
       await bot.send_msg({ ...context, message: [Structs.text(JSON.stringify(res))] })
     }

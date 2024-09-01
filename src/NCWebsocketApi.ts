@@ -2,6 +2,14 @@ import { WSSendParam } from './Interfaces.js'
 import { NCWebsocketBase } from './NCWebsocketBase.js'
 
 export class NCWebsocketApi extends NCWebsocketBase {
+  ArkShareGroup(params: WSSendParam['ArkShareGroup']) {
+    return this.send('ArkShareGroup', params)
+  }
+
+  ArkSharePeer(params: WSSendParam['ArkSharePeer']) {
+    return this.send('ArkSharePeer', params)
+  }
+
   get_robot_uin_range() {
     return this.send('get_robot_uin_range', {})
   }
@@ -166,10 +174,6 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('get_record', params)
   }
 
-  clean_cache() {
-    return this.send('clean_cache', {})
-  }
-
   get_cookies(params: WSSendParam['get_cookies']) {
     return this.send('get_cookies', params)
   }
@@ -226,6 +230,30 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('upload_group_file', params)
   }
 
+  delete_group_file(params: WSSendParam['delete_group_file']) {
+    return this.send('delete_group_file', params)
+  }
+
+  create_group_file_folder(params: WSSendParam['create_group_file_folder']) {
+    return this.send('create_group_file_folder', params)
+  }
+
+  delete_group_file_folder(params: WSSendParam['delete_group_file_folder']) {
+    return this.send('delete_group_file_folder', params)
+  }
+
+  get_group_file_system_info(params: WSSendParam['get_group_file_system_info']) {
+    return this.send('get_group_file_system_info', params)
+  }
+
+  get_group_root_files(params: WSSendParam['get_group_root_files']) {
+    return this.send('get_group_root_files', params)
+  }
+
+  get_group_files_by_folder(params: WSSendParam['get_group_files_by_folder']) {
+    return this.send('get_group_files_by_folder', params)
+  }
+
   download_file(params: WSSendParam['download_file']) {
     return this.send('download_file', params)
   }
@@ -242,20 +270,16 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('get_friend_msg_history', params)
   }
 
-  get_group_system_msg(params: WSSendParam['get_group_system_msg']) {
-    return this.send('get_group_system_msg', params)
-  }
-
-  get_online_clients(params: WSSendParam['get_online_clients']) {
-    return this.send('get_online_clients', params)
+  get_group_ignored_notifies(params: WSSendParam['get_group_ignored_notifies']) {
+    return this.send('get_group_ignored_notifies', params)
   }
 
   ocr_image(params: WSSendParam['ocr_image']) {
     return this.send('ocr_image', params)
   }
 
-  set_self_profile(params: WSSendParam['set_self_profile']) {
-    return this.send('set_self_profile', params)
+  set_qq_profile(params: WSSendParam['set_qq_profile']) {
+    return this.send('set_qq_profile', params)
   }
 
   create_collections(params: WSSendParam['create_collection']) {
@@ -312,5 +336,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   _del_group_notice(params: WSSendParam['_del_group_notice']) {
     return this.send('_del_group_notice', params)
+  }
+
+  get_group_info_ex(params: WSSendParam['get_group_info_ex']) {
+    return this.send('get_group_info_ex', params)
   }
 }
