@@ -497,12 +497,11 @@ export type EventHandle<T extends keyof AllHandlers> = (context: AllHandlers[T])
 // =====================================================================================
 
 export type WSSendParam = {
-  // ===================================NAPCAT扩展==============================================
   ArkShareGroup: { group_id: string } | { user_id: string; phoneNumber?: string }
   ArkSharePeer: { group_id: string }
   // reboot_normal: { delay?: number }
   get_robot_uin_range: {}
-  set_online_status: { status: number; extStatus: number; batteryStatus: number }
+  set_online_status: { status: number; ext_status: number; battery_status: number }
   get_friends_with_category: {}
   // get_group_ignore_add_request: {}
   set_qq_avatar: { file: string }
@@ -523,7 +522,6 @@ export type WSSendParam = {
   set_group_file_folder: { group_id: number; folder_name: string }
   del_group_file: { group_id: number; file_id: string }
   del_group_file_folder: { group_id: number; folder_id: string }
-  // ===================================ONEBOT接口==============================================
   // set_restart: { delay?: number }
   send_like: { user_id: number; times: number }
   get_login_info: {}
@@ -533,12 +531,9 @@ export type WSSendParam = {
   get_group_member_info: { group_id: number; user_id: number; no_cache?: boolean }
   get_group_member_list: { group_id: number; no_cache?: boolean }
   get_msg: { message_id: number }
-  send_msg: ({ user_id: number } | { group_id: number }) & {
-    message: Send[keyof Send][]
-    auto_escape?: boolean
-  }
-  send_group_msg: { group_id: number; message: Send[keyof Send][]; auto_escape?: boolean }
-  send_private_msg: { user_id: number; message: Send[keyof Send][]; auto_escape?: boolean }
+  send_msg: ({ user_id: number } | { group_id: number }) & { message: Send[keyof Send][] }
+  send_group_msg: { group_id: number; message: Send[keyof Send][] }
+  send_private_msg: { user_id: number; message: Send[keyof Send][] }
   delete_msg: { message_id: number }
   set_msg_emoji_like: { message_id: number; emoji_id: string }
   set_group_add_request: { flag: string; approve?: boolean; reason?: string }
@@ -556,37 +551,16 @@ export type WSSendParam = {
   set_group_name: { group_id: number; group_name: string }
   get_image: { file: string }
   get_record: { file: string }
-  clean_cache: {}
+  // clean_cache: {}
   get_cookies: { domain: string }
-  // ===================================GOCQHTTP扩展==============================================
   '.handle_quick_operation':
-    | {
-        context: PrivateMessage
-        operation: { reply?: Send[keyof Send][]; auto_escape?: boolean }
-      }
-    | {
-        context: GroupMessage
-        operation: {
-          reply?: Send[keyof Send][]
-          auto_escape?: boolean
-          at_sender?: boolean
-          delete?: boolean
-          kick?: boolean
-          ban?: boolean
-          ban_duration?: number
-        }
-      }
-    | {
-        context: RequestFriend
-        operation: { approve?: boolean; remark?: string }
-      }
-    | {
-        context: RequestGroup
-        operation: { approve?: boolean; reason?: string }
-      }
+    | { context: PrivateMessage; operation: { reply?: Send[keyof Send][] } }
+    | { context: GroupMessage; operation: { reply?: Send[keyof Send][]; at_sender?: boolean } }
+    | { context: RequestFriend; operation: { approve?: boolean } }
+    | { context: RequestGroup; operation: { approve?: boolean; reason?: string } }
   get_group_honor_info: {
     group_id: number
-    type: 'all' | 'talkative' | 'performer' | 'legend' | 'strong_newbie' | 'emotion'
+    type?: 'all' | 'talkative' | 'performer' | 'legend' | 'strong_newbie' | 'emotion'
   }
   get_essence_msg_list: { group_id: number }
   _send_group_notice: {
@@ -597,22 +571,12 @@ export type WSSendParam = {
     confirmRequired?: number
   }
   _get_group_notice: { group_id: number }
-  send_forward_msg: ({ user_id: number } | { group_id: number }) & {
-    message: Send['node'][]
-    auto_escape?: boolean
-  }
-  send_group_forward_msg: {
-    group_id: number
-    message: Send['node'][]
-    auto_escape?: boolean
-  }
-  send_private_forward_msg: {
-    user_id: number
-    message: Send['node'][]
-    auto_escape?: boolean
-  }
+  send_forward_msg: ({ user_id: number } | { group_id: number }) & { message: Send['node'][] }
+  send_group_forward_msg: { group_id: number; message: Send['node'][] }
+  send_private_forward_msg: { user_id: number; message: Send['node'][] }
   get_stranger_info: { user_id: number }
-  mark_msg_as_read: { message_id: number }
+  mark_msg_as_read: { user_id: number } | { group_id: number }
+  // get_guild_list: {}
   mark_private_msg_as_read: { user_id: number }
   mark_group_msg_as_read: { group_id: number }
   upload_group_file: {
@@ -622,19 +586,38 @@ export type WSSendParam = {
     // folder?: string
     folder_id?: string
   }
-  download_file: ({ url: string } | { base64: string }) & {
-    thread_count: number
-    name: string
-    headers: string | string[]
+  delete_group_file: WSSendParam['del_group_file']
+  create_group_file_folder: WSSendParam['set_group_file_folder']
+  delete_group_file_folder: WSSendParam['del_group_file_folder']
+  get_group_file_system_info: { group_id: number }
+  get_group_root_files: { group_id: number }
+  get_group_files_by_folder: { group_id: number; folder_id: string }
+  download_file:
+    | { base64: string }
+    | {
+        url: string
+        // thread_count: number
+        name?: string
+        headers?: string | string[]
+      }
+  get_group_msg_history: {
+    group_id: number
+    message_seq?: number
+    count?: number
+    reverseOrder?: boolean
   }
-  get_group_msg_history: { group_id: number; message_seq: number; count: number }
   get_forward_msg: { messager_id: string }
-  get_friend_msg_history: { user_id: number; message_seq: number; count: number }
-  get_group_system_msg: { group_id: number }
-  get_online_clients: { no_cache?: boolean }
+  get_friend_msg_history: {
+    user_id: number
+    message_seq?: number
+    count?: number
+    reverseOrder?: boolean
+  }
+  get_group_ignored_notifies: { group_id: number }
+  // get_online_clients: { no_cache?: boolean }
   ocr_image: { image: string }
-  set_self_profile: { nick: string; longNick: string; sex: number }
-  create_collection: { type: string; brief: string }
+  set_qq_profile: { nickname: string; personal_note?: string; sex?: number }
+  create_collection: { rawData: string; brief: string }
   get_collection_list: { category: number; count: number }
   set_self_longnick: { longNick: string }
   set_essence_msg: { message_id: number }
@@ -651,60 +634,54 @@ export type WSSendParam = {
     message_id: number
     count?: number
   }
+  // test_api_01: {}
   // get_guild_service_profile: {}
   // _set_model_show: {}
   set_input_status: ({ group_id: string } | { user_id: string }) & { eventType: string }
+  // get_csrf_token: {}
   _del_group_notice: { group_id: number; notice_id: string }
   get_group_info_ex: { group_id: number }
 }
 
 export type WSSendReturn = {
-  // ===================================NAPCAT扩展==============================================
-  ArkShareGroup: string
+  ArkShareGroup: {
+    errCode: 0
+    errMsg: ''
+    arkJson: string
+  }
   ArkSharePeer: string
   // reboot_normal: {}
-  get_robot_uin_range: { minUin: number; maxUin: number }[]
+  get_robot_uin_range: {
+    minUin: string
+    maxUin: string
+  }[]
   set_online_status: {}
   get_friends_with_category: {
     categoryId: number
+    categorySortId: number
     categoryName: string
     categoryMbCount: number
+    onlineCount: number
     buddyList: {
-      uid: string
       qid: string
-      uin: string
-      nick: string
-      remark: string
       longNick: string
-      avatarUrl: string
       birthday_year: number
       birthday_month: number
       birthday_day: number
-      sex: number
-      topTime: string
-      isBlock: boolean
-      isMsgDisturb: boolean
-      isSpecialCareOpen: boolean
-      isSpecialCareZone: boolean
-      ringId: string
-      status: number
-      qidianMasterFlag: number
-      qidianCrewFlag: number
-      qidianCrewFlag2: number
-      extStatus: number
+      age: number
+      sex: 'unknown' | 'male' | 'female'
+      eMail: string
+      phoneNum: string
       categoryId: number
-      onlyChat: boolean
-      qzoneNotWatch: boolean
-      qzoneNotWatched: boolean
-      vipFlag: boolean
-      yearVipFlag: boolean
-      svipFlag: boolean
-      vipLevel: number
-      isZPlanCoupleOpen: boolean
-      zplanCoupleSceneId: number
-      teenagerFlag: number
-      studyFlag: number
-      pendantId: string
+      richTime: number
+      richBuffer: { [key: string]: number }
+      uid: string
+      uin: string
+      nick: string
+      remark: string
+      user_id: number
+      nickname: string
+      level: number
     }[]
   }[]
   // get_group_ignore_add_request: {}
@@ -712,11 +689,19 @@ export type WSSendReturn = {
   // get_config: {}
   // set_config: {}
   // debug: any
-  get_file: { file: string; url: string; file_size: string; file_name: string; base64: string }
+  get_file: {
+    file: string
+    url: string
+    file_size: string
+    file_name: string
+    base64: string
+  }
   forward_friend_single_msg: {}
   forward_group_single_msg: {}
   translate_en2zh: string[]
-  get_group_file_count: { count: number }
+  get_group_file_count: {
+    count: number
+  }
   get_group_file_list: {
     FileList: (
       | {
@@ -768,18 +753,71 @@ export type WSSendReturn = {
         }
     )[]
   }
-  set_group_file_folder: {}
-  del_group_file: {}
-  del_group_file_folder: {}
-  // ===================================ONEBOT接口==============================================
+  set_group_file_folder: {
+    result: {
+      retCode: 0
+      retMsg: 'ok'
+      clientWording: string
+    }
+    groupItem: {
+      peerId: string
+      type: 2
+      folderInfo: {
+        folderId: string
+        parentFolderId: string
+        folderName: string
+        createTime: number
+        modifyTime: number
+        createUin: string
+        creatorName: string
+        totalFileCount: number
+        modifyUin: string
+        modifyName: string
+        usedSpace: string
+      }
+      fileInfo: null
+    }
+  }
+  del_group_file: {
+    result: 0
+    errMsg: 'ok'
+    transGroupFileResult: {
+      result: {
+        retCode: number
+        retMsg: string
+        clientWording: string
+      }
+      successFileIdList: string[]
+      failFileIdList: string[]
+    }
+  }
+  del_group_file_folder: {
+    retCode: 0
+    retMsg: 'ok'
+    clientWording: ''
+  }
   // set_restart: {}
   send_like: {}
   get_login_info: { user_id: number; nickname: string }
   get_friend_list: {
+    qid: string
+    longNick: string
+    birthday_year: number
+    birthday_month: number
+    birthday_day: number
+    age: number
+    sex: 'unknown' | 'male' | 'female'
+    eMail: string
+    phoneNum: string
+    categoryId: number
+    richTime: number
+    richBuffer: { [key: string]: number }
+    uid: string
+    uin: string
+    nick: string
+    remark: string
     user_id: number
     nickname: string
-    remark: string
-    sex: 'unknown' | 'male' | 'female'
     level: number
   }[]
   get_group_info: {
@@ -813,7 +851,6 @@ export type WSSendReturn = {
     shut_up_timestamp: number
     role: 'admin' | 'owner' | 'member'
     title: string
-    qage: number
   }
   get_group_member_list: {
     group_id: number
@@ -868,28 +905,32 @@ export type WSSendReturn = {
     font: number
     post_type: 'message' | 'message_sent'
   } & MessageType
-  send_msg: { message_id: number }
-  send_group_msg: { message_id: number }
-  send_private_msg: { message_id: number }
+  send_msg: {
+    message_id: number
+  }
+  send_group_msg: {
+    message_id: number
+  }
+  send_private_msg: {
+    message_id: number
+  }
   delete_msg: {}
-  set_msg_emoji_like: {}
+  set_msg_emoji_like: {
+    result: 0
+    errMsg: ''
+  }
   set_group_add_request: {}
   set_friend_add_request: {}
   set_group_leave: {}
-  get_version_info: { app_name: 'NapCat.Onebot'; protocol_version: 'v11'; app_version: string }
+  get_version_info: {
+    app_name: 'NapCat.Onebot'
+    protocol_version: 'v11'
+    app_version: string
+  }
   get_status: {
     online: boolean
     good: true
-    stat: {
-      packet_received: number
-      packet_sent: number
-      message_received: number
-      message_sent: number
-      last_message_time: number
-      disconnect_times: number
-      lost_times: number
-      packet_lost: number
-    }
+    stat: {}
   }
   can_send_record: { yes: true }
   can_send_image: { yes: true }
@@ -899,11 +940,25 @@ export type WSSendReturn = {
   set_group_admin: {}
   set_group_card: {}
   set_group_name: {}
-  get_image: { file: string; url: string; file_size: string; file_name: string; base64: string }
-  get_record: { file: string; url: string; file_size: string; file_name: string; base64: string }
-  clean_cache: {}
-  get_cookies: { cookies: string }
-  // ===================================GOCQHTTP扩展==============================================
+  get_image: {
+    file: string
+    url: string
+    file_size: string
+    file_name: string
+    base64: string
+  }
+  get_record: {
+    file: string
+    url: string
+    file_size: string
+    file_name: string
+    base64: string
+  }
+  // clean_cache: {}
+  get_cookies: {
+    cookies: string
+    bkn: string
+  }
   '.handle_quick_operation': {}
   get_group_honor_info: {
     group_id: string
@@ -917,37 +972,37 @@ export type WSSendReturn = {
     talkative_list: {
       user_id: number
       avatar: string
-      nickname: string
-      day_count: number
       description: string
+      day_count: number
+      nickname: string
     }[]
     performer_list: {
       user_id: number
       avatar: string
-      nickname: string
-      day_count: number
       description: string
+      day_count: number
+      nickname: string
     }[]
     legend_list: {
       user_id: number
       avatar: string
-      nickname: string
-      day_count: number
       description: string
+      day_count: number
+      nickname: string
     }[]
     emotion_list: {
       user_id: number
       avatar: string
-      nickname: string
-      day_count: number
       description: string
+      day_count: number
+      nickname: string
     }[]
     strong_newbie_list: {
       user_id: number
       avatar: string
-      nickname: string
-      day_count: number
       description: string
+      day_count: number
+      nickname: string
     }[]
   }
   get_essence_msg_list: {
@@ -963,6 +1018,7 @@ export type WSSendReturn = {
   }[]
   _send_group_notice: {}
   _get_group_notice: {
+    notice_id: string
     sender_id: number
     publish_time: number
     message: {
@@ -978,78 +1034,267 @@ export type WSSendReturn = {
   send_group_forward_msg: {}
   send_private_forward_msg: {}
   get_stranger_info: {
+    result: 0
+    errMsg: 'success'
+    detail: {
+      uid: string
+      uin: string
+      simpleInfo: {
+        uid: string
+        uin: string
+        coreInfo: {
+          uid: string
+          uin: string
+          nick: string
+          remark: string
+        }
+        baseInfo: {
+          qid: string
+          longNick: string
+          birthday_year: number
+          birthday_month: number
+          birthday_day: number
+          age: number
+          sex: number
+          eMail: string
+          phoneNum: string
+          categoryId: number
+          richTime: number
+          richBuffer: { [key: string]: number }
+        }
+        status: {
+          uid: string
+          uin: string
+          status: number
+          extStatus: number
+          batteryStatus: number
+          termType: number
+          netType: number
+          iconType: number
+          customStatus: null
+          setTime: string
+          specialFlag: number
+          abiFlag: number
+          eNetworkType: number
+          showName: string
+          termDesc: string
+          musicInfo: { buf: {} }
+          extOnlineBusinessInfo: {
+            buf: {}
+            customStatus: null
+            videoBizInfo: {
+              cid: string
+              tvUrl: string
+              synchType: string
+            }
+            videoInfo: {
+              name: string
+            }
+          }
+          extBuffer: { buf: {} }
+        }
+        vasInfo: {
+          vipFlag: false
+          yearVipFlag: false
+          svipFlag: false
+          vipLevel: number
+          bigClub: false
+          bigClubLevel: number
+          nameplateVipType: number
+          grayNameplateFlag: number
+          superVipTemplateId: number
+          diyFontId: number
+          pendantId: number
+          pendantDiyId: number
+          faceId: number
+          vipFont: number
+          vipFontType: number
+          magicFont: number
+          fontEffect: number
+          newLoverDiamondFlag: number
+          extendNameplateId: number
+          diyNameplateIDs: []
+          vipStartFlag: number
+          vipDataFlag: number
+          gameNameplateId: string
+          gameLastLoginTime: string
+          gameRank: number
+          gameIconShowFlag: false
+          gameCardId: string
+          vipNameColorId: string
+          privilegeIcon: null
+        }
+        relationFlags: {
+          topTime: string
+          isBlock: false
+          isMsgDisturb: false
+          isSpecialCareOpen: false
+          isSpecialCareZone: false
+          ringId: string
+          isBlocked: false
+          recommendImgFlag: number
+          disableEmojiShortCuts: number
+          qidianMasterFlag: number
+          qidianCrewFlag: number
+          qidianCrewFlag2: number
+          isHideQQLevel: number
+          isHidePrivilegeIcon: number
+        }
+        otherFlags: {
+          onlyChat: false
+          qzoneNotWatch: false
+          qzoneNotWatched: false
+          isZPlanCoupleOpen: false
+          zplanCoupleSceneId: number
+          teenagerFlag: number
+          studyFlag: number
+          isAioShortcutBarOpen: false
+          colorRindId: number
+          isSharingLocation: false
+        }
+        intimate: null
+      }
+      commonExt: {
+        constellation: number
+        shengXiao: number
+        kBloodType: number
+        homeTown: string
+        makeFriendCareer: number
+        pos: string
+        college: string
+        country: string
+        province: string
+        city: string
+        postCode: string
+        address: string
+        regTime: number
+        interest: string
+        labels: []
+        qqLevel: {
+          crownNum: number
+          sunNum: number
+          moonNum: number
+          starNum: number
+        }
+      }
+      photoWall: null
+    }
     uid: string
-    qid: string
     uin: string
     nick: string
     remark: string
+    status: number
+    extStatus: number
+    batteryStatus: number
+    termType: number
+    netType: number
+    iconType: number
+    customStatus: null
+    setTime: string
+    specialFlag: number
+    abiFlag: number
+    eNetworkType: number
+    showName: string
+    termDesc: string
+    musicInfo: { buf: {} }
+    extOnlineBusinessInfo: {
+      buf: {}
+      customStatus: null
+      videoBizInfo: {
+        cid: string
+        tvUrl: string
+        synchType: string
+      }
+      videoInfo: {
+        name: string
+      }
+    }
+    extBuffer: { buf: {} }
+    vipFlag: false
+    yearVipFlag: false
+    svipFlag: false
+    vipLevel: number
+    bigClub: false
+    bigClubLevel: number
+    nameplateVipType: number
+    grayNameplateFlag: number
+    superVipTemplateId: number
+    diyFontId: number
+    pendantId: string
+    pendantDiyId: number
+    faceId: number
+    vipFont: number
+    vipFontType: number
+    magicFont: number
+    fontEffect: number
+    newLoverDiamondFlag: number
+    extendNameplateId: number
+    diyNameplateIDs: []
+    vipStartFlag: number
+    vipDataFlag: number
+    gameNameplateId: string
+    gameLastLoginTime: string
+    gameRank: number
+    gameIconShowFlag: false
+    gameCardId: string
+    vipNameColorId: string
+    privilegeIcon: null
+    qid: string
     longNick: string
-    avatarUrl: string
     birthday_year: number
     birthday_month: number
     birthday_day: number
-    sex: 'unknown' | 'male' | 'female'
-    topTime: string
-    constellation: number
-    shengXiao: number
-    kBloodType: number
-    homeTown: string
-    makeFriendCareer: number
-    pos: string
+    age: number
+    sex: string
     eMail: string
     phoneNum: string
-    college: string
-    country: string
-    province: string
-    city: string
-    postCode: string
-    address: string
-    isBlock: boolean
-    isSpecialCareOpen: boolean
-    isSpecialCareZone: boolean
-    ringId: string
-    regTime: number
-    interest: string
-    termType: number
-    labels: string[]
-    qqLevel: {
-      crownNum: number
-      sunNum: number
-      moonNum: number
-      starNum: number
-    }
-    isHideQQLevel: number
-    privilegeIcon: {
-      jumpUrl: string
-      openIconList: string[]
-      closeIconList: string[]
-    }
-    isHidePrivilegeIcon: number
-    photoWall: {
-      picList: string[]
-    }
-    vipFlag: boolean
-    yearVipFlag: boolean
-    svipFlag: boolean
-    vipLevel: number
-    status: number
-    qidianMasterFlag: number
-    qidianCrewFlag: number
-    qidianCrewFlag2: number
-    extStatus: number
-    recommendImgFlag: number
-    disableEmojiShortCuts: number
-    pendantId: string
+    categoryId: number
+    richTime: number
+    richBuffer: { [key: string]: number }
     user_id: number
     nickname: string
-    age: number
     login_days: number
     level: number
   }
   mark_msg_as_read: {}
+  // get_guild_list: {}
   mark_private_msg_as_read: {}
   mark_group_msg_as_read: {}
   upload_group_file: {}
+  delete_group_file: WSSendReturn['del_group_file']
+  create_group_file_folder: WSSendReturn['set_group_file_folder']
+  delete_group_file_folder: WSSendReturn['del_group_file_folder']
+  get_group_file_system_info: {
+    file_count: number
+    limit_count: number
+    used_space: number
+    total_space: number
+  }
+  get_group_root_files: {
+    files: {
+      group_id: number
+      file_id: string
+      file_name: string
+      busid: number
+      size: number
+      upload_time: number
+      dead_time: number
+      modify_time: number
+      download_times: number
+      uploader: number
+      uploader_name: string
+    }[]
+    folders: {
+      group_id: number
+      folder_id: string
+      folder_name: string
+      create_time: number
+      creator: number
+      creator_name: string
+      total_file_count: number
+    }[]
+  }
+  get_group_files_by_folder: WSSendReturn['get_group_root_files']
   download_file: { file: string }
   get_group_msg_history: {
     messages: ((
@@ -1153,28 +1398,18 @@ export type WSSendReturn = {
       post_type: 'message' | 'message_sent'
     } & MessageType)[]
   }
-  get_group_system_msg: {
-    invited_requests: {
-      request_id: number
-      invitor_uin: number
-      invitor_nick: string
-      group_id: number
-      group_name: string
-      checked: boolean
-      actor: number
-    }[]
+  get_group_ignored_notifies: {
     join_requests: {
       request_id: number
       requester_uin: number
       requester_nick: string
-      message: string
       group_id: number
       group_name: string
       checked: boolean
       actor: number
     }[]
   }
-  get_online_clients: { app_id: string; device_name: string; device_kind: string }[]
+  // get_online_clients: { app_id: string; device_name: string; device_kind: string }[]
   ocr_image: {
     text: string
     pt1: { x: string; y: string }
@@ -1192,9 +1427,9 @@ export type WSSendReturn = {
     }[]
     score: string
   }[]
-  set_self_profile: { result: 0; errMsg: '' }
+  set_qq_profile: { result: 0; errMsg: '' }
   create_collection: {}
-  get_collection_list: {}
+  get_collection_list: any
   set_self_longnick: { result: 0; errMsg: '' }
   set_essence_msg: { errCode: 0; errMsg: 'success' }
   delete_essence_msg: { errCode: 0; errMsg: 'success' }
@@ -1274,9 +1509,11 @@ export type WSSendReturn = {
     isLastPage: boolean
     isFirstPage: boolean
   }
+  // test_api_01: {}
   // get_guild_service_profile: {}
   // _set_model_show: {}
   set_input_status: {}
+  // get_csrf_token: {}
   _del_group_notice: {}
   get_group_info_ex: {
     groupCode: string
