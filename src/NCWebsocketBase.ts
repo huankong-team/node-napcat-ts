@@ -1,5 +1,5 @@
-import { randomUUID } from 'crypto'
 import WebSocket, { type Data } from 'isomorphic-ws'
+import { nanoid } from 'nanoid'
 import type {
   AllHandlers,
   APIRequest,
@@ -143,7 +143,7 @@ export class NCWebsocketBase {
    * @param params 请求参数
    */
   send<T extends keyof WSSendParam>(method: T, params: WSSendParam[T]) {
-    const echo = randomUUID({ disableEntropyCache: true })
+    const echo = nanoid()
 
     const message: APIRequest<T> = {
       action: method,
