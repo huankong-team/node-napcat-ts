@@ -1,4 +1,4 @@
-import { NCWebsocket, Structs } from './src/index.js'
+import { NCWebsocket, Structs } from './index.js'
 
 const bot = new NCWebsocket(
   {
