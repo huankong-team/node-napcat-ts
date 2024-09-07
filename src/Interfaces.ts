@@ -53,8 +53,10 @@ export interface WSErrorRes {
     errno: number
     code: string
     syscall: string
-    address: string
-    port: number
+    // address?: string
+    // port?: number
+    url: string
+    message: string
   }[]
 }
 

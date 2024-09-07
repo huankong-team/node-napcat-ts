@@ -282,7 +282,7 @@ export class NCWebsocketApi extends NCWebsocketBase {
     return this.send('set_qq_profile', params)
   }
 
-  create_collections(params: WSSendParam['create_collection']) {
+  create_collection(params: WSSendParam['create_collection']) {
     return this.send('create_collection', params)
   }
 
