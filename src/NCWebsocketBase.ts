@@ -133,17 +133,16 @@ export class NCWebsocketBase {
         }
       }
     } else {
-      const status = json?.status ?? 'ok'
-
-      if (status !== 'ok' && json.message === 'token验证失败') {
+      if (json?.status === 'failed' && json?.echo === null) {
         this.#reconnection.enable = false
 
         this.#eventBus.emit('socket.error', {
+          reconnection: this.#reconnection,
           error_type: 'response_error',
           info: {
+            url: this.#baseUrl,
             errno: json.retcode,
-            message: json.message,
-            url: this.#baseUrl
+            message: json.message
           }
         })
 

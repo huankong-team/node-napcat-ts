@@ -47,7 +47,9 @@ export interface WSCloseRes {
   reconnection: WSReconnection
 }
 
-export type WSErrorRes =
+export type WSErrorRes = {
+  reconnection: WSReconnection
+} & (
   | {
       error_type: 'response_error'
       info: {
@@ -57,7 +59,6 @@ export type WSErrorRes =
       }
     }
   | {
-      reconnection: WSReconnection
       error_type: 'connect_error'
       errors: {
         errno: number
@@ -67,6 +68,7 @@ export type WSErrorRes =
         port: number
       }[]
     }
+)
 
 export interface SocketHandler {
   'socket.connecting': WSConnecting
