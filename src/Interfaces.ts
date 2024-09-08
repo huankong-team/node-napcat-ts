@@ -47,18 +47,26 @@ export interface WSCloseRes {
   reconnection: WSReconnection
 }
 
-export interface WSErrorRes {
-  reconnection: WSReconnection
-  errors: {
-    errno: number
-    code: string
-    syscall: string
-    // address?: string
-    // port?: number
-    url: string
-    message: string
-  }[]
-}
+export type WSErrorRes =
+  | {
+      error_type: 'response_error'
+      info: {
+        errno: number
+        message: string
+        url: string
+      }
+    }
+  | {
+      reconnection: WSReconnection
+      error_type: 'connect_error'
+      errors: {
+        errno: number
+        code: string
+        syscall: string
+        address: string
+        port: number
+      }[]
+    }
 
 export interface SocketHandler {
   'socket.connecting': WSConnecting
