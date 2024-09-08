@@ -60,19 +60,28 @@ export class NCWebsocketBase {
       this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
       this.#reconnection.nowAttempts = 1
     }
-    socket.onmessage = (event) => this.#message(event.data)
-    socket.onerror = (event) => {
-      event.error.reconnection = this.#reconnection
-      event.error.errors = (event.error.errors as AllHandlers['socket.error']['errors']).map(
-        (err) => {
-          err.url = this.#baseUrl
-          err.message = err.code
-          return err
-        }
-      )
-
-      this.#eventBus.emit('socket.error', event.error)
+    socket.onclose = (event) => {
+      this.#eventBus.emit('socket.close', {
+        code: event.code,
+        reason: event.reason,
+        reconnection: this.#reconnection
+      })
+      this.#socket = undefined
+      if (
+        this.#reconnection.enable &&
+        this.#reconnection.nowAttempts < this.#reconnection.attempts
+      ) {
+        this.#reconnection.nowAttempts++
+        setTimeout(this.reconnect.bind(this), this.#reconnection.delay)
+      }
     }
+    socket.onmessage = (event) => this.#message(event.data)
+    socket.onerror = (event) =>
+      this.#eventBus.emit('socket.error', {
+        reconnection: this.#reconnection,
+        error_type: 'connect_error',
+        errors: event.error.errors ?? [event.error]
+      })
     this.#socket = socket
   }
 
@@ -130,16 +139,12 @@ export class NCWebsocketBase {
         this.#reconnection.enable = false
 
         this.#eventBus.emit('socket.error', {
-          reconnection: this.#reconnection,
-          errors: [
-            {
-              errno: json.retcode,
-              message: json.message,
-              code: json.retcode.toString(),
-              syscall: 'TOKENREFUSED',
-              url: this.#baseUrl
-            }
-          ]
+          error_type: 'response_error',
+          info: {
+            errno: json.retcode,
+            message: json.message,
+            url: this.#baseUrl
+          }
         })
 
         this.disconnect()
