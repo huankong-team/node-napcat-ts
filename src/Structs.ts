@@ -37,6 +37,7 @@ export interface Receive {
   image: {
     type: 'image'
     data: {
+      file_unique: string
       file: string
       subType: string
       file_id: string
@@ -47,6 +48,7 @@ export interface Receive {
   record: {
     type: 'record'
     data: {
+      file_unique: string
       file: string
       path: string
       file_id: string
@@ -56,6 +58,7 @@ export interface Receive {
   file: {
     type: 'file'
     data: {
+      file_unique: string
       file: string
       path: string
       url: string
@@ -66,6 +69,7 @@ export interface Receive {
   video: {
     type: 'video'
     data: {
+      file_unique: string
       file: string
       path: string
       url: string
