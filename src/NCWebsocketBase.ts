@@ -55,7 +55,7 @@ export class NCWebsocketBase {
 
   connect() {
     this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
-    const socket = new WebSocket(`${this.#baseUrl}/event?access_token=${this.#accessToken}`)
+    const socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
     socket.onopen = () => {
       this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
       this.#reconnection.nowAttempts = 1

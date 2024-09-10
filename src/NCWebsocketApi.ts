@@ -341,4 +341,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
   get_group_info_ex(params: WSSendParam['get_group_info_ex']) {
     return this.send('get_group_info_ex', params)
   }
+
+  get_group_system_msg(params: WSSendParam['get_group_system_msg']) {
+    return this.send('get_group_system_msg', params)
+  }
 }
