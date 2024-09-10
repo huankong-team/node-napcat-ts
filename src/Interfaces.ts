@@ -653,6 +653,7 @@ export type WSSendParam = {
   // get_csrf_token: {}
   _del_group_notice: { group_id: number; notice_id: string }
   get_group_info_ex: { group_id: number }
+  get_group_system_msg: { group_id: number }
 }
 
 export type WSSendReturn = {
@@ -1575,5 +1576,25 @@ export type WSSendReturn = {
       inviteRobotMemberExamine: number
       groupSquareSwitch: number
     }
+  }
+  get_group_system_msg: {
+    InvitedRequest: {
+      request_id: number
+      invitor_uin: number
+      invitor_nick: string
+      group_id: number
+      group_name: string
+      checked: boolean
+      actor: number
+    }[]
+    join_requests: {
+      request_id: number
+      invitor_uin: number
+      invitor_nick: string
+      group_id: number
+      group_name: string
+      checked: boolean
+      actor: number
+    }[]
   }
 }
