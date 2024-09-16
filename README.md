@@ -9,7 +9,7 @@
 ## 📚 文档
 
 - [napcat 文档](https://napneko.github.io/) <= 遇到问题先看我
-- [node-napcat-ts 文档](https://blog.huankong.top/docs/node-napcat-ts/) <= 使用前先看我
+- [node-napcat-ts 文档](https://node-napcat-ts.huankong.top) <= 使用前先看我
 - [go-cqhttp 文档](https://docs.go-cqhttp.org/)
 - [onebot11 文档](https://github.com/botuniverse/onebot-11/)
 

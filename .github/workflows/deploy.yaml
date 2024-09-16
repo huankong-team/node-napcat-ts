@@ -1,0 +1,21 @@
+# .github/workflows/deploy.yaml
+
+name: Build and Deploy
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: vuepress-deploy
+        uses: huankong233/hk-vuepress-deploy@master
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BUILD_SCRIPT: cd docs && npm install pnpm -g && pnpm install && pnpm run build
+          BUILD_DIR: docs/src/.vitepress/dist
+          TARGET_REPO: huankong233/node-napcat-ts
+          TARGET_BRANCH: docs
+          COMMIT_MESSAGE: 自动打包完成
+          CNAME: node-napcat-ts.huankong.top
