@@ -14,7 +14,7 @@ jobs:
         env:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BUILD_SCRIPT: cd docs && npm install pnpm -g && pnpm install && pnpm run build
-          BUILD_DIR: docs/src/.vitepress/dist
+          BUILD_DIR: src/.vitepress/dist
           TARGET_REPO: huankong233/node-napcat-ts
           TARGET_BRANCH: docs
           COMMIT_MESSAGE: 自动打包完成
