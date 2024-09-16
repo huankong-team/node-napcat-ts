@@ -5,7 +5,12 @@ const bot = new NCWebsocket(
     protocol: 'ws',
     host: 'localhost',
     port: 3001,
-    accessToken: '' // 请填写你的access_token
+    accessToken: '', // 请填写你的access_token
+    reconnection: {
+      enable: true,
+      attempts: 10,
+      delay: 5000
+    }
   },
   true
 )
