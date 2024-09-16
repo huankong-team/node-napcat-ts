@@ -1,6 +1,6 @@
 {
-  "include": ["src"],
-  "exclude": ["src/test.ts"],
+  "include": ["src", "test/test.ts"],
+  "exclude": ["test/test.ts"],
   "compilerOptions": {
     "declaration": true, //让tsc自动生成对用的.d.ts文件。
     "outDir": "./dist", //指定输出文件夹
