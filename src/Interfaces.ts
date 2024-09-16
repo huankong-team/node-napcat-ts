@@ -628,7 +628,7 @@ export type WSSendParam = {
   get_group_ignored_notifies: { group_id: number }
   // get_online_clients: { no_cache?: boolean }
   ocr_image: { image: string }
-  set_qq_profile: { nickname: string; personal_note?: string; sex?: number }
+  set_self_profile: { nickname: string; personal_note?: string; sex?: number }
   create_collection: { rawData: string; brief: string }
   get_collection_list: { category: number; count: number }
   set_self_longnick: { longNick: string }
@@ -1440,7 +1440,7 @@ export type WSSendReturn = {
     }[]
     score: string
   }[]
-  set_qq_profile: { result: 0; errMsg: '' }
+  set_self_profile: { result: 0; errMsg: '' }
   create_collection: {}
   get_collection_list: any
   set_self_longnick: { result: 0; errMsg: '' }
