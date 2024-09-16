@@ -35,7 +35,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "test": "tsx test.ts"
+    "test": "tsx test.ts",
+    "docs:dev": "pnpm -C docs run dev"
   },
   "dependencies": {
     "events": "^3.3.0",
