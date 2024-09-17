@@ -509,8 +509,8 @@ export type EventHandle<T extends keyof AllHandlers> = (context: AllHandlers[T])
 // =====================================================================================
 
 export type WSSendParam = {
-  ArkShareGroup: { group_id: string } | { user_id: string; phoneNumber?: string }
-  ArkSharePeer: { group_id: string }
+  ArkSharePeer: { group_id: string } | { user_id: string; phoneNumber?: string }
+  ArkShareGroup: { group_id: string }
   // reboot_normal: { delay?: number }
   get_robot_uin_range: {}
   set_online_status: { status: number; ext_status: number; battery_status: number }
@@ -654,15 +654,16 @@ export type WSSendParam = {
   _del_group_notice: { group_id: number; notice_id: string }
   get_group_info_ex: { group_id: number }
   get_group_system_msg: { group_id: number }
+  fetch_user_profile_like: { qq: number }
 }
 
 export type WSSendReturn = {
-  ArkShareGroup: {
+  ArkSharePeer: {
     errCode: 0
     errMsg: ''
     arkJson: string
   }
-  ArkSharePeer: string
+  ArkShareGroup: string
   // reboot_normal: {}
   get_robot_uin_range: {
     minUin: string
@@ -1597,4 +1598,5 @@ export type WSSendReturn = {
       actor: number
     }[]
   }
+  fetch_user_profile_like: string
 }
