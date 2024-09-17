@@ -27,6 +27,9 @@ importers:
       '@types/ws':
         specifier: ^8.5.12
         version: 8.5.12
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
       nodemon:
         specifier: ^3.1.4
         version: 3.1.4
@@ -753,6 +756,9 @@ packages:
       supports-color:
         optional: true
 
+  dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+    engines: {node: '>=12'}
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
@@ -1837,6 +1843,7 @@ snapshots:
     optionalDependencies:
       supports-color: 5.5.0
 
+  dotenv@16.4.5: {}
   dequal@2.0.3: {}
 
   devlop@1.1.0:
