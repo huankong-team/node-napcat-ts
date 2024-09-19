@@ -276,47 +276,74 @@ export const Structs = {
   },
   /**
    * 发送图片
-   * @param file 网络图片地址或者文件路径
+   * @param file 网络图片地址, 文件路径或者Buffer
    * @param name 图片名
    * @param summary 图片简介
    * @param subType 图片类型
    * @returns { type: 'image', data: { file, name, summary, subType } }
    */
   image: function (
-    file: string,
+    file: string | Buffer,
     name?: string,
     summary?: string,
     subType?: string | number
   ): Send['image'] {
-    return { type: 'image', data: { file, name, summary, subType: subType?.toString() } }
+    return {
+      type: 'image',
+      data: {
+        file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
+        name,
+        summary,
+        subType: subType?.toString()
+      }
+    }
   },
   /**
    * 发文件
-   * @param file 网络文件地址或文件路径
+   * @param file 网络文件地址, 文件路径或者Buffer
    * @param name 文件名
    * @returns { type: 'file', data: { file, name } }
    */
-  file: function (file: string, name?: string): Send['file'] {
-    return { type: 'file', data: { file, name } }
+  file: function (file: string | Buffer, name?: string): Send['file'] {
+    return {
+      type: 'file',
+      data: {
+        file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
+        name
+      }
+    }
   },
   /**
    * 发视频
-   * @param file 网络视频地址或者文件路径
+   * @param file 网络视频地址, 文件路径或者Buffer
    * @param name 视频名
    * @param thumb 预览图
    * @returns { type: 'video', data: { file, name, thumb } }
    */
-  video: function (file: string, name?: string, thumb?: string): Send['video'] {
-    return { type: 'video', data: { file, name, thumb } }
+  video: function (file: string | Buffer, name?: string, thumb?: string): Send['video'] {
+    return {
+      type: 'video',
+      data: {
+        file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
+        name,
+        thumb
+      }
+    }
   },
   /**
    * 发语音
-   * @param file 网络语音地址或者文件路径
+   * @param file 网络语音地址, 文件路径或者Buffer
    * @param name 语音备注
    * @returns { type: 'record', data: { file, name } }
    */
-  record: function (file: string, name?: string): Send['record'] {
-    return { type: 'record', data: { file, name } }
+  record: function (file: string | Buffer, name?: string): Send['record'] {
+    return {
+      type: 'record',
+      data: {
+        file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
+        name
+      }
+    }
   },
   /**
    * 发送json消息
