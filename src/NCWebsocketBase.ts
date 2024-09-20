@@ -53,36 +53,45 @@ export class NCWebsocketBase {
 
   // ==================WebSocket操作=============================
 
-  connect() {
-    this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
-    const socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
-    socket.onopen = () => {
-      this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
-      this.#reconnection.nowAttempts = 1
-    }
-    socket.onclose = (event) => {
-      this.#eventBus.emit('socket.close', {
-        code: event.code,
-        reason: event.reason,
-        reconnection: this.#reconnection
-      })
-      this.#socket = undefined
-      if (
-        this.#reconnection.enable &&
-        this.#reconnection.nowAttempts < this.#reconnection.attempts
-      ) {
-        this.#reconnection.nowAttempts++
-        setTimeout(this.reconnect.bind(this), this.#reconnection.delay)
+  /**
+   * await connect() 等待 ws 连接
+   */
+  async connect() {
+    return new Promise<void>((resolve, reject) => {
+      this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
+      const socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
+      socket.onopen = () => {
+        this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
+        this.#reconnection.nowAttempts = 1
+
+        resolve()
       }
-    }
-    socket.onmessage = (event) => this.#message(event.data)
-    socket.onerror = (event) =>
-      this.#eventBus.emit('socket.error', {
-        reconnection: this.#reconnection,
-        error_type: 'connect_error',
-        errors: event.error.errors ?? [event.error]
-      })
-    this.#socket = socket
+      socket.onclose = (event) => {
+        this.#eventBus.emit('socket.close', {
+          code: event.code,
+          reason: event.reason,
+          reconnection: this.#reconnection
+        })
+        this.#socket = undefined
+        if (
+          this.#reconnection.enable &&
+          this.#reconnection.nowAttempts < this.#reconnection.attempts
+        ) {
+          this.#reconnection.nowAttempts++
+          setTimeout(this.reconnect.bind(this), this.#reconnection.delay)
+        }
+      }
+      socket.onmessage = (event) => this.#message(event.data)
+      socket.onerror = (event) => {
+        this.#eventBus.emit('socket.error', {
+          reconnection: this.#reconnection,
+          error_type: 'connect_error',
+          errors: event.error.errors ?? [event.error]
+        })
+        reject(event.error)
+      }
+      this.#socket = socket
+    })
   }
 
   disconnect() {
