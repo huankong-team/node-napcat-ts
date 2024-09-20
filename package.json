@@ -1,6 +1,6 @@
 {
   "name": "node-napcat-ts",
-  "version": "0.2.17",
+  "version": "0.2.18",
   "description": "napcat SDK for Node",
   "license": "MIT",
   "type": "module",
@@ -40,7 +40,8 @@
     "build": "tsc",
     "dev": "nodemon",
     "test": "tsx test/index.ts",
-    "docs:dev": "pnpm -C docs run dev"
+    "docs:dev": "pnpm -C docs run dev",
+    "docs:build": "pnpm -C docs run build"
   },
   "dependencies": {
     "events": "^3.3.0",
