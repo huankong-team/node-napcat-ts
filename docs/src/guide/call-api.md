@@ -4,7 +4,7 @@
 
 大部分接口都可以直接在 `实例化对象` 上直接调用, 比如 发送信息 `send_msg`
 
-此处的 `Structs` 在 [下一篇-结构体构造器](/guide/struct-maker) 中有介绍
+此处的 `Structs` 在 [下一篇-结构体构造器](./struct-maker.md) 中有介绍
 
 ``` typescript
 import { Structs } from 'node-napcat-ts'
