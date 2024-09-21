@@ -20,6 +20,8 @@ const napcat = new NCWebsocket({
   host: 'napcat.example',
   port: 443,
   accessToken: 'your token',
+  // 是否需要在触发 socket.error 时抛出错误, 默认关闭
+  throwPromise: true,
   // ↓ 自动重连(可选)
   reconnection: {
     enable: true,
@@ -38,6 +40,8 @@ import { NCWebsocket } from 'node-napcat-ts'
 const napcat = new NCWebsocket({
   baseUrl: 'ws://napcat.example',
   accessToken: 'your token',
+  // 是否需要在触发 socket.error 时抛出错误, 默认关闭
+  throwPromise: true,
   // ↓ 自动重连(可选)
   reconnection: {
     enable: true,

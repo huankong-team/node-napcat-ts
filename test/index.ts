@@ -7,6 +7,7 @@ const bot = new NCWebsocket(
     host: 'localhost',
     port: 3001,
     accessToken: process.env.NC_ACCESS_TOKEN, // 请填写你的access_token
+    throwPromise: false,
     reconnection: {
       enable: true,
       attempts: 10,
