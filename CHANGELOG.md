@@ -2,6 +2,12 @@
 
 ## 2024
 
+### 09-20 v0.2.20
+
+- [*] `connect` 函数修改为异步 @YunYouJun
+- [-] 移除 `connect` 函数的 `reject` 部分, 继续沿用 `socket.error` 事件 (会影响到自动重连)
+- [*] 更新文档
+
 ### 09-20 v0.2.19
 
 - [*] 文件相关结构体支持传入Buffer @DawningW
