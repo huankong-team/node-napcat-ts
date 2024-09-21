@@ -11,13 +11,14 @@ import type {
   WSSendReturn
 } from './Interfaces.js'
 import { NCEventBus } from './NCEventBus.js'
-import { convertCQCodeToJSON, CQCodeDecode, logger } from './Utils.js'
+import { convertCQCodeToJSON, CQCodeDecode, logger, sleep } from './Utils.js'
 
 export class NCWebsocketBase {
   #debug: boolean
 
   #baseUrl: string
   #accessToken: string
+  #throwPromise: boolean
   #reconnection: WSReconnection
   #socket?: WebSocket
 
@@ -26,6 +27,7 @@ export class NCWebsocketBase {
 
   constructor(NCWebsocketOptions: NCWebsocketOptions, debug = false) {
     this.#accessToken = NCWebsocketOptions.accessToken ?? ''
+    this.#throwPromise = NCWebsocketOptions.throwPromise ?? false
 
     if ('baseUrl' in NCWebsocketOptions) {
       this.#baseUrl = NCWebsocketOptions.baseUrl
@@ -57,7 +59,7 @@ export class NCWebsocketBase {
    * await connect() 等待 ws 连接
    */
   async connect() {
-    return new Promise<void>((resolve, _reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
       const socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
       socket.onopen = () => {
@@ -66,7 +68,7 @@ export class NCWebsocketBase {
 
         resolve()
       }
-      socket.onclose = (event) => {
+      socket.onclose = async (event) => {
         this.#eventBus.emit('socket.close', {
           code: event.code,
           reason: event.reason,
@@ -77,7 +79,12 @@ export class NCWebsocketBase {
           this.#reconnection.nowAttempts < this.#reconnection.attempts
         ) {
           this.#reconnection.nowAttempts++
-          setTimeout(this.reconnect.bind(this), this.#reconnection.delay)
+          await sleep(this.#reconnection.delay)
+          try {
+            await this.reconnect()
+          } catch (error) {
+            reject(error)
+          }
         }
       }
       socket.onmessage = (event) => this.#message(event.data)
@@ -87,6 +94,22 @@ export class NCWebsocketBase {
           error_type: 'connect_error',
           errors: event.error.errors ?? [event.error]
         })
+
+        if (this.#throwPromise) {
+          if (
+            this.#reconnection.enable &&
+            this.#reconnection.nowAttempts < this.#reconnection.attempts
+          ) {
+            // 重连未到最后一次，等待继续重连，不抛出错误
+            return
+          }
+
+          reject({
+            reconnection: this.#reconnection,
+            error_type: 'connect_error',
+            errors: event.error.errors ?? [event.error]
+          })
+        }
       }
       this.#socket = socket
     })
@@ -152,6 +175,8 @@ export class NCWebsocketBase {
             message: json.message
           }
         })
+
+        if (this.#throwPromise) throw new Error(json.message)
 
         this.disconnect()
 

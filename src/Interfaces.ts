@@ -3,6 +3,7 @@ import { Receive, Send } from './Structs.js'
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
   accessToken?: string
+  throwPromise?: boolean
   reconnection?: {
     enable?: boolean
     attempts?: number
@@ -15,6 +16,7 @@ export interface NCWebsocketOptionsHost {
   host: string
   port: number
   accessToken?: string
+  throwPromise?: boolean
   reconnection?: {
     enable?: boolean
     attempts?: number
