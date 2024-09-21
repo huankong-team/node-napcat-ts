@@ -57,7 +57,7 @@ export class NCWebsocketBase {
    * await connect() 等待 ws 连接
    */
   async connect() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, _reject) => {
       this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
       const socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
       socket.onopen = () => {
@@ -72,7 +72,6 @@ export class NCWebsocketBase {
           reason: event.reason,
           reconnection: this.#reconnection
         })
-        this.#socket = undefined
         if (
           this.#reconnection.enable &&
           this.#reconnection.nowAttempts < this.#reconnection.attempts
@@ -88,22 +87,21 @@ export class NCWebsocketBase {
           error_type: 'connect_error',
           errors: event.error.errors ?? [event.error]
         })
-        reject(event.error)
       }
       this.#socket = socket
     })
   }
 
   disconnect() {
-    if (this.#socket !== undefined) {
+    if (this.#socket) {
       this.#socket.close(1000)
       this.#socket = undefined
     }
   }
 
-  reconnect() {
+  async reconnect() {
     this.disconnect()
-    this.connect()
+    await this.connect()
   }
 
   #message(data: Data) {

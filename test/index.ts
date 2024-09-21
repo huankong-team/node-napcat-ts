@@ -74,4 +74,5 @@ bot.on('request', async (event) => {
   console.dir(event, { depth: null })
 })
 
-bot.connect()
+await bot.connect()
+console.log('连接成功')

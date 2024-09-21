@@ -2,7 +2,7 @@
 
 node-napcat-ts 使用 `正向连接` 来连接到 `NapcatQQ`
 
-## 初始化SDK
+## 1.初始化SDK
 
 有一个基类 `NCWebsocket` 用于初始化连接参数
 
@@ -48,19 +48,23 @@ const napcat = new NCWebsocket({
 }, false)
 ```
 
-## 绑定事件
+## 2.绑定事件
 
 请查看 [绑定事件](./getting-started.md)
 
-## 连接
+## 3.连接
 
 ``` typescript
 // 正常连接
 napcat.connect()
 
+// 可追加 await 以在连接成功后往后运行
+await napcat.connect()
+
 // 断开连接
 napcat.disconnect()
 
 // 重新连接
+// 类似 connect 方法一样可以用 await
 napcat.reconnect()
 ```
