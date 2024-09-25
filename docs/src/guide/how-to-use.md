@@ -54,7 +54,7 @@ const napcat = new NCWebsocket({
 
 ## 2.绑定事件
 
-请查看 [绑定事件](./getting-started.md)
+请查看 [绑定事件](./bind-event.md)
 
 ## 3.连接
 
