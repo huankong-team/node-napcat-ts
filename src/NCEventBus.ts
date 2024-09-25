@@ -1,5 +1,6 @@
 import {
   type AllHandlers,
+  type EventHandle,
   type MessageHandler,
   type MessageSentHandler,
   type MetaEventHandler,
@@ -8,42 +9,45 @@ import {
   type WSReceiveHandler
 } from './Interfaces.js'
 
-import { EventEmitter } from 'events'
+import mitt from 'mitt'
 import { logger } from './Utils.js'
 
-export class NCEventBus extends EventEmitter {
-  _events: { [key in keyof AllHandlers]?: Function[] | Function }
+export class NCEventBus {
   debug: boolean
+  // @ts-ignore
+  #mitt = mitt()
 
   constructor(debug = false) {
-    super({ captureRejections: true })
-
     this.debug = debug
-    this._events = {}
-    this.setMaxListeners(0)
   }
 
-  emit<T extends keyof AllHandlers>(type: T, context: AllHandlers[T]): boolean {
-    const handlers = this._events[type]
+  on<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
+    this.#mitt.on(event, handle)
+    return this
+  }
 
-    // 已注册
-    if (handlers) {
-      if (typeof handlers === 'function') {
-        // 单个
-        handlers(context)
-      } else {
-        // 多个
-        for (let i = 0; i < handlers.length; i++) {
-          handlers[i](context)
-        }
-      }
+  once<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
+    const fn = (args: AllHandlers[T]) => {
+      this.#mitt.off(event, fn)
+      handle(args)
     }
+    this.#mitt.on(event, fn)
+    return this
+  }
+
+  off<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
+    this.#mitt.off(event, handle)
+    return this
+  }
+
+  emit<T extends keyof AllHandlers>(type: T, context: AllHandlers[T]): this {
+    this.#mitt.emit(type, context)
 
     // 触发总类
     const indexOf = type.lastIndexOf('.')
     if (indexOf > 0) return this.emit(type.slice(0, indexOf) as T, context)
 
-    return true
+    return this
   }
 
   post_types = ['message', 'notice', 'request', 'meta_event', 'message_sent']

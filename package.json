@@ -1,6 +1,6 @@
 {
   "name": "node-napcat-ts",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "description": "napcat SDK for Node",
   "license": "MIT",
   "type": "module",
@@ -46,6 +46,7 @@
   "dependencies": {
     "events": "^3.3.0",
     "isomorphic-ws": "^5.0.0",
+    "mitt": "^3.0.1",
     "nanoid": "^5.0.7",
     "ws": "^8.18.0"
   },
