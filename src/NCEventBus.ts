@@ -8,40 +8,47 @@ import {
   type RequestHandler,
   type WSReceiveHandler
 } from './Interfaces.js'
-
-import mitt from 'mitt'
 import { logger } from './Utils.js'
 
-export class NCEventBus {
+export class NCEventBus<const T extends keyof AllHandlers> {
+  #events: Map<T, EventHandle<T>[]> = new Map()
   debug: boolean
-  // @ts-ignore
-  #mitt = mitt()
 
   constructor(debug = false) {
     this.debug = debug
   }
 
-  on<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
-    this.#mitt.on(event, handle)
+  on(event: T, handler: EventHandle<T>) {
+    const handlers = this.#events.get(event) ?? []
+    handlers.push(handler)
+    this.#events.set(event, handlers)
     return this
   }
 
-  once<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
-    const fn = (args: AllHandlers[T]) => {
-      this.#mitt.off(event, fn)
-      handle(args)
+  off(event: T, handler: EventHandle<T>) {
+    const handlers = this.#events.get(event) ?? []
+    const index = handlers.indexOf(handler)
+    if (index >= 0) {
+      handlers.splice(index, 1)
+      this.#events.set(event, handlers)
     }
-    this.#mitt.on(event, fn)
     return this
   }
 
-  off<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
-    this.#mitt.off(event, handle)
+  once(event: T, handler: EventHandle<T>) {
+    this.on(event, (context) => {
+      handler(context)
+      this.off(event, handler)
+    })
     return this
   }
 
-  emit<T extends keyof AllHandlers>(type: T, context: AllHandlers[T]): this {
-    this.#mitt.emit(type, context)
+  emit(type: T, context: AllHandlers[T]): this {
+    const handlers = this.#events.get(type) ?? []
+
+    for (const handler of handlers) {
+      handler(context)
+    }
 
     // 触发总类
     const indexOf = type.lastIndexOf('.')
@@ -49,8 +56,6 @@ export class NCEventBus {
 
     return this
   }
-
-  post_types = ['message', 'notice', 'request', 'meta_event', 'message_sent']
 
   parseMessage(json: WSReceiveHandler[keyof WSReceiveHandler]) {
     const post_type = json['post_type']
