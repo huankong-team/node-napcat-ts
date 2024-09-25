@@ -41,7 +41,8 @@
     "dev": "nodemon",
     "test": "tsx test/index.ts",
     "docs:dev": "pnpm -C docs run dev",
-    "docs:build": "pnpm -C docs run build"
+    "docs:build": "pnpm -C docs run build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "isomorphic-ws": "^5.0.0",

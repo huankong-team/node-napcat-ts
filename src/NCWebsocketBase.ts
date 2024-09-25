@@ -3,7 +3,8 @@ import { nanoid } from 'nanoid'
 import type {
   AllHandlers,
   APIRequest,
-  EventHandle,
+  EventHandleMap,
+  EventKey,
   NCWebsocketOptions,
   ResponseHandler,
   WSReconnection,
@@ -254,8 +255,8 @@ export class NCWebsocketBase {
    * @param event
    * @param handle
    */
-  on<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
-    this.#eventBus.on(event, handle)
+  on<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
+    this.#eventBus.on<T>(event, handle)
     return this
   }
 
@@ -264,7 +265,7 @@ export class NCWebsocketBase {
    * @param event
    * @param handle
    */
-  once<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
+  once<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
     this.#eventBus.once(event, handle)
     return this
   }
@@ -274,7 +275,7 @@ export class NCWebsocketBase {
    * @param event
    * @param handle
    */
-  off<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
+  off<T extends keyof AllHandlers>(event: T, handle: EventHandleMap[T]) {
     this.#eventBus.off(event, handle)
     return this
   }

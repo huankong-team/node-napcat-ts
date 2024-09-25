@@ -8,15 +8,9 @@ importers:
 
   .:
     dependencies:
-      events:
-        specifier: ^3.3.0
-        version: 3.3.0
       isomorphic-ws:
         specifier: ^5.0.0
         version: 5.0.0(ws@8.18.0)
-      mitt:
-        specifier: ^3.0.1
-        version: 3.0.1
       nanoid:
         specifier: ^5.0.7
         version: 5.0.7
@@ -814,10 +808,6 @@ packages:
 
   estree-walker@2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
-
-  events@3.3.0:
-    resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
-    engines: {node: '>=0.8.x'}
 
   fill-range@7.1.1:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
@@ -1939,8 +1929,6 @@ snapshots:
   esm@3.2.25: {}
 
   estree-walker@2.0.2: {}
-
-  events@3.3.0: {}
 
   fill-range@7.1.1:
     dependencies:

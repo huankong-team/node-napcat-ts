@@ -1,6 +1,8 @@
 import {
+  EventHandleMap,
+  EventKey,
+  HandlerResMap,
   type AllHandlers,
-  type EventHandle,
   type MessageHandler,
   type MessageSentHandler,
   type MetaEventHandler,
@@ -10,22 +12,22 @@ import {
 } from './Interfaces.js'
 import { logger } from './Utils.js'
 
-export class NCEventBus<const T extends keyof AllHandlers> {
-  #events: Map<T, EventHandle<T>[]> = new Map()
+export class NCEventBus {
+  #events = new Map<EventKey, EventHandleMap[EventKey][]>()
   debug: boolean
 
   constructor(debug = false) {
     this.debug = debug
   }
 
-  on(event: T, handler: EventHandle<T>) {
+  on<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
     const handlers = this.#events.get(event) ?? []
     handlers.push(handler)
     this.#events.set(event, handlers)
     return this
   }
 
-  off(event: T, handler: EventHandle<T>) {
+  off<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
     const handlers = this.#events.get(event) ?? []
     const index = handlers.indexOf(handler)
     if (index >= 0) {
@@ -35,16 +37,17 @@ export class NCEventBus<const T extends keyof AllHandlers> {
     return this
   }
 
-  once(event: T, handler: EventHandle<T>) {
-    this.on(event, (context) => {
+  once<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
+    const onceHandler = (context: HandlerResMap[T]) => {
       handler(context)
-      this.off(event, handler)
-    })
+      this.off(event, onceHandler as EventHandleMap[T])
+    }
+    this.on(event, onceHandler as EventHandleMap[T])
     return this
   }
 
-  emit(type: T, context: AllHandlers[T]): this {
-    const handlers = this.#events.get(type) ?? []
+  emit<T extends EventKey>(type: T, context: HandlerResMap[T]): this {
+    const handlers = this.#events.get(type) as EventHandleMap[T][] ?? []
 
     for (const handler of handlers) {
       handler(context)
@@ -52,7 +55,7 @@ export class NCEventBus<const T extends keyof AllHandlers> {
 
     // 触发总类
     const indexOf = type.lastIndexOf('.')
-    if (indexOf > 0) return this.emit(type.slice(0, indexOf) as T, context)
+    if (indexOf > 0) return this.emit(type.slice(0, indexOf) as EventKey, context)
 
     return this
   }

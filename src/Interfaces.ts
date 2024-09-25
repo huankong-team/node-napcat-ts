@@ -492,7 +492,8 @@ export interface NoticeHandler {
 
 // =====================================================================================
 
-export type AllHandlers = SocketHandler &
+export type AllHandlers = |
+  SocketHandler &
   ApiHandler &
   MessageHandler &
   MessageSentHandler &
@@ -500,13 +501,22 @@ export type AllHandlers = SocketHandler &
   RequestHandler &
   NoticeHandler
 
-export type WSReceiveHandler = MessageHandler &
+
+export type WSReceiveHandler = |
+  MessageHandler &
   MessageSentHandler &
   MetaEventHandler &
   RequestHandler &
   NoticeHandler
 
-export type EventHandle<T extends keyof AllHandlers> = (context: AllHandlers[T]) => any
+export type EventKey = keyof AllHandlers
+export type HandlerResMap = {
+  [K in EventKey]: AllHandlers[K]
+}
+export type EventHandleMap = {
+  [K in EventKey]: (context: HandlerResMap[K]) => void
+}
+
 
 // =====================================================================================
 
