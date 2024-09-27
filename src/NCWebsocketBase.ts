@@ -50,7 +50,7 @@ export class NCWebsocketBase {
     this.#reconnection = { enable, attempts, delay, nowAttempts: 1 }
 
     this.#debug = debug
-    this.#eventBus = new NCEventBus(this.#debug)
+    this.#eventBus = new NCEventBus()
     this.#echoMap = new Map()
   }
 
@@ -93,7 +93,7 @@ export class NCWebsocketBase {
         this.#eventBus.emit('socket.error', {
           reconnection: this.#reconnection,
           error_type: 'connect_error',
-          errors: event.error.errors ?? [event.error]
+          errors: event?.error?.errors ?? [event?.error ?? null]
         })
 
         if (this.#throwPromise) {

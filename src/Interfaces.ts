@@ -62,13 +62,13 @@ export type WSErrorRes = {
     }
   | {
       error_type: 'connect_error'
-      errors: {
+      errors: ({
         errno: number
         code: string
         syscall: string
         address: string
         port: number
-      }[]
+      } | null)[]
     }
 )
 
@@ -77,7 +77,11 @@ export interface SocketHandler {
   'socket.open': WSOpenRes
   'socket.close': WSCloseRes
   'socket.error': WSErrorRes
-  socket: WSConnecting | WSOpenRes | WSCloseRes | WSErrorRes
+  socket:
+    | SocketHandler['socket.connecting']
+    | SocketHandler['socket.open']
+    | SocketHandler['socket.close']
+    | SocketHandler['socket.error']
 }
 
 export interface APIRequest<T extends keyof WSSendParam> {
@@ -112,10 +116,10 @@ export interface ResponseHandler {
 
 export interface ApiHandler {
   'api.preSend': APIRequest<keyof WSSendParam>
+  'api.response': ApiHandler['api.response.success'] | ApiHandler['api.response.failure']
   'api.response.success': APISuccessResponse<keyof WSSendReturn>
   'api.response.failure': APIErrorResponse
-  'api.response': APISuccessResponse<keyof WSSendReturn> | APIErrorResponse
-  api: APIRequest<keyof WSSendParam> | APISuccessResponse<keyof WSSendReturn> | APIErrorResponse
+  api: ApiHandler['api.preSend'] | ApiHandler['api.response']
 }
 
 // 心跳包
@@ -142,9 +146,10 @@ export interface LifeCycle {
 }
 
 export interface MetaEventHandler {
-  'meta_event.lifecycle': LifeCycle
+  'meta_event.lifecycle': MetaEventHandler['meta_event.lifecycle.connect']
+  'meta_event.lifecycle.connect': LifeCycle
   'meta_event.heartbeat': HeartBeat
-  meta_event: HeartBeat | LifeCycle
+  meta_event: MetaEventHandler['meta_event.lifecycle'] | MetaEventHandler['meta_event.heartbeat']
 }
 
 // =====================================================================================
@@ -157,7 +162,7 @@ export type ArrayMessage = {
 export type MessageType = ArrayMessage
 
 // 私聊消息
-export type PrivateMessage = {
+export type PrivateFriendMessage = {
   self_id: number
   user_id: number
   time: number
@@ -173,6 +178,25 @@ export type PrivateMessage = {
   raw_message: string
   font: number
   sub_type: 'friend'
+  post_type: 'message'
+} & MessageType
+
+export type PrivateGroupMessage = {
+  self_id: number
+  user_id: number
+  time: number
+  message_id: number
+  message_seq: number
+  real_id: number
+  message_type: 'private'
+  sender: {
+    user_id: number
+    nickname: string
+    card: string
+  }
+  raw_message: string
+  font: number
+  sub_type: 'group'
   post_type: 'message'
 } & MessageType
 
@@ -199,14 +223,19 @@ export type GroupMessage = {
 } & MessageType
 
 export interface MessageHandler {
-  'message.private': PrivateMessage
-  'message.group': GroupMessage
-  message: PrivateMessage | GroupMessage
+  'message.private':
+    | MessageHandler['message.private.friend']
+    | MessageHandler['message.private.group']
+  'message.private.friend': PrivateFriendMessage
+  'message.private.group': PrivateGroupMessage
+  'message.group': MessageHandler['message.group.normal']
+  'message.group.normal': GroupMessage
+  message: MessageHandler['message.private'] | MessageHandler['message.group']
 }
 
 // =====================================================================================
 
-export type PrivateMessageSelf = {
+export type PrivateFriendMessageSelf = {
   self_id: number
   user_id: number
   time: number
@@ -222,7 +251,26 @@ export type PrivateMessageSelf = {
   raw_message: string
   font: number
   sub_type: 'friend'
-  post_type: 'message_sent'
+  post_type: 'message'
+} & MessageType
+
+export type PrivateGroupMessageSelf = {
+  self_id: number
+  user_id: number
+  time: number
+  message_id: number
+  message_seq: number
+  real_id: number
+  message_type: 'private'
+  sender: {
+    user_id: number
+    nickname: string
+    card: string
+  }
+  raw_message: string
+  font: number
+  sub_type: 'group'
+  post_type: 'message'
 } & MessageType
 
 export type GroupMessageSelf = {
@@ -247,15 +295,22 @@ export type GroupMessageSelf = {
 } & MessageType
 
 export interface MessageSentHandler {
-  'message_sent.private': PrivateMessageSelf
-  'message_sent.group': GroupMessageSelf
-  message_sent: PrivateMessageSelf | GroupMessageSelf
+  'message_sent.private':
+    | MessageSentHandler['message_sent.private.friend']
+    | MessageSentHandler['message_sent.private.group']
+  'message_sent.private.friend': PrivateFriendMessageSelf
+  'message_sent.private.group': PrivateGroupMessageSelf
+  'message_sent.group': MessageSentHandler['message_sent.group.normal']
+  'message_sent.group.normal': GroupMessageSelf
+  message_sent:
+    | MessageSentHandler['message_sent.private']
+    | MessageSentHandler['message_sent.group']
 }
 
 // =====================================================================================
 
 // 加群请求／邀请
-export interface RequestGroup {
+export interface RequestGroupAdd {
   time: number
   self_id: number
   post_type: 'request'
@@ -264,7 +319,19 @@ export interface RequestGroup {
   request_type: 'group'
   comment: string
   flag: string
-  sub_type: 'add' | 'invite'
+  sub_type: 'add'
+}
+
+export interface RequestGroupInvite {
+  time: number
+  self_id: number
+  post_type: 'request'
+  group_id: number
+  user_id: number
+  request_type: 'group'
+  comment: string
+  flag: string
+  sub_type: 'invite'
 }
 
 // 加好友请求
@@ -280,8 +347,10 @@ export interface RequestFriend {
 
 export interface RequestHandler {
   'request.friend': RequestFriend
-  'request.group': RequestGroup
-  request: RequestGroup | RequestFriend
+  'request.group': RequestHandler['request.group.invte'] | RequestHandler['request.group.add']
+  'request.group.invte': RequestGroupInvite
+  'request.group.add': RequestGroupAdd
+  request: RequestHandler['request.friend'] | RequestHandler['request.group']
 }
 
 // =====================================================================================
@@ -306,36 +375,79 @@ export interface GroupRecall {
   message_id: number
 }
 
-export interface GroupIncrease {
+export interface GroupIncreaseApprove {
   time: number
   self_id: number
   post_type: 'notice'
   notice_type: 'group_increase'
-  sub_type: 'invite' | 'approve'
+  sub_type: 'approve'
   group_id: number
   operator_id: number
   user_id: number
 }
 
-export interface GroupDecrease {
+export interface GroupIncreaseInvite {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'group_increase'
+  sub_type: 'invite'
+  group_id: number
+  operator_id: number
+  user_id: number
+}
+
+export interface GroupDecreaseLeave {
   time: number
   self_id: number
   post_type: 'notice'
   group_id: number
   user_id: number
   notice_type: 'group_decrease'
-  sub_type: 'leave' | 'kick' | 'kick_me'
+  sub_type: 'leave'
   operator_id: number
 }
 
-export interface GroupAdmin {
+export interface GroupDecreaseKick {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'group_decrease'
+  sub_type: 'kick'
+  operator_id: number
+}
+
+export interface GroupDecreaseKickMe {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'group_decrease'
+  sub_type: 'kick_me'
+  operator_id: number
+}
+
+export interface GroupAdminSet {
   time: number
   self_id: number
   post_type: 'notice'
   group_id: number
   user_id: number
   notice_type: 'group_admin'
-  sub_type: 'set' | 'unset'
+  sub_type: 'set'
+}
+
+export interface GroupAdminUnset {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'group_admin'
+  sub_type: 'unset'
 }
 
 export interface GroupUpload {
@@ -353,7 +465,18 @@ export interface GroupUpload {
   }
 }
 
-export interface GroupBan {
+export interface GroupCard {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'group_card'
+  card_new: string
+  card_old: string
+}
+
+export interface GroupBanBan {
   time: number
   self_id: number
   post_type: 'notice'
@@ -362,7 +485,19 @@ export interface GroupBan {
   notice_type: 'group_ban'
   operator_id: number
   duration: number
-  sub_type: 'ban' | 'lift_ban'
+  sub_type: 'ban'
+}
+
+export interface GroupBanLiftBan {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'group_ban'
+  operator_id: number
+  duration: number
+  sub_type: 'lift_ban'
 }
 
 export interface FriendAdd {
@@ -417,7 +552,6 @@ export interface Essence {
   sub_type: 'add' | 'delete'
 }
 
-// TODO: 收不到
 export interface GroupMsgEmojiLike {
   time: number
   self_id: number
@@ -453,61 +587,91 @@ export interface NotifyInputStatusFriend {
   group_id: 0
 }
 
+export interface NotifyProfileLike {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'notify'
+  sub_type: 'profile_like'
+  operator_id: number
+  operator_nick: string
+  times: number
+}
+
 export interface NoticeHandler {
-  'notice.friend_recall': FriendRecall
-  'notice.group_recall': GroupRecall
-  'notice.group_increase': GroupIncrease
-  'notice.group_decrease': GroupDecrease
-  'notice.group_admin': GroupAdmin
-  'notice.group_upload': GroupUpload
-  'notice.group_ban': GroupBan
   'notice.friend_add': FriendAdd
-  'notice.notify.input_status.friend': NotifyInputStatusFriend
-  'notice.notify.input_status.group': NotifyInputStatusGroup
-  'notice.notify.input_status': NotifyInputStatusFriend | NotifyInputStatusGroup
+  'notice.friend_recall': FriendRecall
+  'notice.group_admin':
+    | NoticeHandler['notice.group_admin.set']
+    | NoticeHandler['notice.group_admin.unset']
+  'notice.group_admin.set': GroupAdminSet
+  'notice.group_admin.unset': GroupAdminUnset
+  'notice.group_ban':
+    | NoticeHandler['notice.group_ban.ban']
+    | NoticeHandler['notice.group_ban.lift_ban']
+  'notice.group_ban.ban': GroupBanBan
+  'notice.group_ban.lift_ban': GroupBanLiftBan
+  'notice.group_card': GroupCard
+  'notice.group_decrease':
+    | NoticeHandler['notice.group_decrease.leave']
+    | NoticeHandler['notice.group_decrease.kick']
+    | NoticeHandler['notice.group_decrease.kick_me']
+  'notice.group_decrease.leave': GroupDecreaseLeave
+  'notice.group_decrease.kick': GroupDecreaseKick
+  'notice.group_decrease.kick_me': GroupDecreaseKickMe
+  'notice.group_increase':
+    | NoticeHandler['notice.group_increase.approve']
+    | NoticeHandler['notice.group_increase.invite']
+  'notice.group_increase.approve': GroupIncreaseApprove
+  'notice.group_increase.invite': GroupIncreaseInvite
+  'notice.group_recall': GroupRecall
+  'notice.group_upload': GroupUpload
+  'notice.group_msg_emoji_like': GroupMsgEmojiLike
+  'notice.essence': NoticeHandler['notice.essence.add']
+  'notice.essence.add': Essence
+  'notice.notify':
+    | NoticeHandler['notice.notify.poke']
+    | NoticeHandler['notice.notify.input_status']
+    | NoticeHandler['notice.notify.profile_like']
+  'notice.notify.poke':
+    | NoticeHandler['notice.notify.poke.friend']
+    | NoticeHandler['notice.notify.poke.group']
   'notice.notify.poke.friend': NotifyPokeFriend
   'notice.notify.poke.group': NotifyPokeGroup
-  'notice.notify.poke': NotifyPokeFriend | NotifyPokeGroup
-  'notice.notify':
-    | NotifyPokeFriend
-    | NotifyPokeGroup
-    | NotifyInputStatusFriend
-    | NotifyInputStatusGroup
-  'notice.essence': Essence
-  'notice.group_msg_emoji_like': GroupMsgEmojiLike
+  'notice.notify.input_status':
+    | NoticeHandler['notice.notify.input_status.friend']
+    | NoticeHandler['notice.notify.input_status.group']
+  'notice.notify.input_status.friend': NotifyInputStatusFriend
+  'notice.notify.input_status.group': NotifyInputStatusGroup
+  'notice.notify.profile_like': NotifyProfileLike
   notice:
-    | FriendRecall
-    | GroupRecall
-    | GroupIncrease
-    | GroupDecrease
-    | GroupAdmin
-    | GroupUpload
-    | GroupBan
-    | FriendAdd
-    | NotifyPokeFriend
-    | NotifyPokeGroup
-    | Essence
-    | GroupMsgEmojiLike
+    | NoticeHandler['notice.friend_add']
+    | NoticeHandler['notice.friend_recall']
+    | NoticeHandler['notice.group_admin']
+    | NoticeHandler['notice.group_ban']
+    | NoticeHandler['notice.group_card']
+    | NoticeHandler['notice.group_decrease']
+    | NoticeHandler['notice.group_increase']
+    | NoticeHandler['notice.group_recall']
+    | NoticeHandler['notice.group_upload']
+    | NoticeHandler['notice.group_msg_emoji_like']
+    | NoticeHandler['notice.essence']
+    | NoticeHandler['notice.notify']
 }
 
 // =====================================================================================
 
-export type AllHandlers = |
-  SocketHandler &
-  ApiHandler &
-  MessageHandler &
-  MessageSentHandler &
-  MetaEventHandler &
-  RequestHandler &
-  NoticeHandler
+export type AllHandlers =
+  | SocketHandler &
+      ApiHandler &
+      MessageHandler &
+      MessageSentHandler &
+      MetaEventHandler &
+      RequestHandler &
+      NoticeHandler
 
-
-export type WSReceiveHandler = |
-  MessageHandler &
-  MessageSentHandler &
-  MetaEventHandler &
-  RequestHandler &
-  NoticeHandler
+export type WSReceiveHandler =
+  | MessageHandler & MessageSentHandler & MetaEventHandler & RequestHandler & NoticeHandler
 
 export type EventKey = keyof AllHandlers
 export type HandlerResMap = {
@@ -516,7 +680,6 @@ export type HandlerResMap = {
 export type EventHandleMap = {
   [K in EventKey]: (context: HandlerResMap[K]) => void
 }
-
 
 // =====================================================================================
 
@@ -578,10 +741,19 @@ export type WSSendParam = {
   // clean_cache: {}
   get_cookies: { domain: string }
   '.handle_quick_operation':
-    | { context: PrivateMessage; operation: { reply?: Send[keyof Send][] } }
-    | { context: GroupMessage; operation: { reply?: Send[keyof Send][]; at_sender?: boolean } }
-    | { context: RequestFriend; operation: { approve?: boolean } }
-    | { context: RequestGroup; operation: { approve?: boolean; reason?: string } }
+    | {
+        context: MessageHandler['message.private']
+        operation: { reply?: Send[keyof Send][] }
+      }
+    | {
+        context: MessageHandler['message.group']
+        operation: { reply?: Send[keyof Send][]; at_sender?: boolean }
+      }
+    | { context: RequestHandler['request.friend']; operation: { approve?: boolean } }
+    | {
+        context: RequestHandler['request.group']
+        operation: { approve?: boolean; reason?: string }
+      }
   get_group_honor_info: {
     group_id: number
     type?: 'all' | 'talkative' | 'performer' | 'legend' | 'strong_newbie' | 'emotion'
