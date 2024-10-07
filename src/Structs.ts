@@ -193,7 +193,7 @@ export interface Send {
     type: 'music'
     data:
       | {
-          type: 'qq' | '163'
+          type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo'
           id: string
         }
       | {
@@ -373,7 +373,10 @@ export const Structs = {
    * @param id 音乐id
    * @returns { type: 'music', data: { type, id } }
    */
-  music: function (type: 'qq' | '163', id: string | number): Send['music'] {
+  music: function (
+    type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo',
+    id: string | number
+  ): Send['music'] {
     return { type: 'music', data: { type, id: id.toString() } }
   },
   /**
