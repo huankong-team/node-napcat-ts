@@ -1,7 +1,4 @@
 export const logger = {
-  log: (...args: any[]) => {
-    console.log(`[${getTime()}]`, ...args)
-  },
   warn: (...args: any[]) => {
     console.warn(`[${getTime()}]`, ...args)
   },

@@ -1,6 +1,6 @@
 {
   "name": "node-napcat-ts",
-  "version": "0.2.22",
+  "version": "0.3.0",
   "description": "napcat SDK for Node",
   "license": "MIT",
   "type": "module",
@@ -35,27 +35,29 @@
       "url": "https://github.com/YunYouJun"
     }
   ],
-  "repository": "https://github.com/huankong233/node-napcat-ts.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huankong233/node-napcat-ts.git"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
     "test": "tsx test/index.ts",
+    "typecheck": "tsc --noEmit",
     "docs:dev": "pnpm -C docs run dev",
     "docs:build": "pnpm -C docs run build"
   },
   "dependencies": {
-    "events": "^3.3.0",
     "isomorphic-ws": "^5.0.0",
-    "mitt": "^3.0.1",
     "nanoid": "^5.0.7",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@types/node": "^22.5.1",
+    "@types/node": "^22.7.3",
     "@types/ws": "^8.5.12",
     "dotenv": "^16.4.5",
-    "nodemon": "^3.1.4",
-    "tsx": "^4.19.0",
-    "typescript": "^5.5.4"
+    "nodemon": "^3.1.7",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
   }
 }

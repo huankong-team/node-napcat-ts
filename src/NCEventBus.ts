@@ -1,6 +1,7 @@
 import {
-  type AllHandlers,
-  type EventHandle,
+  EventHandleMap,
+  EventKey,
+  HandlerResMap,
   type MessageHandler,
   type MessageSentHandler,
   type MetaEventHandler,
@@ -8,68 +9,72 @@ import {
   type RequestHandler,
   type WSReceiveHandler
 } from './Interfaces.js'
-
-import mitt from 'mitt'
 import { logger } from './Utils.js'
 
 export class NCEventBus {
-  debug: boolean
-  // @ts-ignore
-  #mitt = mitt()
+  #events = new Map<EventKey, EventHandleMap[EventKey][]>()
 
-  constructor(debug = false) {
-    this.debug = debug
-  }
-
-  on<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
-    this.#mitt.on(event, handle)
+  on<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
+    const handlers = this.#events.get(event) ?? []
+    if (handlers.indexOf(handler) >= 0) return this
+    handlers.push(handler)
+    this.#events.set(event, handlers)
     return this
   }
 
-  once<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
-    const fn = (args: AllHandlers[T]) => {
-      this.#mitt.off(event, fn)
-      handle(args)
+  off<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
+    const handlers = this.#events.get(event) ?? []
+
+    const index = handlers.indexOf(handler)
+    if (index >= 0) {
+      handlers.splice(index, 1)
+      this.#events.set(event, handlers)
     }
-    this.#mitt.on(event, fn)
+
     return this
   }
 
-  off<T extends keyof AllHandlers>(event: T, handle: EventHandle<T>) {
-    this.#mitt.off(event, handle)
+  once<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
+    const onceHandler = (context: HandlerResMap[T]) => {
+      handler(context)
+      this.off(event, onceHandler as EventHandleMap[T])
+    }
+    this.on(event, onceHandler as EventHandleMap[T])
     return this
   }
 
-  emit<T extends keyof AllHandlers>(type: T, context: AllHandlers[T]): this {
-    this.#mitt.emit(type, context)
+  emit<T extends EventKey>(event: T, context: HandlerResMap[T]): boolean {
+    const handlers = (this.#events.get(event) as EventHandleMap[T][]) ?? []
+
+    for (const handler of handlers) {
+      handler(context)
+    }
 
     // 触发总类
-    const indexOf = type.lastIndexOf('.')
-    if (indexOf > 0) return this.emit(type.slice(0, indexOf) as T, context)
+    const indexOf = event.lastIndexOf('.')
+    if (indexOf > 0) return this.emit(event.slice(0, indexOf) as EventKey, context)
 
-    return this
+    return true
   }
-
-  post_types = ['message', 'notice', 'request', 'meta_event', 'message_sent']
 
   parseMessage(json: WSReceiveHandler[keyof WSReceiveHandler]) {
     const post_type = json['post_type']
 
     switch (post_type) {
+      case 'meta_event':
+        this.meta_event(json)
+        break
       case 'message':
         this.message(json)
         break
       case 'message_sent':
         this.message_sent(json)
         break
-      case 'notice':
-        this.notice(json)
-        break
       case 'request':
         this.request(json)
         break
-      case 'meta_event':
-        this.meta_event(json)
+      case 'notice':
+        this.notice(json)
         break
       default:
         logger.warn('[node-napcat-ts]', '[eventBus]', `unknown post_type: ${post_type}`)
@@ -77,107 +82,6 @@ export class NCEventBus {
     }
 
     return true
-  }
-
-  message(json: MessageHandler[keyof MessageHandler]) {
-    const messageType = json['message_type']
-    switch (messageType) {
-      case 'private':
-        return this.emit('message.private', json)
-      case 'group':
-        return this.emit('message.group', json)
-      default:
-        if (this.debug) {
-          logger.warn('[node-napcat-ts]', '[eventBus]', `unknown message_type: ${messageType}`)
-        }
-        return false
-    }
-  }
-
-  message_sent(json: MessageSentHandler[keyof MessageSentHandler]) {
-    const message_type = json['message_type']
-    switch (message_type) {
-      case 'private':
-        return this.emit('message_sent.private', json)
-      case 'group':
-        return this.emit('message_sent.group', json)
-      default:
-        if (this.debug) {
-          logger.warn(
-            '[node-napcat-ts]',
-            '[eventBus]',
-            `unknown message_sent_type: ${message_type}`
-          )
-        }
-        return false
-    }
-  }
-
-  notice(json: NoticeHandler[keyof NoticeHandler]) {
-    const notice_type = json['notice_type']
-    switch (notice_type) {
-      case 'group_upload':
-        return this.emit('notice.group_upload', json)
-      case 'group_admin':
-        return this.emit('notice.group_admin', json)
-      case 'group_decrease':
-        return this.emit('notice.group_decrease', json)
-      case 'group_increase':
-        return this.emit('notice.group_increase', json)
-      case 'group_ban':
-        return this.emit('notice.group_ban', json)
-      case 'friend_add':
-        return this.emit('notice.friend_add', json)
-      case 'group_recall':
-        return this.emit('notice.group_recall', json)
-      case 'friend_recall':
-        return this.emit('notice.friend_recall', json)
-      case 'notify':
-        const sub_type = json['sub_type']
-        switch (sub_type) {
-          case 'poke':
-            return this.emit(
-              'group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend',
-              json
-            )
-          case 'input_status':
-            return this.emit(
-              json.group_id !== 0
-                ? 'notice.notify.input_status.group'
-                : 'notice.notify.input_status.friend',
-              json
-            )
-          default:
-            if (this.debug) {
-              logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notify_type: ${sub_type}`)
-            }
-            return false
-        }
-      case 'essence':
-        return this.emit('notice.essence', json)
-      case 'group_msg_emoji_like':
-        return this.emit('notice.group_msg_emoji_like', json)
-      default:
-        if (this.debug) {
-          logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_type: ${notice_type}`)
-        }
-        return false
-    }
-  }
-
-  request(json: RequestHandler[keyof RequestHandler]) {
-    const request_type = json['request_type']
-    switch (request_type) {
-      case 'friend':
-        return this.emit('request.friend', json)
-      case 'group':
-        return this.emit('request.group', json)
-      default:
-        if (this.debug) {
-          logger.warn('[node-napcat-ts]', '[eventBus]', `unknown request_type: ${request_type}`)
-        }
-        return false
-    }
   }
 
   meta_event(json: MetaEventHandler[keyof MetaEventHandler]) {
@@ -189,13 +93,240 @@ export class NCEventBus {
       case 'heartbeat':
         return this.emit('meta_event.heartbeat', json)
       default:
-        if (this.debug) {
-          logger.warn(
-            '[node-napcat-ts]',
-            '[eventBus]',
-            `unknown meta_event_type: ${meta_event_type}`
-          )
-        }
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown meta_event_type: ${meta_event_type}`)
+        return false
+    }
+  }
+
+  message(json: MessageHandler[keyof MessageHandler]) {
+    const messageType = json['message_type']
+    switch (messageType) {
+      case 'private':
+        return this.message_private(json)
+      case 'group':
+        return this.message_group(json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown message_type: ${messageType}`)
+        return false
+    }
+  }
+
+  message_private(json: MessageHandler['message.private']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'group':
+        return this.emit('message.private.group', json)
+      case 'friend':
+        return this.emit('message.private.friend', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown message_private_type: ${subType}`)
+        return false
+    }
+  }
+
+  message_group(json: MessageHandler['message.group']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'normal':
+        return this.emit('message.group.normal', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown message_group_type: ${subType}`)
+        return false
+    }
+  }
+
+  message_sent(json: MessageSentHandler[keyof MessageSentHandler]) {
+    const messageType = json['message_type']
+    switch (messageType) {
+      case 'private':
+        return this.message_sent_private(json)
+      case 'group':
+        return this.message_sent_group(json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown message_sent_type: ${messageType}`)
+        return false
+    }
+  }
+
+  message_sent_private(json: MessageSentHandler['message_sent.private']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'group':
+        return this.emit('message_sent.private.group', json)
+      case 'friend':
+        return this.emit('message_sent.private.friend', json)
+      default:
+        logger.warn(
+          '[node-napcat-ts]',
+          '[eventBus]',
+          `unknown message_sent_private_type: ${subType}`
+        )
+        return false
+    }
+  }
+
+  message_sent_group(json: MessageSentHandler['message_sent.group']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'normal':
+        return this.emit('message_sent.group.normal', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown message_sent_group_type: ${subType}`)
+        return false
+    }
+  }
+
+  request(json: RequestHandler[keyof RequestHandler]) {
+    const request_type = json['request_type']
+    switch (request_type) {
+      case 'friend':
+        return this.emit('request.friend', json)
+      case 'group':
+        return this.request_group(json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown request_type: ${request_type}`)
+        return false
+    }
+  }
+
+  request_group(json: RequestHandler['request.group']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'add':
+        return this.emit('request.group.add', json)
+      case 'invite':
+        return this.emit('request.group.invte', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown request_group_type: ${subType}`)
+        return false
+    }
+  }
+
+  notice(json: NoticeHandler[keyof NoticeHandler]) {
+    const notice_type = json['notice_type']
+    switch (notice_type) {
+      case 'friend_add':
+        return this.emit('notice.friend_add', json)
+      case 'friend_recall':
+        return this.emit('notice.friend_recall', json)
+      case 'group_admin':
+        return this.notice_group_admin(json)
+      case 'group_ban':
+        return this.notice_group_ban(json)
+      case 'group_card':
+        return this.emit('notice.group_card', json)
+      case 'group_decrease':
+        return this.notice_group_decrease(json)
+      case 'group_increase':
+        return this.notice_group_increase(json)
+      case 'group_recall':
+        return this.emit('notice.group_recall', json)
+      case 'group_upload':
+        return this.emit('notice.group_upload', json)
+      case 'group_msg_emoji_like':
+        return this.emit('notice.group_msg_emoji_like', json)
+      case 'essence':
+        return this.notice_essence(json)
+      case 'notify':
+        return this.notice_notify(json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_type: ${notice_type}`)
+        return false
+    }
+  }
+
+  notice_group_admin(json: NoticeHandler['notice.group_admin']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'set':
+        return this.emit('notice.group_admin.set', json)
+      case 'unset':
+        return this.emit('notice.group_admin.unset', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_group_admin_type: ${subType}`)
+        return false
+    }
+  }
+
+  notice_group_ban(json: NoticeHandler['notice.group_ban']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'ban':
+        return this.emit('notice.group_ban.ban', json)
+      case 'lift_ban':
+        return this.emit('notice.group_ban.lift_ban', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_group_ban_type: ${subType}`)
+        return false
+    }
+  }
+
+  notice_group_decrease(json: NoticeHandler['notice.group_decrease']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'leave':
+        return this.emit('notice.group_decrease.leave', json)
+      case 'kick':
+        return this.emit('notice.group_decrease.kick', json)
+      case 'kick_me':
+        return this.emit('notice.group_decrease.kick_me', json)
+      default:
+        logger.warn(
+          '[node-napcat-ts]',
+          '[eventBus]',
+          `unknown notice_group_decrease_type: ${subType}`
+        )
+        return false
+    }
+  }
+
+  notice_group_increase(json: NoticeHandler['notice.group_increase']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'approve':
+        return this.emit('notice.group_increase.approve', json)
+      case 'invite':
+        return this.emit('notice.group_increase.invite', json)
+      default:
+        logger.warn(
+          '[node-napcat-ts]',
+          '[eventBus]',
+          `unknown notice_group_increase_type: ${subType}`
+        )
+        return false
+    }
+  }
+
+  notice_essence(json: NoticeHandler['notice.essence']) {
+    const subType = json['sub_type']
+    switch (subType) {
+      case 'add':
+        return this.emit('notice.essence.add', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_essence_type: ${subType}`)
+        return false
+    }
+  }
+
+  notice_notify(json: NoticeHandler['notice.notify']) {
+    const sub_type = json['sub_type']
+    switch (sub_type) {
+      case 'poke':
+        return this.emit(
+          'group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend',
+          json
+        )
+      case 'input_status':
+        return this.emit(
+          'group_id' in json && json.group_id !== 0
+            ? 'notice.notify.input_status.group'
+            : 'notice.notify.input_status.friend',
+          json
+        )
+      case 'profile_like':
+        return this.emit('notice.notify.profile_like', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_notify_type: ${sub_type}`)
         return false
     }
   }
