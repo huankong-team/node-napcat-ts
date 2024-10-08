@@ -22,6 +22,16 @@ napcat.off('事件名', (context) => {
 napcat.emit('事件名', context)
 ```
 
+## 快捷操作
+
+``` typescript
+// 背后调用的接口是 .handle_quick_operation
+// 只支持 message request 这两个事件
+napcat.on('message', (context) => {
+  await context.quick_action([Structs.text('233')])
+})
+```
+
 ## 注意事项
 
 虽然这里直接编写函数是有类型的,不过一般我们是分开写的,比如:
