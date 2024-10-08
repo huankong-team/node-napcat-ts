@@ -43,6 +43,9 @@ bot.on('api.preSend', function (params) {
 bot.on('message', async (context) => {
   console.log('\n收到了一条信息')
   console.dir(context, { depth: null })
+
+  await context.quick_action([Structs.text('233')])
+
   context.message.forEach(async (item) => {
     if (item.type !== 'text') return
 

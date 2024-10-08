@@ -50,7 +50,7 @@ export class NCWebsocketBase {
     this.#reconnection = { enable, attempts, delay, nowAttempts: 1 }
 
     this.#debug = debug
-    this.#eventBus = new NCEventBus()
+    this.#eventBus = new NCEventBus(this)
     this.#echoMap = new Map()
   }
 

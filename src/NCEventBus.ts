@@ -9,10 +9,17 @@ import {
   type RequestHandler,
   type WSReceiveHandler
 } from './Interfaces.js'
+import type { NCWebsocketBase } from './NCWebsocketBase.js'
+import type { Send } from './Structs.js'
 import { logger } from './Utils.js'
 
 export class NCEventBus {
   #events = new Map<EventKey, EventHandleMap[EventKey][]>()
+  #ws: NCWebsocketBase
+
+  constructor(ws: NCWebsocketBase) {
+    this.#ws = ws
+  }
 
   on<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
     const handlers = this.#events.get(event) ?? []
@@ -112,6 +119,9 @@ export class NCEventBus {
   }
 
   message_private(json: MessageHandler['message.private']) {
+    json.quick_action = (reply: Send[keyof Send][]) =>
+      this.#ws.send('.handle_quick_operation', { context: json, operation: { reply } })
+
     const subType = json['sub_type']
     switch (subType) {
       case 'group':
@@ -125,6 +135,9 @@ export class NCEventBus {
   }
 
   message_group(json: MessageHandler['message.group']) {
+    json.quick_action = (reply: Send[keyof Send][], at_sender = false) =>
+      this.#ws.send('.handle_quick_operation', { context: json, operation: { reply, at_sender } })
+
     const subType = json['sub_type']
     switch (subType) {
       case 'normal':
@@ -180,6 +193,8 @@ export class NCEventBus {
     const request_type = json['request_type']
     switch (request_type) {
       case 'friend':
+        json.quick_action = (approve = true) =>
+          this.#ws.send('.handle_quick_operation', { context: json, operation: { approve } })
         return this.emit('request.friend', json)
       case 'group':
         return this.request_group(json)
@@ -190,6 +205,9 @@ export class NCEventBus {
   }
 
   request_group(json: RequestHandler['request.group']) {
+    json.quick_action = (approve = true, reason?: string) =>
+      this.#ws.send('.handle_quick_operation', { context: json, operation: { approve, reason } })
+
     const subType = json['sub_type']
     switch (subType) {
       case 'add':

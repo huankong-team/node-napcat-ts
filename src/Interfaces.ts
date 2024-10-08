@@ -154,12 +154,10 @@ export interface MetaEventHandler {
 
 // =====================================================================================
 
-export type ArrayMessage = {
+export type MessageType = {
   message_format: 'array'
   message: Receive[keyof Receive][]
 }
-
-export type MessageType = ArrayMessage
 
 // 私聊消息
 export type PrivateFriendMessage = {
@@ -179,6 +177,7 @@ export type PrivateFriendMessage = {
   font: number
   sub_type: 'friend'
   post_type: 'message'
+  quick_action: (reply: Send[keyof Send][]) => Promise<{}>
 } & MessageType
 
 export type PrivateGroupMessage = {
@@ -198,6 +197,7 @@ export type PrivateGroupMessage = {
   font: number
   sub_type: 'group'
   post_type: 'message'
+  quick_action: (reply: Send[keyof Send][], at_sender?: boolean) => Promise<{}>
 } & MessageType
 
 // 群消息
@@ -220,6 +220,7 @@ export type GroupMessage = {
   sub_type: 'normal'
   post_type: 'message'
   group_id: number
+  quick_action: (reply: Send[keyof Send][], at_sender?: boolean) => Promise<{}>
 } & MessageType
 
 export interface MessageHandler {
@@ -251,7 +252,7 @@ export type PrivateFriendMessageSelf = {
   raw_message: string
   font: number
   sub_type: 'friend'
-  post_type: 'message'
+  post_type: 'message_sent'
 } & MessageType
 
 export type PrivateGroupMessageSelf = {
@@ -270,7 +271,7 @@ export type PrivateGroupMessageSelf = {
   raw_message: string
   font: number
   sub_type: 'group'
-  post_type: 'message'
+  post_type: 'message_sent'
 } & MessageType
 
 export type GroupMessageSelf = {
@@ -320,6 +321,7 @@ export interface RequestGroupAdd {
   comment: string
   flag: string
   sub_type: 'add'
+  quick_action: (approve?: boolean, reason?: string) => Promise<{}>
 }
 
 export interface RequestGroupInvite {
@@ -332,6 +334,7 @@ export interface RequestGroupInvite {
   comment: string
   flag: string
   sub_type: 'invite'
+  quick_action: (approve?: boolean, reason?: string) => Promise<{}>
 }
 
 // 加好友请求
@@ -343,6 +346,7 @@ export interface RequestFriend {
   user_id: number
   comment: string
   flag: string
+  quick_action: (approve?: boolean) => Promise<{}>
 }
 
 export interface RequestHandler {
