@@ -848,6 +848,8 @@ export type WSSendParam = {
   nc_get_rkey: {}
   set_group_special_title: { group_id: number; user_id: number; special_title: string }
   // get_group_shut_list: {}
+  group_poke: { group_id: number; user_id: number }
+  friend_poke: { user_id: number }
 }
 
 export type WSSendReturn = {
@@ -1800,5 +1802,7 @@ export type WSSendReturn = {
     type: number
   }[]
   set_group_special_title: {}
-  // get_group_shut_list: {}
+  // get_group_shut_list: { result: number; errMsg: string }
+  group_poke: {}
+  friend_poke: {}
 }
