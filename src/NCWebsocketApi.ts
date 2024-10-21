@@ -692,4 +692,44 @@ export class NCWebsocketApi extends NCWebsocketBase {
   get_group_system_msg(params: WSSendParam['get_group_system_msg']) {
     return this.send('get_group_system_msg', params)
   }
+
+  /**
+   * @napcat
+   * 不造啊,干什么的呢?
+   */
+  fetch_user_profile_like(params: WSSendParam['fetch_user_profile_like']) {
+    return this.send('fetch_user_profile_like', params)
+  }
+
+  /**
+   * @napcat
+   * 检查 PacketServer 是否在线
+   */
+  nc_get_packet_status(params: WSSendParam['nc_get_packet_status']) {
+    return this.send('nc_get_packet_status', params)
+  }
+
+  /**
+   * @napcat
+   * 获取用户状态
+   */
+  nc_get_user_status(params: WSSendParam['nc_get_user_status']) {
+    return this.send('nc_get_user_status', params)
+  }
+
+  /**
+   * @napcat
+   * 获取Rkey
+   */
+  nc_get_rkey(params: WSSendParam['nc_get_rkey']) {
+    return this.send('nc_get_rkey', params)
+  }
+
+  /**
+   * @onebot
+   * 设置群头衔
+   */
+  set_group_special_title(params: WSSendParam['set_group_special_title']) {
+    return this.send('set_group_special_title', params)
+  }
 }
