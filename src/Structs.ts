@@ -1,3 +1,10 @@
+export interface UnSafeStruct {
+  type: string
+  data: {
+    [k: string]: any
+  }
+}
+
 export interface Receive {
   text: {
     type: 'text'
