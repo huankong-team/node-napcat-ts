@@ -12,7 +12,7 @@ import type {
   WSSendReturn
 } from './Interfaces.js'
 import { NCEventBus } from './NCEventBus.js'
-import { convertCQCodeToJSON, CQCodeDecode, logger, sleep } from './Utils.js'
+import { convertCQCodeToJSON, CQCodeDecode, logger } from './Utils.js'
 
 export class NCWebsocketBase {
   #debug: boolean
@@ -80,12 +80,13 @@ export class NCWebsocketBase {
           this.#reconnection.nowAttempts < this.#reconnection.attempts
         ) {
           this.#reconnection.nowAttempts++
-          await sleep(this.#reconnection.delay)
-          try {
-            await this.reconnect()
-          } catch (error) {
-            reject(error)
-          }
+          setTimeout(async () => {
+            try {
+              await this.reconnect()
+            } catch (error) {
+              reject(error)
+            }
+          }, this.#reconnection.delay)
         }
       }
       socket.onmessage = (event) => this.#message(event.data)

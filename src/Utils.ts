@@ -1,3 +1,5 @@
+import type { UnSafeStruct } from './Structs.js'
+
 export const logger = {
   warn: (...args: any[]) => {
     console.warn(`[${getTime()}]`, ...args)
@@ -10,23 +12,15 @@ export const logger = {
   }
 }
 
-export const getTime = () => new Date().toLocaleString()
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const getTime = () => new Date().toLocaleString()
 
 export const SPLIT = /(?=\[CQ:)|(?<=])/
 export const CQ_TAG_REGEXP = /^\[CQ:([a-z]+)(?:,([^\]]+))?]$/
 
-interface Struct {
-  type: string
-  data: {
-    [k: string]: any
-  }
-}
-
 /**
  * CQ码转JSON
  */
-export function convertCQCodeToJSON(msg: string): Struct[] {
+export function convertCQCodeToJSON(msg: string): UnSafeStruct[] {
   return CQCodeDecode(msg)
     .split(SPLIT)
     .map((tagStr) => {
@@ -51,7 +45,7 @@ const _conver = (json: any) => {
 /**
  * JSON转CQ码
  */
-export function convertJSONToCQCode(json: Struct | Struct[]): string {
+export function convertJSONToCQCode(json: UnSafeStruct | UnSafeStruct[]): string {
   if (Array.isArray(json)) {
     return json.map((item) => _conver(item)).join('')
   } else {

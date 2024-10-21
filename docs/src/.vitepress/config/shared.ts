@@ -45,7 +45,10 @@ export const shared = defineConfig({
 
   themeConfig: {
     logo: { src: 'https://img.huankong.top/i/2022/11/29/6385ef8c7a675.ico', width: 24, height: 24 },
-
+    //开启本地搜索
+    search: {
+      provider: 'local'
+    },
     socialLinks: [{ icon: 'github', link: 'https://github.com/huankong233/node-napcat-ts' }]
   }
 })
