@@ -843,6 +843,11 @@ export type WSSendParam = {
   get_group_info_ex: { group_id: number }
   get_group_system_msg: { group_id: number }
   fetch_user_profile_like: { qq: number }
+  nc_get_packet_status: {}
+  nc_get_user_status: { user_id: number }
+  nc_get_rkey: {}
+  set_group_special_title: { group_id: number; user_id: number; special_title: string }
+  // get_group_shut_list: {}
 }
 
 export type WSSendReturn = {
@@ -1787,4 +1792,13 @@ export type WSSendReturn = {
     }[]
   }
   fetch_user_profile_like: string
+  nc_get_packet_status: {}
+  nc_get_user_status: { status: number; ext_status: number }
+  nc_get_rkey: {
+    rkey: string
+    time: number
+    type: number
+  }[]
+  set_group_special_title: {}
+  // get_group_shut_list: {}
 }
