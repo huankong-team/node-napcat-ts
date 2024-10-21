@@ -732,4 +732,20 @@ export class NCWebsocketApi extends NCWebsocketBase {
   set_group_special_title(params: WSSendParam['set_group_special_title']) {
     return this.send('set_group_special_title', params)
   }
+
+  /**
+   * @napcat
+   * 群聊戳一戳
+   */
+  group_poke(params: WSSendParam['group_poke']) {
+    return this.send('group_poke', params)
+  }
+
+  /**
+   * @napcat
+   * 私聊戳一戳
+   */
+  friend_poke(params: WSSendParam['friend_poke']) {
+    return this.send('friend_poke', params)
+  }
 }
