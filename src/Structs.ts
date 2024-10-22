@@ -12,82 +12,43 @@ export interface Receive {
       text: string
     }
   }
-  face: {
-    type: 'face'
-    data: {
-      id: string
-    }
-  }
-  mface: {
-    type: 'mface'
-    data: {
-      summary: string
-      url: string
-      emoji_id: string
-      emoji_package_id: string
-      key: string
-    }
-  }
   at: {
     type: 'at'
     data: {
       qq: string | 'all'
-      name: string
-    }
-  }
-  reply: {
-    type: 'reply'
-    data: {
-      id: string
     }
   }
   image: {
     type: 'image'
-    data: {
-      file_unique: string
-      file: string
-      subType: string
-      file_id: string
-      url: string
-      file_size: string
-    }
-  }
-  record: {
-    type: 'record'
-    data: {
-      file_unique: string
-      file: string
-      path: string
-      file_id: string
-      file_size: string
-    }
+    data:
+      | {
+          summary: string
+          file: string
+          sub_type: string
+          file_id: string
+          url: string
+          path: string
+          file_size: string
+          file_unique: string
+        }
+      | {
+          summary: string
+          file: 'marketface'
+          file_id: string
+          path: string
+          url: string
+          file_unique: string
+        }
   }
   file: {
     type: 'file'
     data: {
-      file_unique: string
       file: string
       path: string
       url: string
       file_id: string
       file_size: string
-    }
-  }
-  video: {
-    type: 'video'
-    data: {
       file_unique: string
-      file: string
-      path: string
-      url: string
-      file_id: string
-      file_size: string
-    }
-  }
-  json: {
-    type: 'json'
-    data: {
-      data: string
     }
   }
   dice: {
@@ -102,10 +63,38 @@ export interface Receive {
       result: string
     }
   }
-  markdown: {
-    type: 'markdown'
+  face: {
+    type: 'face'
     data: {
-      content: string
+      id: string
+    }
+  }
+  reply: {
+    type: 'reply'
+    data: {
+      id: string
+    }
+  }
+  video: {
+    type: 'video'
+    data: {
+      file: string
+      path: string
+      url: string
+      file_id: string
+      file_size: string
+      file_unique: string
+    }
+  }
+  record: {
+    type: 'record'
+    data: {
+      file: string
+      path: string
+      url: string
+      file_id: string
+      file_size: string
+      file_unique: string
     }
   }
   forward: {
@@ -113,6 +102,18 @@ export interface Receive {
     data: {
       id: string
       content: Receive[keyof Receive][]
+    }
+  }
+  json: {
+    type: 'json'
+    data: {
+      data: string
+    }
+  }
+  markdown: {
+    type: 'markdown'
+    data: {
+      content: string
     }
   }
 }
@@ -148,7 +149,7 @@ export interface Send {
       emoji_id: string
       emoji_package_id: string
       key: string
-      summary: string
+      summary?: string
     }
   }
   image: {
@@ -157,7 +158,7 @@ export interface Send {
       file: string
       name?: string
       summary?: string
-      subType?: string
+      sub_type?: string
     }
   }
   file: {
@@ -196,6 +197,12 @@ export interface Send {
     type: 'rps'
     data: {}
   }
+  // markdown: {
+  //   type: 'markdown'
+  //   data: {
+  //     content: string
+  //   }
+  // }
   music: {
     type: 'music'
     data:
@@ -221,6 +228,34 @@ export interface Send {
       | {
           id: string
         }
+  }
+  forward: {
+    type: 'forward'
+    data: {
+      id: string
+    }
+  }
+  // xml: {
+  //   type: 'xml'
+  //   data: {}
+  // }
+  // poke: {
+  //   type: 'poke'
+  //   data: {}
+  // }
+  // location: {
+  //   type: 'location'
+  //   data: {}
+  // }
+  // miniapp: {
+  //   type: 'miniapp'
+  //   data: {}
+  // }
+  contact: {
+    type: 'contact'
+    data: {
+      id: string
+    }
   }
 }
 
@@ -259,17 +294,17 @@ export const Structs = {
   },
   /**
    * 发送QQ表情包
-   * @param summary 表情包简介
    * @param emoji_id 表情id
    * @param emoji_package_id 表情包id
    * @param key 未知(必要)
+   * @param summary 表情简介,可选
    * @returns { type: 'mface', data: { summary, emoji_id, emoji_package_id, key } }
    */
   mface: function (
-    summary: string,
     emoji_id: string | number,
     emoji_package_id: string | number,
-    key: string
+    key: string,
+    summary?: string
   ): Send['mface'] {
     return {
       type: 'mface',
@@ -286,14 +321,14 @@ export const Structs = {
    * @param file 网络图片地址, 文件路径或者Buffer
    * @param name 图片名
    * @param summary 图片简介
-   * @param subType 图片类型
-   * @returns { type: 'image', data: { file, name, summary, subType } }
+   * @param sub_type 图片类型
+   * @returns { type: 'image', data: { file, name, summary, sub_type } }
    */
   image: function (
     file: string | Buffer,
     name?: string,
     summary?: string,
-    subType?: string | number
+    sub_type?: string | number
   ): Send['image'] {
     return {
       type: 'image',
@@ -301,7 +336,7 @@ export const Structs = {
         file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
         name,
         summary,
-        subType: subType?.toString()
+        sub_type: sub_type?.toString()
       }
     }
   },
@@ -419,5 +454,21 @@ export const Structs = {
    */
   customNode: function (content: Send[keyof Send][]): Send['node'] {
     return { type: 'node', data: { content } }
+  },
+  /**
+   * 转发消息
+   * @param message_id 消息id
+   * @return { type: 'forward', data: { id }}
+   */
+  forward: function (message_id: number): Send['forward'] {
+    return { type: 'forward', data: { id: message_id.toString() } }
+  },
+  /**
+   * 发送联系人名片(仅限好友)
+   * @param user_id 联系人QQ号
+   * @returns { type: 'contact', data: { id } }
+   */
+  contact: function (user_id: number): Send['contact'] {
+    return { type: 'contact', data: { id: user_id.toString() } }
   }
 }
