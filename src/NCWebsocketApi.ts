@@ -158,8 +158,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @onebot11
    * 获取登录号信息
    */
-  async get_login_info(params: WSSendParam['get_login_info']) {
-    return await this.send('get_login_info', params)
+  async get_login_info() {
+    return await this.send('get_login_info', {})
   }
 
   /**
@@ -174,8 +174,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @onebot11
    * 获取好友列表
    */
-  async get_friend_list(params: WSSendParam['get_friend_list']) {
-    return await this.send('get_friend_list', params)
+  async get_friend_list(params?: WSSendParam['get_friend_list']) {
+    return await this.send('get_friend_list', params ?? {})
   }
 
   /**
@@ -190,8 +190,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @onebot11
    * 获取群列表
    */
-  async get_group_list(params: WSSendParam['get_group_list']) {
-    return await this.send('get_group_list', params)
+  async get_group_list(params?: WSSendParam['get_group_list']) {
+    return await this.send('get_group_list', params ?? {})
   }
 
   /**
@@ -230,16 +230,16 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @onebot11
    * 获取CsrfToken
    */
-  async get_csrf_token(params: WSSendParam['get_csrf_token']) {
-    return await this.send('get_csrf_token', params)
+  async get_csrf_token() {
+    return await this.send('get_csrf_token', {})
   }
 
   /**
    * @onebot11
    * 获取Credentials
    */
-  async get_credentials(params: WSSendParam['get_credentials']) {
-    return await this.send('get_credentials', params)
+  async get_credentials() {
+    return await this.send('get_credentials', {})
   }
 
   /**
@@ -262,32 +262,32 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @onebot11
    * 能否发图片
    */
-  async can_send_image(params: WSSendParam['can_send_image']) {
-    return await this.send('can_send_image', params)
+  async can_send_image() {
+    return await this.send('can_send_image', {})
   }
 
   /**
    * @onebot11
    * 能否发语音
    */
-  async can_send_record(params: WSSendParam['can_send_record']) {
-    return await this.send('can_send_record', params)
+  async can_send_record() {
+    return await this.send('can_send_record', {})
   }
 
   /**
    * @onebot11
    * 获取状态
    */
-  async get_status(params: WSSendParam['get_status']) {
-    return await this.send('get_status', params)
+  async get_status() {
+    return await this.send('get_status', {})
   }
 
   /**
    * @onebot11
    * 获取版本信息
    */
-  async get_version_info(params: WSSendParam['get_version_info']) {
-    return await this.send('get_version_info', params)
+  async get_version_info() {
+    return await this.send('get_version_info', {})
   }
 
   /**
@@ -342,8 +342,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @gocqhttp
    * 获取在线客户端
    */
-  async get_online_clients(params: WSSendParam['get_online_clients']) {
-    return await this.send('get_online_clients', params)
+  async get_online_clients(params?: WSSendParam['get_online_clients']) {
+    return await this.send('get_online_clients', params ?? {})
   }
 
   /**
@@ -622,8 +622,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @napcat
    * 获取机器人列表
    */
-  async get_robot_uin_range(params: WSSendParam['get_robot_uin_range']) {
-    return await this.send('get_robot_uin_range', params)
+  async get_robot_uin_range() {
+    return await this.send('get_robot_uin_range', {})
   }
 
   /**
@@ -638,8 +638,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @napcat
    * 获取分类后的好友列表
    */
-  async get_friends_with_category(params: WSSendParam['get_friends_with_category']) {
-    return await this.send('get_friends_with_category', params)
+  async get_friends_with_category() {
+    return await this.send('get_friends_with_category', {})
   }
 
   /**
@@ -750,32 +750,32 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @napcat
    * 获取最近聊天信息
    */
-  async get_recent_contact(params: WSSendParam['get_recent_contact']) {
-    return await this.send('get_recent_contact', params)
+  async get_recent_contact(params?: WSSendParam['get_recent_contact']) {
+    return await this.send('get_recent_contact', params ?? {})
   }
 
   /**
    * @napcat
    * 标记所有消息已读
    */
-  async _mark_all_as_read(params: WSSendParam['_mark_all_as_read']) {
-    return await this.send('_mark_all_as_read', params)
+  async _mark_all_as_read() {
+    return await this.send('_mark_all_as_read', {})
   }
 
   /**
    * @napcat
    * 获取资料信息 (?)
    */
-  async get_profile_like(params: WSSendParam['get_profile_like']) {
-    return await this.send('get_profile_like', params)
+  async get_profile_like({}) {
+    return await this.send('get_profile_like', {})
   }
 
   /**
    * @napcat
    * 获取自定义表情
    */
-  async fetch_custom_face(params: WSSendParam['fetch_custom_face']) {
-    return await this.send('fetch_custom_face', params)
+  async fetch_custom_face(params?: WSSendParam['fetch_custom_face']) {
+    return await this.send('fetch_custom_face', params ?? {})
   }
 
   /**
@@ -846,8 +846,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @napcat
    * 获取PacketServer状态
    */
-  async nc_get_packet_status(params: WSSendParam['nc_get_packet_status']) {
-    return await this.send('nc_get_packet_status', params)
+  async nc_get_packet_status() {
+    return await this.send('nc_get_packet_status', {})
   }
 
   /**
@@ -862,8 +862,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @napcat
    * 获取Rkey
    */
-  async nc_get_rkey(params: WSSendParam['nc_get_rkey']) {
-    return await this.send('nc_get_rkey', params)
+  async nc_get_rkey() {
+    return await this.send('nc_get_rkey', {})
   }
 
   /**
