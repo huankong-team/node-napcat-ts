@@ -1307,12 +1307,12 @@ export type WSSendReturn = {
     buddyList: WSSendReturn['get_friend_list']
   }[]
   set_qq_avatar: {}
-  get_file: {}
+  get_file: WSSendReturn['get_record']
   forward_friend_single_msg: {}
   forward_group_single_msg: {}
   translate_en2zh: string[]
   set_msg_emoji_like: {}
-  send_forward_msg: {}
+  send_forward_msg: { message_id: number; res_id: string }
   mark_private_msg_as_read: {}
   mark_group_msg_as_read: {}
   get_friend_msg_history: { messages: WSSendReturn['get_msg'][] }
