@@ -21,4 +21,4 @@ await napcat.send_msg({
 如有缺少或类型错误请提交 [pr](https://github.com/huankong233/node-napcat-ts/compare)
 :::
 
-以 [NapCatQQ文档](https://napneko.github.io/zh-CN/develop/compatibility/api) 为准
+以 [NapCatQQ文档](https://napneko.com/develop/api) 为准

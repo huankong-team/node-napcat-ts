@@ -20,21 +20,8 @@ await napcat.send_msg({
 
 ## 结构体大全
 
-| 方法名        | 说明               |
-| ------------- | ------------------ |
-| `text`        | 纯文本             |
-| `at`          | @某人              |
-| `reply`       | 回复消息           |
-| `face`        | `qq` 表情          |
-| `mface`       | `qq` 表情包        |
-| `image`       | 图片               |
-| `file`        | 文件               |
-| `video`       | 视频               |
-| `record`      | 语音               |
-| `json`        | `json` 信息        |
-| `dice`        | 骰子               |
-| `rps`         | 猜拳               |
-| `music`       | 音乐分享           |
-| `customMusic` | 自定义音乐分享     |
-| `node`        | 转发消息节点       |
-| `customNode`  | 自定义转发消息节点 |
+::: tip 注意
+如有缺少或类型错误请提交 [pr](https://github.com/huankong233/node-napcat-ts/compare)
+:::
+
+以 [NapCatQQ文档](https://napneko.com/develop/msg) 为准
