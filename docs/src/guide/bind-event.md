@@ -58,7 +58,7 @@ function handler(context: AllHandlers['message']) {
 如有缺少或类型错误请提交 [pr](https://github.com/huankong233/node-napcat-ts/compare)
 :::
 
-以 [NapCatQQ文档](https://napneko.github.io/zh-CN/develop/compatibility/event) 为准
+以 [NapCatQQ文档](https://napneko.com/develop/event) 为准
 
 ::: tip 注意
 使用父类可以被子类触发
