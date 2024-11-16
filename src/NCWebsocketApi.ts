@@ -326,17 +326,17 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @gocqhttp
    * 获取型号设置
    */
-  // async _get_model_show(params: WSSendParam['_get_model_show']) {
-  //   return await this.send('_get_model_show', params)
-  // }
+  async _get_model_show(params: WSSendParam['_get_model_show']) {
+    return await this.send('_get_model_show', params)
+  }
 
   /**
    * @gocqhttp
    * 设置型号设置
    */
-  // async _set_model_show(params: WSSendParam['_set_model_show']) {
-  //   return await this.send('_set_model_show', params)
-  // }
+  async _set_model_show(params: WSSendParam['_set_model_show']) {
+    return await this.send('_set_model_show', params)
+  }
 
   /**
    * @gocqhttp
@@ -358,9 +358,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @gocqhttp
    * 删除好友
    */
-  // async delete_friend(params: WSSendParam['delete_friend']) {
-  //   return await this.send('delete_friend', params)
-  // }
+  async delete_friend(params: WSSendParam['delete_friend']) {
+    return await this.send('delete_friend', params)
+  }
 
   /**
    * @gocqhttp
@@ -438,9 +438,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @gocqhttp
    * 获取群聊@全体成员剩余次数
    */
-  // async get_group_at_all_remain(params: WSSendParam['get_group_at_all_remain']) {
-  //   return await this.send('get_group_at_all_remain', params)
-  // }
+  async get_group_at_all_remain(params: WSSendParam['get_group_at_all_remain']) {
+    return await this.send('get_group_at_all_remain', params)
+  }
 
   /**
    * @gocqhttp
@@ -574,9 +574,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @gocqhttp
    * 检查链接是否安全
    */
-  // async check_url_safely(params: WSSendParam['check_url_safely']) {
-  //   return await this.send('check_url_safely', params)
-  // }
+  async check_url_safely(params: WSSendParam['check_url_safely']) {
+    return await this.send('check_url_safely', params)
+  }
 
   /**
    * @gocqhttp
@@ -872,5 +872,60 @@ export class NCWebsocketApi extends NCWebsocketBase {
    */
   async get_group_shut_list(params: WSSendParam['get_group_shut_list']) {
     return await this.send('get_group_shut_list', params)
+  }
+
+  /**
+   * @napcat
+   * 获取忽略的加群通知
+   */
+  async get_group_ignored_notifies(params: WSSendParam['get_group_ignored_notifies']) {
+    return await this.send('get_group_ignored_notifies', params)
+  }
+
+  /**
+   * @napcat
+   * 群签到
+   */
+  async set_group_sign(params: WSSendParam['set_group_sign']) {
+    return await this.send('set_group_sign', params)
+  }
+
+  /**
+   * @napcat
+   * 群签到
+   */
+  async send_group_sign(params: WSSendParam['send_group_sign']) {
+    return await this.send('send_group_sign', params)
+  }
+
+  /**
+   * @napcat
+   * 签名小程序
+   */
+  async get_mini_app_ark(params: WSSendParam['get_mini_app_ark']) {
+    return await this.send('get_mini_app_ark', params)
+  }
+
+  /**
+   * @napcat
+   * 获取ai语音
+   */
+  async get_ai_record(params: WSSendParam['get_ai_record']) {
+    return await this.send('get_ai_record', params)
+  }
+
+  /**
+   * @napcat
+   * 获取ai语音h模型列表
+   */
+  async get_ai_characters(params: WSSendParam['get_ai_characters']) {
+    return await this.send('get_ai_characters', params)
+  }
+  /**
+   * @napcat
+   * 发送群聊ai语音
+   */
+  async send_group_ai_record(params: WSSendParam['send_group_ai_record']) {
+    return await this.send('send_group_ai_record', params)
   }
 }

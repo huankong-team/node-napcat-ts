@@ -733,14 +733,15 @@ export type WSSendParam = {
   get_version_info: {}
   // set_restart: { delay?: number }
   // clean_cache: {}
+
   // go-cqhttp
   set_qq_profile: { nickname: string; personal_note?: string; sex?: number }
   // qidian_get_account_info: {}
-  // _get_model_show: {}
-  // _set_model_show: {}
+  _get_model_show: { model?: string }
+  _set_model_show: {}
   get_online_clients: { no_cache?: boolean }
   // get_unidirectional_friend_list: {}
-  // delete_friend: {}
+  delete_friend: { user_id: number; temp_block?: boolean; temp_both_del?: boolean }
   // delete_unidirectional_friend: {}
   mark_msg_as_read: { user_id: number } | { group_id: number }
   send_group_forward_msg: { group_id: number; message: Send['node'][] }
@@ -755,7 +756,7 @@ export type WSSendParam = {
   '.ocr_image': WSSendParam['ocr_image']
   get_group_system_msg: { group_id: number }
   get_essence_msg_list: { group_id: number }
-  // get_group_at_all_remain: {}
+  get_group_at_all_remain: { group_id: number }
   set_group_portrait: { file: string; group_id: number }
   set_essence_msg: { message_id: number }
   delete_essence_msg: { message_id: number }
@@ -795,7 +796,7 @@ export type WSSendParam = {
   ) & {
     name?: string
   }
-  // check_url_safely: {}
+  check_url_safely: { url: string }
   // '.get_word_slices': {}
   '.handle_quick_operation':
     | {
@@ -811,6 +812,7 @@ export type WSSendParam = {
         context: RequestHandler['request.group']
         operation: { approve?: boolean; reason?: string }
       }
+
   // napcat
   ArkSharePeer: { group_id: string } | { user_id: string; phoneNumber?: string }
   ArkShareGroup: { group_id: string }
@@ -857,9 +859,52 @@ export type WSSendParam = {
   nc_get_user_status: { user_id: number }
   nc_get_rkey: {}
   get_group_shut_list: { group_id: number }
+  get_group_ignored_notifies: { group_id: number }
+  set_group_sign: { group_id: number }
+  send_group_sign: WSSendParam['set_group_sign']
+  get_mini_app_ark:
+    | {
+        type: 'bili' | 'weibo'
+        title: string
+        desc: string
+        picUrl: string
+        jumpUrl: string
+      }
+    | {
+        title: string
+        desc: string
+        picUrl: string
+        jumpUrl: string
+        iconUrl: string
+        appId: string
+        scene: number
+        templateType: number
+        businessType: number
+        verType: number
+        shareType: number
+        versionId: string
+        withShareTicket: number
+        sdkId?: string
+        rawArkData?: boolean
+      }
+  get_ai_record: {
+    character: string
+    group_id: number
+    text: string
+  }
+  get_ai_characters: {
+    group_id: number
+    char_type?: number
+  }
+  send_group_ai_record: {
+    character: string
+    group_id: number
+    text: string
+  }
 }
 
 export type WSSendReturn = {
+  // ontbot11
   send_private_msg: WSSendReturn['send_msg']
   send_group_msg: WSSendReturn['send_msg']
   send_msg: { message_id: number }
@@ -1094,14 +1139,15 @@ export type WSSendReturn = {
   }
   // set_restart: {}
   // clean_cache: {}
+
   // go-cqhttp
   set_qq_profile: { result: 0; errMsg: '' }
   // qidian_get_account_info: {}
-  // _get_model_show: {}
-  // _set_model_show: {}
+  _get_model_show: { variants: { model_show: string; need_pay: boolean } }[]
+  _set_model_show: {}
   get_online_clients: []
   // get_unidirectional_friend_list: {}
-  // delete_friend: {}
+  delete_friend: { result: 0; errMsg: 'success' }
   // delete_unidirectional_friend: {}
   mark_msg_as_read: {}
   send_group_forward_msg: WSSendReturn['send_msg']
@@ -1189,7 +1235,11 @@ export type WSSendReturn = {
     operator_time: number
     content: Receive[keyof Receive][]
   }[]
-  // get_group_at_all_remain: {}
+  get_group_at_all_remain: {
+    can_at_all: boolean
+    remain_at_all_count_for_group: number
+    remain_at_all_count_for_uin: number
+  }
   set_group_portrait: { result: 0; errMsg: 'success' }
   set_essence_msg: { errCode: 0; errMsg: 'success' }
   delete_essence_msg: { errCode: 0; errMsg: 'success' }
@@ -1283,9 +1333,11 @@ export type WSSendReturn = {
   upload_private_file: {}
   // reload_event_filter: {}
   download_file: { file: string }
-  // check_url_safely: {}
+  check_url_safely: { level: 1 }
   // '.get_word_slices': {}
   '.handle_quick_operation': {}
+
+  // napcat
   ArkSharePeer: {
     errCode: 0
     errMsg: ''
@@ -1435,4 +1487,101 @@ export type WSSendReturn = {
     type: number
   }[]
   get_group_shut_list: {}
+  get_group_ignored_notifies: {
+    join_requests: {
+      request_id: number
+      requester_uin: number
+      requester_nick: string
+      group_id: string
+      group_name: string
+      checked: boolean
+      actor: number
+    }[]
+  }
+  set_group_sign: {}
+  send_group_sign: WSSendReturn['set_group_sign']
+  get_mini_app_ark:
+    | {
+        appName: string
+        appView: string
+        ver: string
+        desc: string
+        prompt: string
+        metaData: {
+          detail_1: {
+            appid: string
+            appType: number
+            title: string
+            desc: string
+            icon: string
+            preview: string
+            url: string
+            scene: number
+            host: { uin: number; nick: string }
+            shareTemplateId: string
+            shareTemplateData: Record<string, unknown>
+            showLittleTail: string
+            gamePoints: string
+            gamePointsUrl: string
+            shareOrigin: number
+          }
+        }
+        config: {
+          type: string
+          width: number
+          height: number
+          forward: number
+          autoSize: number
+          ctime: number
+          token: string
+        }
+      }
+    | {
+        ver: string
+        prompt: string
+        config: {
+          type: string
+          width: number
+          height: number
+          forward: number
+          autoSize: number
+          ctime: number
+          token: string
+        }
+        app: string
+        view: string
+        meta: {
+          detail_1: {
+            appid: string
+            appType: number
+            title: string
+            desc: string
+            icon: string
+            preview: string
+            url: string
+            scene: number
+            host: { uin: number; nick: string }
+            shareTemplateId: string
+            shareTemplateData: Record<string, unknown>
+            showLittleTail: string
+            gamePoints: string
+            gamePointsUrl: string
+            shareOrigin: number
+          }
+        }
+        miniappShareOrigin: number
+        miniappOpenRefer: string
+      }
+  get_ai_record: string
+  get_ai_characters: {
+    type: string
+    characters: {
+      character_id: string
+      character_name: string
+      preview_url: string
+    }[]
+  }[]
+  send_group_ai_record: {
+    message_id: number
+  }
 }
