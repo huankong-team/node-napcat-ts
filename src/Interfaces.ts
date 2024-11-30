@@ -197,7 +197,7 @@ export type PrivateGroupMessage = {
   font: number
   sub_type: 'group'
   post_type: 'message'
-  quick_action: (reply: Send[keyof Send][], at_sender?: boolean) => Promise<{}>
+  quick_action: (reply: Send[keyof Send][]) => Promise<{}>
 } & MessageType
 
 // 群消息
