@@ -6,12 +6,12 @@
 
 此处的 `Structs` 在 [下一篇-结构体构造器](./struct-maker.md) 中有介绍
 
-``` typescript
+```typescript
 import { Structs } from 'node-napcat-ts'
 
 await napcat.send_msg({
   user_id: 10001,
-  message: [Structs.text('你好呀~')]
+  message: [Structs.text('你好呀~')],
 })
 ```
 
@@ -21,4 +21,4 @@ await napcat.send_msg({
 如有缺少或类型错误请提交 [pr](https://github.com/huankong233/node-napcat-ts/compare)
 :::
 
-以 [NapCatQQ文档](https://napneko.com/develop/api) 为准
+以 [NapCatQQ 文档](https://napneko.github.io/develop/api) 为准

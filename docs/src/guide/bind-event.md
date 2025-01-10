@@ -2,7 +2,7 @@
 
 推荐在调用 `connect` 方法前注册哦~
 
-``` typescript
+```typescript
 // 可以多次触发
 napcat.on('事件名', (context) => {
   console.log(context)
@@ -24,7 +24,7 @@ napcat.emit('事件名', context)
 
 ## 快捷操作
 
-``` typescript
+```typescript
 // 背后调用的接口是 .handle_quick_operation
 // 只支持 message request 这两个事件
 napcat.on('message', (context) => {
@@ -36,7 +36,7 @@ napcat.on('message', (context) => {
 
 虽然这里直接编写函数是有类型的,不过一般我们是分开写的,比如:
 
-``` typescript
+```typescript
 napcat.on('message', handler)
 
 //                 ↓ 这里会缺少类型,导致没有提词器等
@@ -58,7 +58,7 @@ function handler(context: AllHandlers['message']) {
 如有缺少或类型错误请提交 [pr](https://github.com/huankong233/node-napcat-ts/compare)
 :::
 
-以 [NapCatQQ文档](https://napneko.com/develop/event) 为准
+以 [NapCatQQ 文档](https://napneko.github.io/develop/event) 为准
 
 ::: tip 注意
 使用父类可以被子类触发
