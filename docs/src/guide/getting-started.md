@@ -13,7 +13,7 @@ node-napcat-ts 使用 `pnpm` 作为默认包管理工具,
 ::: code-group
 
 ```sh [pnpm]
-$ pnpm add node-napcat-ts
+pnpm add node-napcat-ts
 ```
 
 :::
