@@ -11,10 +11,10 @@ const bot = new NCWebsocket(
     reconnection: {
       enable: true,
       attempts: 10,
-      delay: 5000
-    }
+      delay: 5000,
+    },
   },
-  true
+  true,
 )
 
 bot.on('socket.connecting', function (res) {
@@ -44,8 +44,6 @@ bot.on('message', async (context) => {
   console.log('\n收到了一条信息')
   console.dir(context, { depth: null })
 
-  await context.quick_action([Structs.text('233')])
-
   context.message.forEach(async (item) => {
     if (item.type !== 'text') return
 
@@ -61,7 +59,7 @@ bot.on('message', async (context) => {
       } catch (error) {
         await bot.send_msg({
           ...context,
-          message: [Structs.text('发送请求出错\n'), Structs.text(JSON.stringify(error))]
+          message: [Structs.text('发送请求出错\n'), Structs.text(JSON.stringify(error))],
         })
       }
     }

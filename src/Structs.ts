@@ -300,20 +300,15 @@ export const Structs = {
    * @param summary 表情简介,可选
    * @returns { type: 'mface', data: { summary, emoji_id, emoji_package_id, key } }
    */
-  mface: function (
-    emoji_id: string | number,
-    emoji_package_id: string | number,
-    key: string,
-    summary?: string
-  ): Send['mface'] {
+  mface: function (emoji_id: string | number, emoji_package_id: string | number, key: string, summary?: string): Send['mface'] {
     return {
       type: 'mface',
       data: {
         summary,
         emoji_id: emoji_id.toString(),
         emoji_package_id: emoji_package_id.toString(),
-        key
-      }
+        key,
+      },
     }
   },
   /**
@@ -324,20 +319,15 @@ export const Structs = {
    * @param sub_type 图片类型
    * @returns { type: 'image', data: { file, name, summary, sub_type } }
    */
-  image: function (
-    file: string | Buffer,
-    name?: string,
-    summary?: string,
-    sub_type?: string | number
-  ): Send['image'] {
+  image: function (file: string | Buffer, name?: string, summary?: string, sub_type?: string | number): Send['image'] {
     return {
       type: 'image',
       data: {
-        file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
+        file: (file instanceof Buffer ? `base64://${file.toString('base64')}` : file) as string,
         name,
         summary,
-        sub_type: sub_type?.toString()
-      }
+        sub_type: sub_type?.toString(),
+      },
     }
   },
   /**
@@ -350,9 +340,9 @@ export const Structs = {
     return {
       type: 'file',
       data: {
-        file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
-        name
-      }
+        file: (file instanceof Buffer ? `base64://${file.toString('base64')}` : file) as string,
+        name,
+      },
     }
   },
   /**
@@ -366,10 +356,10 @@ export const Structs = {
     return {
       type: 'video',
       data: {
-        file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
+        file: (file instanceof Buffer ? `base64://${file.toString('base64')}` : file) as string,
         name,
-        thumb
-      }
+        thumb,
+      },
     }
   },
   /**
@@ -382,9 +372,9 @@ export const Structs = {
     return {
       type: 'record',
       data: {
-        file: file instanceof Buffer ? `base64://${file.toString('base64')}` : file,
-        name
-      }
+        file: (file instanceof Buffer ? `base64://${file.toString('base64')}` : file) as string,
+        name,
+      },
     }
   },
   /**
@@ -415,10 +405,7 @@ export const Structs = {
    * @param id 音乐id
    * @returns { type: 'music', data: { type, id } }
    */
-  music: function (
-    type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo',
-    id: string | number
-  ): Send['music'] {
+  music: function (type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo', id: string | number): Send['music'] {
     return { type: 'music', data: { type, id: id.toString() } }
   },
   /**
@@ -430,13 +417,7 @@ export const Structs = {
    * @param singer 发送时可选，图片 URL
    * @returns { type: 'music', data: { type: 'custom', url, audio, title, image, singer } }
    */
-  customMusic: function (
-    url: string,
-    audio: string,
-    title: string,
-    image?: string,
-    singer?: string
-  ): Send['music'] {
+  customMusic: function (url: string, audio: string, title: string, image?: string, singer?: string): Send['music'] {
     return { type: 'music', data: { type: 'custom', url, audio, title, image, singer } }
   },
   /**
@@ -470,5 +451,5 @@ export const Structs = {
    */
   contact: function (user_id: number): Send['contact'] {
     return { type: 'contact', data: { id: user_id.toString() } }
-  }
+  },
 }

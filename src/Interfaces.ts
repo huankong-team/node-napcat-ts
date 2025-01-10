@@ -77,11 +77,7 @@ export interface SocketHandler {
   'socket.open': WSOpenRes
   'socket.close': WSCloseRes
   'socket.error': WSErrorRes
-  socket:
-    | SocketHandler['socket.connecting']
-    | SocketHandler['socket.open']
-    | SocketHandler['socket.close']
-    | SocketHandler['socket.error']
+  socket: SocketHandler['socket.connecting'] | SocketHandler['socket.open'] | SocketHandler['socket.close'] | SocketHandler['socket.error']
 }
 
 export interface APIRequest<T extends keyof WSSendParam> {
@@ -224,9 +220,7 @@ export type GroupMessage = {
 } & MessageType
 
 export interface MessageHandler {
-  'message.private':
-    | MessageHandler['message.private.friend']
-    | MessageHandler['message.private.group']
+  'message.private': MessageHandler['message.private.friend'] | MessageHandler['message.private.group']
   'message.private.friend': PrivateFriendMessage
   'message.private.group': PrivateGroupMessage
   'message.group': MessageHandler['message.group.normal']
@@ -296,16 +290,12 @@ export type GroupMessageSelf = {
 } & MessageType
 
 export interface MessageSentHandler {
-  'message_sent.private':
-    | MessageSentHandler['message_sent.private.friend']
-    | MessageSentHandler['message_sent.private.group']
+  'message_sent.private': MessageSentHandler['message_sent.private.friend'] | MessageSentHandler['message_sent.private.group']
   'message_sent.private.friend': PrivateFriendMessageSelf
   'message_sent.private.group': PrivateGroupMessageSelf
   'message_sent.group': MessageSentHandler['message_sent.group.normal']
   'message_sent.group.normal': GroupMessageSelf
-  message_sent:
-    | MessageSentHandler['message_sent.private']
-    | MessageSentHandler['message_sent.group']
+  message_sent: MessageSentHandler['message_sent.private'] | MessageSentHandler['message_sent.group']
 }
 
 // =====================================================================================
@@ -520,10 +510,7 @@ export interface NotifyPokeFriend {
   sub_type: 'poke'
   target_id: number
   user_id: number
-  raw_info: [
-    { col: string; nm: string; type: 'qq'; uid: string },
-    { col: string; nm: string; tp: string; type: 'qq'; uid: string }
-  ]
+  raw_info: [{ col: string; nm: string; type: 'qq'; uid: string }, { col: string; nm: string; tp: string; type: 'qq'; uid: string }]
 }
 
 export interface NotifyPokeGroup {
@@ -540,7 +527,7 @@ export interface NotifyPokeGroup {
     { jp: string; src: string; type: 'img' },
     { txt: string; type: 'nor' },
     { col: string; nm: string; tp: string; type: 'qq'; uid: string },
-    { txt: string; type: 'nor' }
+    { txt: string; type: 'nor' },
   ]
 }
 
@@ -605,14 +592,10 @@ export interface NotifyProfileLike {
 export interface NoticeHandler {
   'notice.friend_add': FriendAdd
   'notice.friend_recall': FriendRecall
-  'notice.group_admin':
-    | NoticeHandler['notice.group_admin.set']
-    | NoticeHandler['notice.group_admin.unset']
+  'notice.group_admin': NoticeHandler['notice.group_admin.set'] | NoticeHandler['notice.group_admin.unset']
   'notice.group_admin.set': GroupAdminSet
   'notice.group_admin.unset': GroupAdminUnset
-  'notice.group_ban':
-    | NoticeHandler['notice.group_ban.ban']
-    | NoticeHandler['notice.group_ban.lift_ban']
+  'notice.group_ban': NoticeHandler['notice.group_ban.ban'] | NoticeHandler['notice.group_ban.lift_ban']
   'notice.group_ban.ban': GroupBanBan
   'notice.group_ban.lift_ban': GroupBanLiftBan
   'notice.group_card': GroupCard
@@ -623,9 +606,7 @@ export interface NoticeHandler {
   'notice.group_decrease.leave': GroupDecreaseLeave
   'notice.group_decrease.kick': GroupDecreaseKick
   'notice.group_decrease.kick_me': GroupDecreaseKickMe
-  'notice.group_increase':
-    | NoticeHandler['notice.group_increase.approve']
-    | NoticeHandler['notice.group_increase.invite']
+  'notice.group_increase': NoticeHandler['notice.group_increase.approve'] | NoticeHandler['notice.group_increase.invite']
   'notice.group_increase.approve': GroupIncreaseApprove
   'notice.group_increase.invite': GroupIncreaseInvite
   'notice.group_recall': GroupRecall
@@ -633,18 +614,11 @@ export interface NoticeHandler {
   'notice.group_msg_emoji_like': GroupMsgEmojiLike
   'notice.essence': NoticeHandler['notice.essence.add']
   'notice.essence.add': Essence
-  'notice.notify':
-    | NoticeHandler['notice.notify.poke']
-    | NoticeHandler['notice.notify.input_status']
-    | NoticeHandler['notice.notify.profile_like']
-  'notice.notify.poke':
-    | NoticeHandler['notice.notify.poke.friend']
-    | NoticeHandler['notice.notify.poke.group']
+  'notice.notify': NoticeHandler['notice.notify.poke'] | NoticeHandler['notice.notify.input_status'] | NoticeHandler['notice.notify.profile_like']
+  'notice.notify.poke': NoticeHandler['notice.notify.poke.friend'] | NoticeHandler['notice.notify.poke.group']
   'notice.notify.poke.friend': NotifyPokeFriend
   'notice.notify.poke.group': NotifyPokeGroup
-  'notice.notify.input_status':
-    | NoticeHandler['notice.notify.input_status.friend']
-    | NoticeHandler['notice.notify.input_status.group']
+  'notice.notify.input_status': NoticeHandler['notice.notify.input_status.friend'] | NoticeHandler['notice.notify.input_status.group']
   'notice.notify.input_status.friend': NotifyInputStatusFriend
   'notice.notify.input_status.group': NotifyInputStatusGroup
   'notice.notify.profile_like': NotifyProfileLike
@@ -665,17 +639,9 @@ export interface NoticeHandler {
 
 // =====================================================================================
 
-export type AllHandlers =
-  | SocketHandler &
-      ApiHandler &
-      MessageHandler &
-      MessageSentHandler &
-      MetaEventHandler &
-      RequestHandler &
-      NoticeHandler
+export type AllHandlers = SocketHandler & ApiHandler & MessageHandler & MessageSentHandler & MetaEventHandler & RequestHandler & NoticeHandler
 
-export type WSReceiveHandler =
-  | MessageHandler & MessageSentHandler & MetaEventHandler & RequestHandler & NoticeHandler
+export type WSReceiveHandler = MessageHandler & MessageSentHandler & MetaEventHandler & RequestHandler & NoticeHandler
 
 export type EventKey = keyof AllHandlers
 export type HandlerResMap = {
@@ -859,9 +825,15 @@ export type WSSendParam = {
   nc_get_user_status: { user_id: number }
   nc_get_rkey: {}
   get_group_shut_list: { group_id: number }
+
+  // 不支持频道
+  // get_guild_list: {}
+  // get_guild_service_profile: {}
+
   get_group_ignored_notifies: { group_id: number }
   set_group_sign: { group_id: number }
   send_group_sign: WSSendParam['set_group_sign']
+  send_packet: string | undefined
   get_mini_app_ark:
     | {
         type: 'bili' | 'weibo'
@@ -901,6 +873,8 @@ export type WSSendParam = {
     group_id: number
     text: string
   }
+  get_clientkey: {}
+  send_poke: { group_id: number } | { user_id: number }
 }
 
 export type WSSendReturn = {
@@ -1487,6 +1461,11 @@ export type WSSendReturn = {
     type: number
   }[]
   get_group_shut_list: {}
+
+  // 不支持频道
+  // get_guild_list: {}
+  // get_guild_service_profile: {}
+
   get_group_ignored_notifies: {
     join_requests: {
       request_id: number
@@ -1500,6 +1479,7 @@ export type WSSendReturn = {
   }
   set_group_sign: {}
   send_group_sign: WSSendReturn['set_group_sign']
+  send_packet: { cmd: string; data: string; rsp: boolean }
   get_mini_app_ark:
     | {
         appName: string
@@ -1581,7 +1561,7 @@ export type WSSendReturn = {
       preview_url: string
     }[]
   }[]
-  send_group_ai_record: {
-    message_id: number
-  }
+  send_group_ai_record: { message_id: number }
+  get_clientkey: { clientkey: string }
+  send_poke: {}
 }
