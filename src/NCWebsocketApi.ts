@@ -900,6 +900,14 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   /**
    * @napcat
+   * 发送包
+   */
+  async send_packet(params: WSSendParam['send_packet']) {
+    return await this.send('send_packet', params)
+  }
+
+  /**
+   * @napcat
    * 签名小程序
    */
   async get_mini_app_ark(params: WSSendParam['get_mini_app_ark']) {
@@ -927,5 +935,21 @@ export class NCWebsocketApi extends NCWebsocketBase {
    */
   async send_group_ai_record(params: WSSendParam['send_group_ai_record']) {
     return await this.send('send_group_ai_record', params)
+  }
+
+  /**
+   * @napcat
+   *
+   */
+  async get_clientkey() {
+    return await this.send('get_clientkey', {})
+  }
+
+  /**
+   * @napcat
+   * 发送戳一戳
+   */
+  async send_poke(params: WSSendParam['send_poke']) {
+    return await this.send('send_poke', params)
   }
 }
