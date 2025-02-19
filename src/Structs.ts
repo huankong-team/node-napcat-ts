@@ -25,19 +25,17 @@ export interface Receive {
           summary: string
           file: string
           sub_type: string
-          file_id: string
           url: string
-          path: string
           file_size: string
-          file_unique: string
         }
       | {
           summary: string
-          file: 'marketface'
-          file_id: string
+          file: string
           path: string
           url: string
-          file_unique: string
+          key: string
+          emoji_id: string
+          emoji_package_id: string
         }
   }
   file: {
@@ -48,7 +46,6 @@ export interface Receive {
       url: string
       file_id: string
       file_size: string
-      file_unique: string
     }
   }
   dice: {
@@ -83,7 +80,6 @@ export interface Receive {
       url: string
       file_id: string
       file_size: string
-      file_unique: string
     }
   }
   record: {
@@ -94,7 +90,6 @@ export interface Receive {
       url: string
       file_id: string
       file_size: string
-      file_unique: string
     }
   }
   forward: {

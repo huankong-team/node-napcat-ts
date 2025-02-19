@@ -599,10 +599,7 @@ export interface NoticeHandler {
   'notice.group_ban.ban': GroupBanBan
   'notice.group_ban.lift_ban': GroupBanLiftBan
   'notice.group_card': GroupCard
-  'notice.group_decrease':
-    | NoticeHandler['notice.group_decrease.leave']
-    | NoticeHandler['notice.group_decrease.kick']
-    | NoticeHandler['notice.group_decrease.kick_me']
+  'notice.group_decrease': NoticeHandler['notice.group_decrease.leave'] | NoticeHandler['notice.group_decrease.kick'] | NoticeHandler['notice.group_decrease.kick_me']
   'notice.group_decrease.leave': GroupDecreaseLeave
   'notice.group_decrease.kick': GroupDecreaseKick
   'notice.group_decrease.kick_me': GroupDecreaseKickMe
@@ -689,10 +686,10 @@ export type WSSendParam = {
   get_csrf_token: {}
   get_credentials: {}
   get_record: {
-    file_id: string
+    file: string
     out_format?: 'mp3' | 'amr' | 'wma' | 'm4a' | 'spx' | 'ogg' | 'wav' | 'flac'
   }
-  get_image: { file_id: string }
+  get_image: { file: string }
   can_send_image: {}
   can_send_record: {}
   get_status: {}
@@ -787,7 +784,7 @@ export type WSSendParam = {
   set_online_status: { status: number; ext_status: number; battery_status: number }
   get_friends_with_category: {}
   set_qq_avatar: { file: string }
-  get_file: { file_id: string }
+  get_file: { file: string }
   forward_friend_single_msg: { message_id: number; user_id: number }
   forward_group_single_msg: { message_id: number; group_id: number }
   translate_en2zh: { words: string[] }
