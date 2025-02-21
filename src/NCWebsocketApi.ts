@@ -382,7 +382,7 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @gocqhttp
    * 标记消息已读
    */
-  mark_msg_read(params: WSSendParam['mark_msg_as_read']) {
+  mark_msg_as_read(params: WSSendParam['mark_msg_as_read']) {
     return this.send('mark_msg_as_read', params)
   }
 
