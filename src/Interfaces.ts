@@ -125,7 +125,7 @@ export interface HeartBeat {
   post_type: 'meta_event'
   meta_event_type: 'heartbeat'
   status: {
-    online: boolean
+    online: boolean | undefined
     good: boolean
   }
   // 到下次的间隔
@@ -133,7 +133,23 @@ export interface HeartBeat {
 }
 
 // 生命周期
-export interface LifeCycle {
+export interface LifeCycleEnable {
+  time: number
+  self_id: number
+  post_type: 'meta_event'
+  meta_event_type: 'lifecycle'
+  sub_type: 'enable'
+}
+
+export interface LifeCycleDisable {
+  time: number
+  self_id: number
+  post_type: 'meta_event'
+  meta_event_type: 'lifecycle'
+  sub_type: 'disable'
+}
+
+export interface LifeCycleConnect {
   time: number
   self_id: number
   post_type: 'meta_event'
@@ -142,8 +158,10 @@ export interface LifeCycle {
 }
 
 export interface MetaEventHandler {
-  'meta_event.lifecycle': MetaEventHandler['meta_event.lifecycle.connect']
-  'meta_event.lifecycle.connect': LifeCycle
+  'meta_event.lifecycle': MetaEventHandler['meta_event.lifecycle.enable'] | MetaEventHandler['meta_event.lifecycle.disable'] | MetaEventHandler['meta_event.lifecycle.connect']
+  'meta_event.lifecycle.enable': LifeCycleEnable
+  'meta_event.lifecycle.disable': LifeCycleDisable
+  'meta_event.lifecycle.connect': LifeCycleConnect
   'meta_event.heartbeat': HeartBeat
   meta_event: MetaEventHandler['meta_event.lifecycle'] | MetaEventHandler['meta_event.heartbeat']
 }
@@ -173,7 +191,7 @@ export type PrivateFriendMessage = {
   font: number
   sub_type: 'friend'
   post_type: 'message'
-  quick_action: (reply: Send[keyof Send][]) => Promise<{}>
+  quick_action: (reply: Send[keyof Send][]) => Promise<null>
 } & MessageType
 
 export type PrivateGroupMessage = {
@@ -193,7 +211,7 @@ export type PrivateGroupMessage = {
   font: number
   sub_type: 'group'
   post_type: 'message'
-  quick_action: (reply: Send[keyof Send][]) => Promise<{}>
+  quick_action: (reply: Send[keyof Send][], at_sender?: boolean) => Promise<null>
 } & MessageType
 
 // 群消息
@@ -216,7 +234,7 @@ export type GroupMessage = {
   sub_type: 'normal'
   post_type: 'message'
   group_id: number
-  quick_action: (reply: Send[keyof Send][], at_sender?: boolean) => Promise<{}>
+  quick_action: (reply: Send[keyof Send][], at_sender?: boolean) => Promise<null>
 } & MessageType
 
 export interface MessageHandler {
@@ -311,7 +329,7 @@ export interface RequestGroupAdd {
   comment: string
   flag: string
   sub_type: 'add'
-  quick_action: (approve?: boolean, reason?: string) => Promise<{}>
+  quick_action: (approve?: boolean, reason?: string) => Promise<null>
 }
 
 export interface RequestGroupInvite {
@@ -324,7 +342,7 @@ export interface RequestGroupInvite {
   comment: string
   flag: string
   sub_type: 'invite'
-  quick_action: (approve?: boolean, reason?: string) => Promise<{}>
+  quick_action: (approve?: boolean, reason?: string) => Promise<null>
 }
 
 // 加好友请求
@@ -336,7 +354,7 @@ export interface RequestFriend {
   user_id: number
   comment: string
   flag: string
-  quick_action: (approve?: boolean) => Promise<{}>
+  quick_action: (approve?: boolean) => Promise<null>
 }
 
 export interface RequestHandler {
@@ -349,6 +367,24 @@ export interface RequestHandler {
 
 // =====================================================================================
 
+export interface BotOffline {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'bot_offline'
+  user_id: number
+  tag: string
+  message: string
+}
+
+export interface FriendAdd {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'friend_add'
+  user_id: number
+}
+
 export interface FriendRecall {
   time: number
   self_id: number
@@ -358,37 +394,59 @@ export interface FriendRecall {
   message_id: number
 }
 
-export interface GroupRecall {
+export interface GroupAdminSet {
   time: number
   self_id: number
   post_type: 'notice'
   group_id: number
   user_id: number
-  notice_type: 'group_recall'
-  operator_id: number
-  message_id: number
+  notice_type: 'group_admin'
+  sub_type: 'set'
 }
 
-export interface GroupIncreaseApprove {
+export interface GroupAdminUnset {
   time: number
   self_id: number
   post_type: 'notice'
-  notice_type: 'group_increase'
-  sub_type: 'approve'
   group_id: number
-  operator_id: number
   user_id: number
+  notice_type: 'group_admin'
+  sub_type: 'unset'
 }
 
-export interface GroupIncreaseInvite {
+export interface GroupBanBan {
   time: number
   self_id: number
   post_type: 'notice'
-  notice_type: 'group_increase'
-  sub_type: 'invite'
   group_id: number
-  operator_id: number
   user_id: number
+  notice_type: 'group_ban'
+  operator_id: number
+  duration: number
+  sub_type: 'ban'
+}
+
+export interface GroupBanLiftBan {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'group_ban'
+  operator_id: number
+  duration: number
+  sub_type: 'lift_ban'
+}
+
+export interface GroupCard {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'group_card'
+  card_new: string
+  card_old: string
 }
 
 export interface GroupDecreaseLeave {
@@ -424,24 +482,83 @@ export interface GroupDecreaseKickMe {
   operator_id: number
 }
 
-export interface GroupAdminSet {
+export interface GroupEssenceAdd {
   time: number
   self_id: number
   post_type: 'notice'
   group_id: number
   user_id: number
-  notice_type: 'group_admin'
-  sub_type: 'set'
+  notice_type: 'essence'
+  message_id: number
+  sender_id: number
+  sub_type: 'add'
 }
 
-export interface GroupAdminUnset {
+export interface GroupEssenceDelete {
   time: number
   self_id: number
   post_type: 'notice'
   group_id: number
   user_id: number
-  notice_type: 'group_admin'
-  sub_type: 'unset'
+  notice_type: 'essence'
+  message_id: number
+  sender_id: number
+  sub_type: 'delete'
+}
+
+export interface GroupIncreaseApprove {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'group_increase'
+  sub_type: 'approve'
+  group_id: number
+  operator_id: number
+  user_id: number
+}
+
+export interface GroupIncreaseInvite {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  notice_type: 'group_increase'
+  sub_type: 'invite'
+  group_id: number
+  operator_id: number
+  user_id: number
+}
+
+export interface NotifyGroupName {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'notify'
+  sub_type: 'group_name'
+  name_new: string
+}
+
+export interface GroupRecall {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'group_recall'
+  operator_id: number
+  message_id: number
+}
+
+export interface NotifyTitle {
+  time: number
+  self_id: number
+  post_type: 'notice'
+  group_id: number
+  user_id: number
+  notice_type: 'notify'
+  sub_type: 'title'
+  title: string
 }
 
 export interface GroupUpload {
@@ -459,47 +576,39 @@ export interface GroupUpload {
   }
 }
 
-export interface GroupCard {
+export interface NotifyInputStatusGroup {
   time: number
   self_id: number
   post_type: 'notice'
-  group_id: number
+  notice_type: 'notify'
+  sub_type: 'input_status'
+  status_text: string
+  event_type: number
   user_id: number
-  notice_type: 'group_card'
-  card_new: string
-  card_old: string
+  group_id: number
 }
 
-export interface GroupBanBan {
+export interface NotifyInputStatusFriend {
   time: number
   self_id: number
   post_type: 'notice'
-  group_id: number
+  notice_type: 'notify'
+  sub_type: 'input_status'
+  status_text: string
+  event_type: number
   user_id: number
-  notice_type: 'group_ban'
-  operator_id: number
-  duration: number
-  sub_type: 'ban'
+  group_id: 0
 }
 
-export interface GroupBanLiftBan {
+export interface GroupMsgEmojiLike {
   time: number
   self_id: number
   post_type: 'notice'
+  notice_type: 'group_msg_emoji_like'
   group_id: number
   user_id: number
-  notice_type: 'group_ban'
-  operator_id: number
-  duration: number
-  sub_type: 'lift_ban'
-}
-
-export interface FriendAdd {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'friend_add'
-  user_id: number
+  message_id: number
+  likes: { emoji_id: string; count: number }[]
 }
 
 export interface NotifyPokeFriend {
@@ -531,53 +640,6 @@ export interface NotifyPokeGroup {
   ]
 }
 
-export interface Essence {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  group_id: number
-  user_id: number
-  notice_type: 'essence'
-  message_id: number
-  sender_id: number
-  sub_type: 'add' | 'delete'
-}
-
-export interface GroupMsgEmojiLike {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'group_msg_emoji_like'
-  group_id: number
-  user_id: number
-  message_id: number
-  likes: { emoji_id: string; count: number }[]
-}
-
-export interface NotifyInputStatusGroup {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'notify'
-  sub_type: 'input_status'
-  status_text: string
-  event_type: number
-  user_id: number
-  group_id: number
-}
-
-export interface NotifyInputStatusFriend {
-  time: number
-  self_id: number
-  post_type: 'notice'
-  notice_type: 'notify'
-  sub_type: 'input_status'
-  status_text: string
-  event_type: number
-  user_id: number
-  group_id: 0
-}
-
 export interface NotifyProfileLike {
   time: number
   self_id: number
@@ -586,10 +648,10 @@ export interface NotifyProfileLike {
   sub_type: 'profile_like'
   operator_id: number
   operator_nick: string
-  times: number
 }
 
 export interface NoticeHandler {
+  'notice.bot_offline': BotOffline
   'notice.friend_add': FriendAdd
   'notice.friend_recall': FriendRecall
   'notice.group_admin': NoticeHandler['notice.group_admin.set'] | NoticeHandler['notice.group_admin.unset']
@@ -599,30 +661,37 @@ export interface NoticeHandler {
   'notice.group_ban.ban': GroupBanBan
   'notice.group_ban.lift_ban': GroupBanLiftBan
   'notice.group_card': GroupCard
-  'notice.group_decrease':
-    | NoticeHandler['notice.group_decrease.leave']
-    | NoticeHandler['notice.group_decrease.kick']
-    | NoticeHandler['notice.group_decrease.kick_me']
+  'notice.group_decrease': NoticeHandler['notice.group_decrease.leave'] | NoticeHandler['notice.group_decrease.kick'] | NoticeHandler['notice.group_decrease.kick_me']
   'notice.group_decrease.leave': GroupDecreaseLeave
   'notice.group_decrease.kick': GroupDecreaseKick
   'notice.group_decrease.kick_me': GroupDecreaseKickMe
+  'notice.essence': NoticeHandler['notice.essence.add'] | NoticeHandler['notice.essence.delete']
+  'notice.essence.add': GroupEssenceAdd
+  'notice.essence.delete': GroupEssenceDelete
   'notice.group_increase': NoticeHandler['notice.group_increase.approve'] | NoticeHandler['notice.group_increase.invite']
   'notice.group_increase.approve': GroupIncreaseApprove
   'notice.group_increase.invite': GroupIncreaseInvite
+  'notice.notify':
+    | NoticeHandler['notice.notify.group_name']
+    | NoticeHandler['notice.notify.title']
+    | NoticeHandler['notice.notify.input_status.group']
+    | NoticeHandler['notice.notify.input_status.friend']
+    | NoticeHandler['notice.notify.poke.friend']
+    | NoticeHandler['notice.notify.poke.group']
+    | NoticeHandler['notice.notify.profile_like']
+  'notice.notify.group_name': NotifyGroupName
+  'notice.notify.title': NotifyTitle
+  'notice.notify.input_status': NoticeHandler['notice.notify.input_status.group'] | NoticeHandler['notice.notify.input_status.friend']
+  'notice.notify.input_status.group': NotifyInputStatusGroup
+  'notice.notify.input_status.friend': NotifyInputStatusFriend
+  'notice.notify.poke.friend': NotifyPokeFriend
+  'notice.notify.poke.group': NotifyPokeGroup
+  'notice.notify.profile_like': NotifyProfileLike
   'notice.group_recall': GroupRecall
   'notice.group_upload': GroupUpload
   'notice.group_msg_emoji_like': GroupMsgEmojiLike
-  'notice.essence': NoticeHandler['notice.essence.add']
-  'notice.essence.add': Essence
-  'notice.notify': NoticeHandler['notice.notify.poke'] | NoticeHandler['notice.notify.input_status'] | NoticeHandler['notice.notify.profile_like']
-  'notice.notify.poke': NoticeHandler['notice.notify.poke.friend'] | NoticeHandler['notice.notify.poke.group']
-  'notice.notify.poke.friend': NotifyPokeFriend
-  'notice.notify.poke.group': NotifyPokeGroup
-  'notice.notify.input_status': NoticeHandler['notice.notify.input_status.friend'] | NoticeHandler['notice.notify.input_status.group']
-  'notice.notify.input_status.friend': NotifyInputStatusFriend
-  'notice.notify.input_status.group': NotifyInputStatusGroup
-  'notice.notify.profile_like': NotifyProfileLike
   notice:
+    | NoticeHandler['notice.bot_offline']
     | NoticeHandler['notice.friend_add']
     | NoticeHandler['notice.friend_recall']
     | NoticeHandler['notice.group_admin']
@@ -630,11 +699,11 @@ export interface NoticeHandler {
     | NoticeHandler['notice.group_card']
     | NoticeHandler['notice.group_decrease']
     | NoticeHandler['notice.group_increase']
+    | NoticeHandler['notice.essence']
+    | NoticeHandler['notice.notify']
     | NoticeHandler['notice.group_recall']
     | NoticeHandler['notice.group_upload']
     | NoticeHandler['notice.group_msg_emoji_like']
-    | NoticeHandler['notice.essence']
-    | NoticeHandler['notice.notify']
 }
 
 // =====================================================================================
@@ -660,10 +729,10 @@ export type WSSendParam = {
   send_msg: ({ user_id: number } | { group_id: number }) & { message: Send[keyof Send][] }
   delete_msg: { message_id: number }
   get_msg: { message_id: number }
-  get_forward_msg: { messager_id: string }
-  send_like: { user_id: number; times: number }
+  get_forward_msg: { message_id: string }
+  send_like: { user_id: number; times?: number }
   set_group_kick: { group_id: number; user_id: number; reject_add_request?: boolean }
-  set_group_ban: { group_id: number; user_id: number; duration: number }
+  set_group_ban: { group_id: number; user_id: number; duration?: number }
   // set_group_anonymous_ban: {}
   set_group_whole_ban: { group_id: number; enable?: boolean }
   set_group_admin: { group_id: number; user_id: number; enable?: boolean }
@@ -676,7 +745,7 @@ export type WSSendParam = {
   set_group_add_request: { flag: string; approve?: boolean; reason?: string }
   get_login_info: {}
   get_stranger_info: { user_id: number }
-  get_friend_list: { no_cache?: boolean }
+  get_friend_list: {}
   get_group_info: { group_id: number }
   get_group_list: { no_cache?: boolean }
   get_group_member_info: { group_id: number; user_id: number; no_cache?: boolean }
@@ -689,27 +758,28 @@ export type WSSendParam = {
   get_csrf_token: {}
   get_credentials: {}
   get_record: {
-    file_id: string
+    file: string
     out_format?: 'mp3' | 'amr' | 'wma' | 'm4a' | 'spx' | 'ogg' | 'wav' | 'flac'
   }
-  get_image: { file_id: string }
+  get_image: { file: string }
   can_send_image: {}
   can_send_record: {}
   get_status: {}
   get_version_info: {}
   // set_restart: { delay?: number }
   // clean_cache: {}
+  bot_exit: {}
 
   // go-cqhttp
   set_qq_profile: { nickname: string; personal_note?: string; sex?: number }
   // qidian_get_account_info: {}
-  _get_model_show: { model?: string }
-  _set_model_show: {}
-  get_online_clients: { no_cache?: boolean }
+  _get_model_show: { model: string }
+  // _set_model_show: {}
+  // get_online_clients: {}
   // get_unidirectional_friend_list: {}
   delete_friend: { user_id: number; temp_block?: boolean; temp_both_del?: boolean }
   // delete_unidirectional_friend: {}
-  mark_msg_as_read: { user_id: number } | { group_id: number }
+  mark_msg_as_read: { user_id: number } | { group_id: number } | { message_id: number }
   send_group_forward_msg: { group_id: number; message: Send['node'][] }
   send_private_forward_msg: { user_id: number; message: Send['node'][] }
   get_group_msg_history: {
@@ -719,8 +789,8 @@ export type WSSendParam = {
     reverseOrder?: boolean
   }
   ocr_image: { image: string }
-  '.ocr_image': WSSendParam['ocr_image']
-  get_group_system_msg: { group_id: number }
+  // '.ocr_image': WSSendParam['ocr_image']
+  get_group_system_msg: {}
   get_essence_msg_list: { group_id: number }
   get_group_at_all_remain: { group_id: number }
   set_group_portrait: { file: string; group_id: number }
@@ -756,13 +826,12 @@ export type WSSendParam = {
     | { base64: string }
     | {
         url: string
-        thread_count?: number
         headers?: string | string[]
       }
   ) & {
     name?: string
   }
-  check_url_safely: { url: string }
+  // check_url_safely: { url: string }
   // '.get_word_slices': {}
   '.handle_quick_operation':
     | {
@@ -780,6 +849,7 @@ export type WSSendParam = {
       }
 
   // napcat
+  set_diy_online_status: { face_id: number; face_type: number; wording: string }
   ArkSharePeer: { group_id: string } | { user_id: string; phoneNumber?: string }
   ArkShareGroup: { group_id: string }
   // reboot_normal: { delay?: number }
@@ -787,11 +857,11 @@ export type WSSendParam = {
   set_online_status: { status: number; ext_status: number; battery_status: number }
   get_friends_with_category: {}
   set_qq_avatar: { file: string }
-  get_file: { file_id: string }
+  get_file: { file: string }
   forward_friend_single_msg: { message_id: number; user_id: number }
   forward_group_single_msg: { message_id: number; group_id: number }
   translate_en2zh: { words: string[] }
-  set_msg_emoji_like: { message_id: number; emoji_id: string }
+  set_msg_emoji_like: { message_id: number; emoji_id: string; set?: boolean }
   send_forward_msg: ({ user_id: number } | { group_id: number }) & { message: Send['node'][] }
   mark_private_msg_as_read: { user_id: number }
   mark_group_msg_as_read: { group_id: number }
@@ -802,7 +872,7 @@ export type WSSendParam = {
     reverseOrder?: boolean
   }
   create_collection: { rawData: string; brief: string }
-  get_collection_list: { category: number; count: number }
+  // get_collection_list: { category: number; count?: number }
   set_self_longnick: { longNick: string }
   get_recent_contact: { count?: number }
   _mark_all_as_read: {}
@@ -814,11 +884,11 @@ export type WSSendParam = {
     message_id: number
     count?: number
   }
-  set_input_status: ({ group_id: string } | { user_id: string }) & { eventType: string }
+  set_input_status: { user_id: string; event_type: number }
   get_group_info_ex: { group_id: number }
-  get_group_ignore_add_request: { group_id: number }
+  // get_group_ignore_add_request: { group_id: number }
   _del_group_notice: { group_id: number; notice_id: string }
-  fetch_user_profile_like: { qq: number }
+  // fetch_user_profile_like: { qq: number }
   friend_poke: { user_id: number }
   group_poke: { group_id: number; user_id: number }
   nc_get_packet_status: {}
@@ -833,7 +903,7 @@ export type WSSendParam = {
   get_group_ignored_notifies: { group_id: number }
   set_group_sign: { group_id: number }
   send_group_sign: WSSendParam['set_group_sign']
-  send_packet: string | undefined
+  send_packet: { cmd: string; data: string; rsp: boolean }
   get_mini_app_ark:
     | {
         type: 'bili' | 'weibo'
@@ -841,6 +911,8 @@ export type WSSendParam = {
         desc: string
         picUrl: string
         jumpUrl: string
+        webUrl?: string
+        rawArkData?: string
       }
     | {
         title: string
@@ -848,6 +920,7 @@ export type WSSendParam = {
         picUrl: string
         jumpUrl: string
         iconUrl: string
+        webUrl?: string
         appId: string
         scene: number
         templateType: number
@@ -855,9 +928,9 @@ export type WSSendParam = {
         verType: number
         shareType: number
         versionId: string
+        sdkId: string
         withShareTicket: number
-        sdkId?: string
-        rawArkData?: boolean
+        rawArkData?: string
       }
   get_ai_record: {
     character: string
@@ -874,7 +947,9 @@ export type WSSendParam = {
     text: string
   }
   get_clientkey: {}
-  send_poke: { group_id: number } | { user_id: number }
+  send_poke: { group_id: number; user_id: number } | { user_id: number }
+  get_private_file_url: { file_id: string }
+  click_inline_keyboard_button: { group_id: number; bot_appid: string; button_id?: string; callback_data?: string; msg_seq?: string }
 }
 
 export type WSSendReturn = {
@@ -882,7 +957,7 @@ export type WSSendReturn = {
   send_private_msg: WSSendReturn['send_msg']
   send_group_msg: WSSendReturn['send_msg']
   send_msg: { message_id: number }
-  delete_msg: {}
+  delete_msg: null
   get_msg: (
     | {
         message_type: 'private'
@@ -916,71 +991,110 @@ export type WSSendReturn = {
     post_type: 'message' | 'message_sent'
   } & MessageType
   get_forward_msg: {
-    messages: ((
-      | {
-          message_type: 'private'
-          sender: {
-            user_id: number
-            nickname: string
-            card: string
-          }
-          sub_type: 'friend'
-        }
-      | {
-          message_type: 'group'
-          group_id: number
-          sender: {
-            user_id: number
-            nickname: string
-            card: string
-            role: 'owner' | 'admin' | 'member'
-          }
-          sub_type: 'normal'
-        }
-    ) & {
-      self_id: number
-      user_id: number
-      time: number
-      message_id: number
-      message_seq: number
-      real_id: number
-      raw_message: string
-      font: number
-      post_type: 'message' | 'message_sent'
-    } & MessageType)[]
+    messages: WSSendReturn['get_msg'][]
   }
-  send_like: {}
-  set_group_kick: {}
-  set_group_ban: {}
-  // set_group_anonymous_ban: {}
-  set_group_whole_ban: {}
-  set_group_admin: {}
-  // set_group_anonymous: {}
-  set_group_card: {}
-  set_group_name: {}
-  set_group_leave: {}
-  set_group_special_title: {}
-  set_friend_add_request: {}
-  set_group_add_request: {}
+  send_like: null
+  set_group_kick: null
+  set_group_ban: null
+  // set_group_anonymous_ban: null
+  set_group_whole_ban: null
+  set_group_admin: null
+  // set_group_anonymous: null
+  set_group_card: null
+  set_group_name: null
+  set_group_leave: null
+  set_group_special_title: null
+  set_friend_add_request: null
+  set_group_add_request: null
   get_login_info: {
     user_id: number
     nickname: string
   }
   get_stranger_info: {
-    user_id: number
     uid: string
-    nickname: string
-    age: number
-    qid: string
+    uin: string
+    nick: string
+    remark: string
+    constellation: number
+    shengXiao: number
+    kBloodType: number
+    homeTown: string
+    makeFriendCareer: number
+    pos: string
+    college: string
+    country: string
+    province: string
+    city: string
+    postCode: string
+    address: string
+    regTime: number
+    interest: string
+    labels: string[]
     qqLevel: number
-    sex: 'female' | 'male' | 'unknown'
+    qid: string
+    longNick: string
+    birthday_year: number
+    birthday_month: number
+    birthday_day: number
+    age: number
+    sex: 'male' | 'female' | 'unknown'
+    eMail: string
+    phoneNum: string
+    categoryId: number
+    richTime: number
+    richBuffer: string | {}
+    topTime: string
+    isBlock: boolean
+    isMsgDisturb: boolean
+    isSpecialCareOpen: boolean
+    isSpecialCareZone: boolean
+    ringId: string
+    isBlocked: boolean
+    recommendImgFlag: number
+    disableEmojiShortCuts: number
+    qidianMasterFlag: number
+    qidianCrewFlag: number
+    qidianCrewFlag2: number
+    isHideQQLevel: number
+    isHidePrivilegeIcon: number
+    status: number
+    extStatus: number
+    batteryStatus: number
+    termType: number
+    netType: number
+    iconType: number
+    customStatus: unknown
+    setTime: string
+    specialFlag: number
+    abiFlag: number
+    eNetworkType: number
+    showName: string
+    termDesc: string
+    musicInfo: {
+      buf: string | {}
+    }
+    extOnlineBusinessInfo: {
+      buf: string | {}
+      customStatus: unknown
+      videoBizInfo: {
+        cid: string
+        tvUrl: string
+        synchType: string
+      }
+      videoInfo: {
+        name: string
+      }
+    }
+    extBuffer: {
+      buf: string | {}
+    }
+    user_id: number
+    nickname: string
     long_nick: string
     reg_time: number
     is_vip: boolean
     is_years_vip: boolean
     vip_level: number
-    remark: string
-    status: number
     login_days: number
   }
   get_friend_list: {
@@ -1010,12 +1124,7 @@ export type WSSendReturn = {
     member_count: number
     max_member_count: number
   }
-  get_group_list: {
-    group_id: number
-    group_name: string
-    member_count: number
-    max_member_count: number
-  }[]
+  get_group_list: WSSendReturn['get_group_info'][]
   get_group_member_info: {
     group_id: number
     user_id: number
@@ -1024,7 +1133,7 @@ export type WSSendReturn = {
     sex: 'unknown' | 'male' | 'female'
     age: number
     area: string
-    level: number
+    level: string
     qq_level: number
     join_time: number
     last_sent_time: number
@@ -1096,7 +1205,7 @@ export type WSSendReturn = {
     url: string
     file_size: string
     file_name: string
-    base64: string
+    base64?: string
   }
   get_image: WSSendReturn['get_record']
   can_send_image: { yes: true }
@@ -1111,54 +1220,24 @@ export type WSSendReturn = {
     protocol_version: 'v11'
     app_version: string
   }
-  // set_restart: {}
-  // clean_cache: {}
+  // set_restart: null
+  // clean_cache: null
+  bot_exit: null
 
   // go-cqhttp
   set_qq_profile: { result: 0; errMsg: '' }
-  // qidian_get_account_info: {}
+  // qidian_get_account_info: null
   _get_model_show: { variants: { model_show: string; need_pay: boolean } }[]
-  _set_model_show: {}
-  get_online_clients: []
-  // get_unidirectional_friend_list: {}
+  // _set_model_show: null
+  // get_online_clients: null
+  // get_unidirectional_friend_list: null
   delete_friend: { result: 0; errMsg: 'success' }
-  // delete_unidirectional_friend: {}
-  mark_msg_as_read: {}
+  // delete_unidirectional_friend: null
+  mark_msg_as_read: null
   send_group_forward_msg: WSSendReturn['send_msg']
   send_private_forward_msg: WSSendReturn['send_msg']
   get_group_msg_history: {
-    messages: ((
-      | {
-          message_type: 'private'
-          sender: {
-            user_id: number
-            nickname: string
-            card: string
-          }
-          sub_type: 'friend'
-        }
-      | {
-          message_type: 'group'
-          group_id: number
-          sender: {
-            user_id: number
-            nickname: string
-            card: string
-            role: 'owner' | 'admin' | 'member'
-          }
-          sub_type: 'normal'
-        }
-    ) & {
-      self_id: number
-      user_id: number
-      time: number
-      message_id: number
-      message_seq: number
-      real_id: number
-      raw_message: string
-      font: number
-      post_type: 'message' | 'message_sent'
-    } & MessageType)[]
+    messages: WSSendReturn['get_msg'][]
   }
   ocr_image: {
     text: string
@@ -1177,7 +1256,7 @@ export type WSSendReturn = {
     }[]
     score: string
   }[]
-  '.ocr_image': WSSendReturn['ocr_image']
+  // '.ocr_image': WSSendReturn['ocr_image']
   get_group_system_msg: {
     InvitedRequest: {
       request_id: number
@@ -1217,7 +1296,7 @@ export type WSSendReturn = {
   set_group_portrait: { result: 0; errMsg: 'success' }
   set_essence_msg: { errCode: 0; errMsg: 'success' }
   delete_essence_msg: { errCode: 0; errMsg: 'success' }
-  _send_group_notice: {}
+  _send_group_notice: null
   _get_group_notice: {
     notice_id: string
     sender_id: number
@@ -1231,7 +1310,7 @@ export type WSSendReturn = {
       }[]
     }
   }[]
-  upload_group_file: {}
+  upload_group_file: null
   delete_group_file: {
     result: 0
     errMsg: 'ok'
@@ -1304,26 +1383,27 @@ export type WSSendReturn = {
   }
   get_group_files_by_folder: WSSendReturn['get_group_root_files']
   get_group_file_url: { url: string }
-  upload_private_file: {}
-  // reload_event_filter: {}
+  upload_private_file: null
+  // reload_event_filter: null
   download_file: { file: string }
-  check_url_safely: { level: 1 }
-  // '.get_word_slices': {}
-  '.handle_quick_operation': {}
+  // check_url_safely: { level: 1 }
+  // '.get_word_slices': null
+  '.handle_quick_operation': null
 
   // napcat
+  set_diy_online_status: string
   ArkSharePeer: {
     errCode: 0
     errMsg: ''
     arkJson: string
   }
   ArkShareGroup: string
-  // reboot_normal: {}
+  // reboot_normal: null
   get_robot_uin_range: {
     minUin: string
     maxUin: string
   }[]
-  set_online_status: {}
+  set_online_status: null
   get_friends_with_category: {
     categoryId: number
     categorySortId: number
@@ -1332,48 +1412,132 @@ export type WSSendReturn = {
     onlineCount: number
     buddyList: WSSendReturn['get_friend_list']
   }[]
-  set_qq_avatar: {}
+  set_qq_avatar: null
   get_file: WSSendReturn['get_record']
-  forward_friend_single_msg: {}
-  forward_group_single_msg: {}
+  forward_friend_single_msg: null
+  forward_group_single_msg: null
   translate_en2zh: string[]
-  set_msg_emoji_like: {}
+  set_msg_emoji_like: null
   send_forward_msg: { message_id: number; res_id: string }
-  mark_private_msg_as_read: {}
-  mark_group_msg_as_read: {}
+  mark_private_msg_as_read: null
+  mark_group_msg_as_read: null
   get_friend_msg_history: { messages: WSSendReturn['get_msg'][] }
-  create_collection: {}
-  get_collection_list: {}
+  create_collection: { result: 0; errMsg: '' }
+  // get_collection_list: {
+  //   result: 0
+  //   errMsg: ''
+  //   collectionSearchList: {
+  //     collectionItemList: {
+  //       cid: string
+  //       type: number
+  //       status: number
+  //       author: {
+  //         type: number
+  //         numId: string
+  //         strId: string
+  //         groupId: string
+  //         groupName: string
+  //         uid: string
+  //       }
+  //       bid: number
+  //       category: number
+  //       createTime: string
+  //       collectTime: string
+  //       modifyTime: string
+  //       sequence: string
+  //       shareUrl: string
+  //       customGroupId: number
+  //       securityBeat: boolean
+  //       summary: {
+  //         textSummary: unknown
+  //         linkSummary: unknown
+  //         gallerySummary: unknown
+  //         audioSummary: unknown
+  //         videoSummary: unknown
+  //         fileSummary: unknown
+  //         locationSummary: unknown
+  //         richMediaSummary: unknown
+  //       }
+  //     }[]
+  //     hasMore: boolean
+  //     bottomTimeStamp: string
+  //   }
+  // }
   set_self_longnick: { result: 0; errMsg: '' }
-  get_recent_contact: {
-    lastestMsg: WSSendReturn['get_msg']
-    peerUin: string
-    remark: string
-    msgTime: string
-    chatType: number
-    msgId: string
-    sendNickName: string
-    sendMemberName: string
-    peerName: string
-  }[]
-  _mark_all_as_read: {}
+  get_recent_contact: (
+    | {
+        lastestMsg: WSSendReturn['get_msg']
+        peerUin: string
+        remark: string
+        msgTime: string
+        chatType: number
+        msgId: string
+        sendNickName: string
+        sendMemberName: string
+        peerName: string
+      }
+    | {
+        peerUin: string
+        remark: string
+        msgTime: number
+        chatType: number
+        msgId: string
+        sendNickName: string
+        sendMemberName: string
+        peerName: string
+      }
+  )[]
+  _mark_all_as_read: null
   get_profile_like: {
     uid: string
-    src: number
-    latestTime: number
-    count: number
-    giftCount: number
-    customId: number
-    lastCharged: number
-    bAvailableCnt: number
-    bTodayVotedCnt: number
-    nick: string
-    gender: number
-    age: number
-    isFriend: boolean
-    isvip: boolean
-    isSvip: boolean
-    uin: number
+    time: number
+    favoriteInfo: {
+      total_count: number
+      last_time: number
+      today_count: number
+      userInfos: {
+        age: number
+        bAvailableCnt: number
+        bTodayVotedCnt: number
+        count: number
+        customId: number
+        gender: number
+        giftCount: number
+        isFriend: boolean
+        isSvip: boolean
+        isvip: boolean
+        lastCharged: number
+        latestTime: number
+        nick: string
+        src: number
+        uid: string
+        uin: number
+      }[]
+    }
+    voteInfo: {
+      total_count: number
+      new_count: number
+      new_nearby_count: number
+      last_visit_time: number
+      userInfos: {
+        age: number
+        bAvailableCnt: number
+        bTodayVotedCnt: number
+        count: number
+        customId: number
+        gender: number
+        giftCount: number
+        isFriend: boolean
+        isSvip: boolean
+        isvip: boolean
+        lastCharged: number
+        latestTime: number
+        nick: string
+        src: number
+        uid: string
+        uin: number
+      }[]
+    }
   }[]
   fetch_custom_face: string[]
   fetch_emoji_like: {
@@ -1438,120 +1602,95 @@ export type WSSendReturn = {
       groupSquareSwitch: number
     }
   }
-  get_group_ignore_add_request: {
-    join_requests: {
-      request_id: number
-      requester_uin: number
-      requester_nick: string
-      group_id: number
-      group_name: string
-      checked: boolean
-      actor: number
-    }[]
-  }
-  _del_group_notice: {}
-  fetch_user_profile_like: string
-  friend_poke: {}
-  group_poke: {}
-  nc_get_packet_status: {}
+  // get_group_ignore_add_request: {
+  //   join_requests: {
+  //     request_id: number
+  //     requester_uin: number
+  //     requester_nick: string
+  //     group_id: number
+  //     group_name: string
+  //     checked: boolean
+  //     actor: number
+  //   }[]
+  // }
+  _del_group_notice: null
+  // fetch_user_profile_like: string
+  friend_poke: null
+  group_poke: null
+  nc_get_packet_status: undefined
   nc_get_user_status: { status: number; ext_status: number }
   nc_get_rkey: {
     rkey: string
+    ttl: string
     time: number
     type: number
   }[]
-  get_group_shut_list: {}
+  get_group_shut_list: {
+    uid: string
+    qid: string
+    uin: string
+    nick: string
+    remark: string
+    cardType: number
+    cardName: string
+    role: number
+    avatarPath: string
+    shutUpTime: number
+    isDelete: boolean
+    isSpecialConcerned: boolean
+    isSpecialShield: boolean
+    isRobot: boolean
+    groupHonor: { [key: string]: number }
+    memberRealLevel: number
+    memberLevel: number
+    globalGroupLevel: number
+    globalGroupPoint: number
+    memberTitleId: number
+    memberSpecialTitle: string
+    specialTitleExpireTime: string
+    userShowFlag: number
+    userShowFlagNew: number
+    richFlag: number
+    mssVipType: number
+    bigClubLevel: number
+    bigClubFlag: number
+    autoRemark: string
+    creditLevel: number
+    joinTime: number
+    lastSpeakTime: number
+    memberFlag: number
+    memberFlagExt: number
+    memberMobileFlag: number
+    memberFlagExt2: number
+    isSpecialShielded: boolean
+    cardNameId: number
+  }[]
 
   // 不支持频道
-  // get_guild_list: {}
-  // get_guild_service_profile: {}
+  // get_guild_list: number
+  // get_guild_service_profile: number
 
-  get_group_ignored_notifies: {
-    join_requests: {
-      request_id: number
-      requester_uin: number
-      requester_nick: string
-      group_id: string
-      group_name: string
-      checked: boolean
-      actor: number
-    }[]
-  }
-  set_group_sign: {}
+  get_group_ignored_notifies: WSSendReturn['get_group_system_msg']
+  set_group_sign: null
   send_group_sign: WSSendReturn['set_group_sign']
-  send_packet: { cmd: string; data: string; rsp: boolean }
-  get_mini_app_ark:
-    | {
-        appName: string
-        appView: string
-        ver: string
-        desc: string
-        prompt: string
-        metaData: {
-          detail_1: {
-            appid: string
-            appType: number
-            title: string
-            desc: string
-            icon: string
-            preview: string
-            url: string
-            scene: number
-            host: { uin: number; nick: string }
-            shareTemplateId: string
-            shareTemplateData: Record<string, unknown>
-            showLittleTail: string
-            gamePoints: string
-            gamePointsUrl: string
-            shareOrigin: number
-          }
-        }
-        config: {
-          type: string
-          width: number
-          height: number
-          forward: number
-          autoSize: number
-          ctime: number
-          token: string
-        }
-      }
-    | {
-        ver: string
-        prompt: string
-        config: {
-          type: string
-          width: number
-          height: number
-          forward: number
-          autoSize: number
-          ctime: number
-          token: string
-        }
-        app: string
-        view: string
-        meta: {
-          detail_1: {
-            appid: string
-            appType: number
-            title: string
-            desc: string
-            icon: string
-            preview: string
-            url: string
-            scene: number
-            host: { uin: number; nick: string }
-            shareTemplateId: string
-            shareTemplateData: Record<string, unknown>
-            showLittleTail: string
-            gamePoints: string
-            gamePointsUrl: string
-            shareOrigin: number
-          }
-        }
-        miniappShareOrigin: number
-        miniappOpenRefer: string
-      }
+  send_packet: string
+  get_mini_app_ark: {
+    title: string
+    desc: string
+    picUrl: string
+    jumpUrl: string
+    webUrl?: string
+    sdkId: string
+    appId: string
+    scene: number
+    iconUrl: string
+    templateType: number
+    businessType: number
+    verType: number
+    shareType: number
+    versionId: string
+    withShareTicket: number
+  }
   get_ai_record: string
   get_ai_characters: {
     type: string
@@ -1561,7 +1700,16 @@ export type WSSendReturn = {
       preview_url: string
     }[]
   }[]
-  send_group_ai_record: { message_id: number }
+  send_group_ai_record: null
   get_clientkey: { clientkey: string }
-  send_poke: {}
+  send_poke: null
+  get_private_file_url: { url: string }
+  click_inline_keyboard_button: {
+    result: 0
+    errMsg: ''
+    status: number
+    promptText: string
+    promptType: number
+    promptIcon: number
+  }
 }

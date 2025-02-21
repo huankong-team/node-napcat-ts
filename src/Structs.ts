@@ -22,33 +22,37 @@ export interface Receive {
     type: 'image'
     data:
       | {
+          // 普通图片
+          summary: string
+          file: string
+          sub_type: number
+          url: string
+          file_size: string
+        }
+      | {
+          // 商城表情
           summary: string
           file: string
           sub_type: string
-          file_id: string
           url: string
-          path: string
-          file_size: string
-          file_unique: string
-        }
-      | {
-          summary: string
-          file: 'marketface'
-          file_id: string
-          path: string
-          url: string
-          file_unique: string
+          key: string
+          emoji_id: string
+          emoji_package_id: number
         }
   }
   file: {
     type: 'file'
     data: {
       file: string
-      path: string
-      url: string
       file_id: string
       file_size: string
-      file_unique: string
+    }
+  }
+  poke: {
+    type: 'poke'
+    data: {
+      type: string
+      id: string
     }
   }
   dice: {
@@ -67,6 +71,33 @@ export interface Receive {
     type: 'face'
     data: {
       id: string
+      raw: {
+        faceIndex: number
+        faceText: string
+        faceType: number
+        packId: string
+        stickerId: string
+        sourceType: number
+        stickerType: number
+        resultId: string
+        surpriseId: string
+        randomType: number
+        imageType: null
+        pokeType: null
+        spokeSummary: null
+        doubleHit: null
+        vaspokeId: null
+        vaspokeName: null
+        vaspokeMinver: null
+        pokeStrength: null
+        msgType: null
+        faceBubbleCount: null
+        oldVersionStr: null
+        pokeFlag: null
+        chainCount: number
+      }
+      resultId: string
+      chainCount: number
     }
   }
   reply: {
@@ -79,29 +110,22 @@ export interface Receive {
     type: 'video'
     data: {
       file: string
-      path: string
       url: string
-      file_id: string
       file_size: string
-      file_unique: string
     }
   }
   record: {
     type: 'record'
     data: {
       file: string
-      path: string
-      url: string
-      file_id: string
       file_size: string
-      file_unique: string
     }
   }
   forward: {
     type: 'forward'
     data: {
       id: string
-      content: Receive[keyof Receive][]
+      content?: Receive[keyof Receive][]
     }
   }
   json: {
@@ -141,6 +165,8 @@ export interface Send {
     type: 'face'
     data: {
       id: string
+      resultId: string
+      chainCount: string
     }
   }
   mface: {
@@ -156,7 +182,6 @@ export interface Send {
     type: 'image'
     data: {
       file: string
-      name?: string
       summary?: string
       sub_type?: string
     }
@@ -180,7 +205,6 @@ export interface Send {
     type: 'record'
     data: {
       file: string
-      name?: string
     }
   }
   json: {
@@ -197,37 +221,51 @@ export interface Send {
     type: 'rps'
     data: {}
   }
-  // markdown: {
-  //   type: 'markdown'
-  //   data: {
-  //     content: string
-  //   }
-  // }
+  markdown: {
+    type: 'markdown'
+    data: {
+      content: string
+    }
+  }
   music: {
     type: 'music'
     data:
       | {
-          type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo'
+          type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu'
           id: string
         }
       | {
-          type: 'custom'
+          type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu' | 'custom'
           url: string
-          audio: string
-          title: string
-          image?: string
+          image: string
+          audio?: string
+          title?: string
           singer?: string
         }
   }
   node: {
     type: 'node'
-    data:
+    data: (
       | {
           content: Send[keyof Send][]
         }
       | {
           id: string
         }
+    ) & {
+      user_id?: string
+      nickname?: string
+      // 群聊的聊天记录
+      source?: string
+      // 聊天记录预览部分
+      news?: { text: string }[]
+      // 查看 100 条转发消息
+      summary?: string
+      // [聊天记录]
+      prompt?: string
+      // 发送时间 (时间戳)
+      time?: string
+    }
   }
   forward: {
     type: 'forward'
@@ -254,6 +292,7 @@ export interface Send {
   contact: {
     type: 'contact'
     data: {
+      type: 'qq' | 'group'
       id: string
     }
   }
@@ -287,10 +326,12 @@ export const Structs = {
   /**
    * 发送QQ表情
    * @param id QQ 表情 ID
-   * @returns { type: 'face', data: { id } }
+   * @param resultId QQ 表情 resultId
+   * @param chainCount QQ 表情 chainCount
+   * @returns { type: 'face', data: { id, resultId, chainCount } }
    */
-  face: function (id: string | number): Send['face'] {
-    return { type: 'face', data: { id: id.toString() } }
+  face: function (id: string | number, resultId: string, chainCount: string | number): Send['face'] {
+    return { type: 'face', data: { id: id.toString(), resultId, chainCount: chainCount.toString() } }
   },
   /**
    * 发送QQ表情包
@@ -317,14 +358,13 @@ export const Structs = {
    * @param name 图片名
    * @param summary 图片简介
    * @param sub_type 图片类型
-   * @returns { type: 'image', data: { file, name, summary, sub_type } }
+   * @returns { type: 'image', data: { file, summary, sub_type } }
    */
-  image: function (file: string | Buffer, name?: string, summary?: string, sub_type?: string | number): Send['image'] {
+  image: function (file: string | Buffer, summary?: string, sub_type?: string | number): Send['image'] {
     return {
       type: 'image',
       data: {
-        file: (file instanceof Buffer ? `base64://${file.toString('base64')}` : file) as string,
-        name,
+        file: Buffer.isBuffer(file) ? `base64://${file.toString('base64')}` : file,
         summary,
         sub_type: sub_type?.toString(),
       },
@@ -340,7 +380,7 @@ export const Structs = {
     return {
       type: 'file',
       data: {
-        file: (file instanceof Buffer ? `base64://${file.toString('base64')}` : file) as string,
+        file: Buffer.isBuffer(file) ? `base64://${file.toString('base64')}` : file,
         name,
       },
     }
@@ -356,7 +396,7 @@ export const Structs = {
     return {
       type: 'video',
       data: {
-        file: (file instanceof Buffer ? `base64://${file.toString('base64')}` : file) as string,
+        file: Buffer.isBuffer(file) ? `base64://${file.toString('base64')}` : file,
         name,
         thumb,
       },
@@ -368,12 +408,11 @@ export const Structs = {
    * @param name 语音备注
    * @returns { type: 'record', data: { file, name } }
    */
-  record: function (file: string | Buffer, name?: string): Send['record'] {
+  record: function (file: string | Buffer): Send['record'] {
     return {
       type: 'record',
       data: {
-        file: (file instanceof Buffer ? `base64://${file.toString('base64')}` : file) as string,
-        name,
+        file: Buffer.isBuffer(file) ? `base64://${file.toString('base64')}` : file,
       },
     }
   },
@@ -400,6 +439,14 @@ export const Structs = {
     return { type: 'rps', data: {} }
   },
   /**
+   * 发送markdown
+   * @param data markdown内容
+   * @returns { type: 'markdown', data: {} }
+   */
+  markdown: function (content: string): Send['markdown'] {
+    return { type: 'markdown', data: { content } }
+  },
+  /**
    * 音乐分享
    * @param type QQ音乐或网易云音乐QQ音乐
    * @param id 音乐id
@@ -417,24 +464,71 @@ export const Structs = {
    * @param singer 发送时可选，图片 URL
    * @returns { type: 'music', data: { type: 'custom', url, audio, title, image, singer } }
    */
-  customMusic: function (url: string, audio: string, title: string, image?: string, singer?: string): Send['music'] {
-    return { type: 'music', data: { type: 'custom', url, audio, title, image, singer } }
+  customMusic: function (type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo' | 'custom', url: string, image: string, audio?: string, title?: string, singer?: string): Send['music'] {
+    return { type: 'music', data: { type, url, audio, title, image, singer } }
   },
   /**
    * 转发消息节点
    * @param id 消息id
+   * @param user_id 消息id
+   * @param nickname 消息id
+   * @param source 消息id
+   * @param id 消息id
+   * @param id 消息id
    * @returns { type: 'node', data: { id } }
    */
-  node: function (id: string | number): Send['node'] {
-    return { type: 'node', data: { id: id.toString() } }
+  node: function (
+    id: string | number,
+    user_id?: number | string,
+    nickname?: string,
+    source?: string,
+    news?: { text: string }[],
+    summary?: string,
+    prompt?: string,
+    time?: string | number,
+  ): Send['node'] {
+    return {
+      type: 'node',
+      data: {
+        id: id.toString(),
+        user_id: user_id?.toString(),
+        nickname,
+        source,
+        news,
+        summary,
+        prompt,
+        time: time?.toString(),
+      },
+    }
   },
   /**
    * 自定义转发消息节点
    * @param content 消息内容
    * @returns { type: 'node', data: { content } }
    */
-  customNode: function (content: Send[keyof Send][]): Send['node'] {
-    return { type: 'node', data: { content } }
+  customNode: function (
+    content: Send[keyof Send][],
+    user_id?: number | string,
+    nickname?: string,
+    source?: string,
+    news?: { text: string }[],
+    summary?: string,
+    prompt?: string,
+    time?: string | number,
+  ): Send['node'] {
+    return {
+      type: 'node',
+      data: {
+        content,
+        user_id: user_id?.toString(),
+        nickname,
+        source,
+        news,
+        summary,
+        prompt,
+        time: time?.toString(),
+      },
+    }
   },
   /**
    * 转发消息
@@ -445,11 +539,12 @@ export const Structs = {
     return { type: 'forward', data: { id: message_id.toString() } }
   },
   /**
-   * 发送联系人名片(仅限好友)
-   * @param user_id 联系人QQ号
+   * 发送名片
+   * @param type 名片类型
+   * @param id 联系人QQ号
    * @returns { type: 'contact', data: { id } }
    */
-  contact: function (user_id: number): Send['contact'] {
-    return { type: 'contact', data: { id: user_id.toString() } }
+  contact: function (type: 'qq' | 'group', id: number | string): Send['contact'] {
+    return { type: 'contact', data: { type, id: id.toString() } }
   },
 }

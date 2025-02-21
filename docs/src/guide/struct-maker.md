@@ -13,8 +13,8 @@ await napcat.send_msg({
     Structs.text('123'), // {"type":"text","data":{"text":"123"}}
     Structs.at(10001), // {"type":"at","data":{"qq":"10001"}}
     Structs.reply(1111111111), // {"type":"reply","data":{"id":"1111111111"}}
-    Structs.image('https://baidu.com','name.jpg') // {"type":"image","data":{"file":"https://baidu.com","name":"name.jpg"}}
-  ]
+    Structs.image('https://baidu.com', 'name.jpg'), // {"type":"image","data":{"file":"https://baidu.com","name":"name.jpg"}}
+  ],
 })
 ```
 
@@ -24,4 +24,4 @@ await napcat.send_msg({
 如有缺少或类型错误请提交 [pr](https://github.com/huankong233/node-napcat-ts/compare)
 :::
 
-以 [NapCatQQ文档](https://napneko.com/develop/msg) 为准
+以 [NapCatQQ 文档](https://napneko.github.io/develop/msg) 为准

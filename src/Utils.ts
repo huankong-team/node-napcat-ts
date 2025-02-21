@@ -9,7 +9,7 @@ export const logger = {
   },
   dir: (json: any) => {
     console.dir(json, { depth: null })
-  }
+  },
 }
 
 const getTime = () => new Date().toLocaleString()
@@ -54,17 +54,9 @@ export function convertJSONToCQCode(json: UnSafeStruct | UnSafeStruct[]): string
 }
 
 export function CQCodeDecode(str: string): string {
-  return str
-    .replace(/&#44;/g, ',')
-    .replace(/&#91;/g, '[')
-    .replace(/&#93;/g, ']')
-    .replace(/&amp;/g, '&')
+  return str.replace(/&#44;/g, ',').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&')
 }
 
 export function CQCodeEncode(str: string): string {
-  return str
-    .replace(/,/g, '&#44;')
-    .replace(/\[/g, '&#91;')
-    .replace(/]/g, '&#93;')
-    .replace(/&/g, '&amp;')
+  return str.replace(/,/g, '&#44;').replace(/\[/g, '&#91;').replace(/]/g, '&#93;').replace(/&/g, '&amp;')
 }
