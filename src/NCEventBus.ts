@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import {
   EventHandleMap,
   EventKey,
@@ -9,7 +7,7 @@ import {
   type MetaEventHandler,
   type NoticeHandler,
   type RequestHandler,
-  type WSReceiveHandler
+  type WSReceiveHandler,
 } from './Interfaces.js'
 import type { NCWebsocketBase } from './NCWebsocketBase.js'
 import type { Send } from './Structs.js'
@@ -25,6 +23,7 @@ export class NCEventBus {
 
   on<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
     const handlers = this.#events.get(event) ?? []
+    // @ts-ignore 表达式过于复杂无法表示
     if (handlers.indexOf(handler) >= 0) return this
     handlers.push(handler)
     this.#events.set(event, handlers)
@@ -98,11 +97,27 @@ export class NCEventBus {
 
     switch (meta_event_type) {
       case 'lifecycle':
-        return this.emit('meta_event.lifecycle', json)
+        return this.life_cycle(json)
       case 'heartbeat':
         return this.emit('meta_event.heartbeat', json)
       default:
         logger.warn('[node-napcat-ts]', '[eventBus]', `unknown meta_event_type: ${meta_event_type}`)
+        return false
+    }
+  }
+
+  life_cycle(json: MetaEventHandler['meta_event.lifecycle']) {
+    const subType = json['sub_type']
+
+    switch (subType) {
+      case 'connect':
+        return this.emit('meta_event.lifecycle.connect', json)
+      case 'enable':
+        return this.emit('meta_event.lifecycle.enable', json)
+      case 'disable':
+        return this.emit('meta_event.lifecycle.disable', json)
+      default:
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown meta_event.lifecycle_type: ${subType}`)
         return false
     }
   }
@@ -121,8 +136,7 @@ export class NCEventBus {
   }
 
   message_private(json: MessageHandler['message.private']) {
-    json.quick_action = (reply: Send[keyof Send][]) =>
-      this.#ws.send('.handle_quick_operation', { context: json, operation: { reply } })
+    json.quick_action = (reply: Send[keyof Send][]) => this.#ws.send('.handle_quick_operation', { context: json, operation: { reply } })
 
     const subType = json['sub_type']
     switch (subType) {
@@ -137,8 +151,7 @@ export class NCEventBus {
   }
 
   message_group(json: MessageHandler['message.group']) {
-    json.quick_action = (reply: Send[keyof Send][], at_sender = false) =>
-      this.#ws.send('.handle_quick_operation', { context: json, operation: { reply, at_sender } })
+    json.quick_action = (reply: Send[keyof Send][], at_sender = false) => this.#ws.send('.handle_quick_operation', { context: json, operation: { reply, at_sender } })
 
     const subType = json['sub_type']
     switch (subType) {
@@ -171,11 +184,7 @@ export class NCEventBus {
       case 'friend':
         return this.emit('message_sent.private.friend', json)
       default:
-        logger.warn(
-          '[node-napcat-ts]',
-          '[eventBus]',
-          `unknown message_sent_private_type: ${subType}`
-        )
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown message_sent_private_type: ${subType}`)
         return false
     }
   }
@@ -195,8 +204,7 @@ export class NCEventBus {
     const request_type = json['request_type']
     switch (request_type) {
       case 'friend':
-        json.quick_action = (approve = true) =>
-          this.#ws.send('.handle_quick_operation', { context: json, operation: { approve } })
+        json.quick_action = (approve = true) => this.#ws.send('.handle_quick_operation', { context: json, operation: { approve } })
         return this.emit('request.friend', json)
       case 'group':
         return this.request_group(json)
@@ -207,8 +215,7 @@ export class NCEventBus {
   }
 
   request_group(json: RequestHandler['request.group']) {
-    json.quick_action = (approve = true, reason?: string) =>
-      this.#ws.send('.handle_quick_operation', { context: json, operation: { approve, reason } })
+    json.quick_action = (approve = true, reason?: string) => this.#ws.send('.handle_quick_operation', { context: json, operation: { approve, reason } })
 
     const subType = json['sub_type']
     switch (subType) {
@@ -291,11 +298,7 @@ export class NCEventBus {
       case 'kick_me':
         return this.emit('notice.group_decrease.kick_me', json)
       default:
-        logger.warn(
-          '[node-napcat-ts]',
-          '[eventBus]',
-          `unknown notice_group_decrease_type: ${subType}`
-        )
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_group_decrease_type: ${subType}`)
         return false
     }
   }
@@ -308,11 +311,7 @@ export class NCEventBus {
       case 'invite':
         return this.emit('notice.group_increase.invite', json)
       default:
-        logger.warn(
-          '[node-napcat-ts]',
-          '[eventBus]',
-          `unknown notice_group_increase_type: ${subType}`
-        )
+        logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_group_increase_type: ${subType}`)
         return false
     }
   }
@@ -332,17 +331,9 @@ export class NCEventBus {
     const sub_type = json['sub_type']
     switch (sub_type) {
       case 'poke':
-        return this.emit(
-          'group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend',
-          json
-        )
+        return this.emit('group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend', json)
       case 'input_status':
-        return this.emit(
-          'group_id' in json && json.group_id !== 0
-            ? 'notice.notify.input_status.group'
-            : 'notice.notify.input_status.friend',
-          json
-        )
+        return this.emit('group_id' in json && json.group_id !== 0 ? 'notice.notify.input_status.group' : 'notice.notify.input_status.friend', json)
       case 'profile_like':
         return this.emit('notice.notify.profile_like', json)
       default:

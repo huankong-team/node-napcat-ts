@@ -1,16 +1,6 @@
 import WebSocket, { type Data } from 'isomorphic-ws'
 import { nanoid } from 'nanoid'
-import type {
-  AllHandlers,
-  APIRequest,
-  EventHandleMap,
-  EventKey,
-  NCWebsocketOptions,
-  ResponseHandler,
-  WSReconnection,
-  WSSendParam,
-  WSSendReturn
-} from './Interfaces.js'
+import type { AllHandlers, APIRequest, EventHandleMap, EventKey, NCWebsocketOptions, ResponseHandler, WSReconnection, WSSendParam, WSSendReturn } from './Interfaces.js'
 import { NCEventBus } from './NCEventBus.js'
 import { convertCQCodeToJSON, CQCodeDecode, logger } from './Utils.js'
 
@@ -32,17 +22,11 @@ export class NCWebsocketBase {
 
     if ('baseUrl' in NCWebsocketOptions) {
       this.#baseUrl = NCWebsocketOptions.baseUrl
-    } else if (
-      'protocol' in NCWebsocketOptions &&
-      'host' in NCWebsocketOptions &&
-      'port' in NCWebsocketOptions
-    ) {
+    } else if ('protocol' in NCWebsocketOptions && 'host' in NCWebsocketOptions && 'port' in NCWebsocketOptions) {
       const { protocol, host, port } = NCWebsocketOptions
       this.#baseUrl = protocol + '://' + host + ':' + port
     } else {
-      throw new Error(
-        'NCWebsocketOptions must contain either "protocol && host && port" or "baseUrl"'
-      )
+      throw new Error('NCWebsocketOptions must contain either "protocol && host && port" or "baseUrl"')
     }
 
     // 整理重连参数
@@ -62,23 +46,22 @@ export class NCWebsocketBase {
   async connect() {
     return new Promise<void>((resolve, reject) => {
       this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
+
       const socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
+
       socket.onopen = () => {
         this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
         this.#reconnection.nowAttempts = 1
-
         resolve()
       }
+
       socket.onclose = async (event) => {
         this.#eventBus.emit('socket.close', {
           code: event.code,
           reason: event.reason,
-          reconnection: this.#reconnection
+          reconnection: this.#reconnection,
         })
-        if (
-          this.#reconnection.enable &&
-          this.#reconnection.nowAttempts < this.#reconnection.attempts
-        ) {
+        if (this.#reconnection.enable && this.#reconnection.nowAttempts < this.#reconnection.attempts) {
           this.#reconnection.nowAttempts++
           setTimeout(async () => {
             try {
@@ -89,19 +72,18 @@ export class NCWebsocketBase {
           }, this.#reconnection.delay)
         }
       }
+
       socket.onmessage = (event) => this.#message(event.data)
+
       socket.onerror = (event) => {
         this.#eventBus.emit('socket.error', {
           reconnection: this.#reconnection,
           error_type: 'connect_error',
-          errors: event?.error?.errors ?? [event?.error ?? null]
+          errors: event?.error?.errors ?? [event?.error ?? null],
         })
 
         if (this.#throwPromise) {
-          if (
-            this.#reconnection.enable &&
-            this.#reconnection.nowAttempts < this.#reconnection.attempts
-          ) {
+          if (this.#reconnection.enable && this.#reconnection.nowAttempts < this.#reconnection.attempts) {
             // 重连未到最后一次，等待继续重连，不抛出错误
             return
           }
@@ -109,10 +91,11 @@ export class NCWebsocketBase {
           reject({
             reconnection: this.#reconnection,
             error_type: 'connect_error',
-            errors: event.error.errors ?? [event.error]
+            errors: event?.error?.errors ?? [event?.error ?? null],
           })
         }
       }
+
       this.#socket = socket
     })
   }
@@ -174,8 +157,8 @@ export class NCWebsocketBase {
           info: {
             url: this.#baseUrl,
             errno: json.retcode,
-            message: json.message
-          }
+            message: json.message,
+          },
         })
 
         if (this.#throwPromise) throw new Error(json.message)
@@ -202,7 +185,7 @@ export class NCWebsocketBase {
     const message: APIRequest<T> = {
       action: method,
       params: params,
-      echo
+      echo,
     }
 
     if (this.#debug) {
@@ -224,7 +207,7 @@ export class NCWebsocketBase {
       this.#echoMap.set(echo, {
         message,
         onSuccess,
-        onFailure
+        onFailure,
       })
 
       this.#eventBus.emit('api.preSend', message)
@@ -235,7 +218,7 @@ export class NCWebsocketBase {
           retcode: -1,
           data: null,
           message: 'api socket is not connected',
-          echo: ''
+          echo: '',
         })
       } else if (this.#socket.readyState === WebSocket.CLOSING) {
         reject({
@@ -243,7 +226,7 @@ export class NCWebsocketBase {
           retcode: -1,
           data: null,
           message: 'api socket is closed',
-          echo: ''
+          echo: '',
         })
       } else {
         this.#socket.send(JSON.stringify(message))
