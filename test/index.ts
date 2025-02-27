@@ -48,7 +48,7 @@ bot.on('message', async (context) => {
     if (item.type !== 'text') return
 
     if (item.data.text === '233') {
-      await bot.send_msg({ ...context, message: [Structs.text('Ciallo～(∠・ω< )⌒☆')] })
+      await bot.send_msg({ ...context, message: [Structs.face(172)] })
     } else if (item.data.text.startsWith('!')) {
       const arr = item.data.text.slice(1).split(' ')
       const commandName: any = arr[0]
@@ -78,3 +78,4 @@ bot.on('request', async (event) => {
 
 await bot.connect()
 console.log('连接成功')
+

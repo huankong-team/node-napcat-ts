@@ -96,8 +96,12 @@ export interface Receive {
         pokeFlag: null
         chainCount: number
       }
-      resultId: string
-      chainCount: number
+      // 超级表情固定 ''
+      // 黄豆固定 null
+      resultId: string | null
+      // 超级表情固定 0
+      // 黄豆固定 null
+      chainCount: number | null
     }
   }
   reply: {
@@ -165,8 +169,6 @@ export interface Send {
     type: 'face'
     data: {
       id: string
-      resultId: string
-      chainCount: string
     }
   }
   mface: {
@@ -326,12 +328,10 @@ export const Structs = {
   /**
    * 发送QQ表情
    * @param id QQ 表情 ID
-   * @param resultId QQ 表情 resultId
-   * @param chainCount QQ 表情 chainCount
    * @returns { type: 'face', data: { id, resultId, chainCount } }
    */
-  face: function (id: string | number, resultId: string, chainCount: string | number): Send['face'] {
-    return { type: 'face', data: { id: id.toString(), resultId, chainCount: chainCount.toString() } }
+  face: function (id: string | number): Send['face'] {
+    return { type: 'face', data: { id: id.toString() } }
   },
   /**
    * 发送QQ表情包
