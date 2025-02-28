@@ -854,8 +854,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @napcat
    * 获取数据包状态
    */
-  nc_get_packet_status(params: WSSendParam['nc_get_packet_status']) {
-    return this.send('nc_get_packet_status', params)
+  nc_get_packet_status() {
+    return this.send('nc_get_packet_status', {})
   }
 
   /**
@@ -870,8 +870,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @napcat
    * 获取 rkey
    */
-  nc_get_rkey(params: WSSendParam['nc_get_rkey']) {
-    return this.send('nc_get_rkey', params)
+  nc_get_rkey() {
+    return this.send('nc_get_rkey', {})
   }
 
   /**
