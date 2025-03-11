@@ -684,6 +684,7 @@ export interface NoticeHandler {
   'notice.notify.input_status': NoticeHandler['notice.notify.input_status.group'] | NoticeHandler['notice.notify.input_status.friend']
   'notice.notify.input_status.group': NotifyInputStatusGroup
   'notice.notify.input_status.friend': NotifyInputStatusFriend
+  'notice.notify.poke': NoticeHandler['notice.notify.poke.friend'] | NoticeHandler['notice.notify.poke.group']
   'notice.notify.poke.friend': NotifyPokeFriend
   'notice.notify.poke.group': NotifyPokeGroup
   'notice.notify.profile_like': NotifyProfileLike
@@ -698,8 +699,8 @@ export interface NoticeHandler {
     | NoticeHandler['notice.group_ban']
     | NoticeHandler['notice.group_card']
     | NoticeHandler['notice.group_decrease']
-    | NoticeHandler['notice.group_increase']
     | NoticeHandler['notice.essence']
+    | NoticeHandler['notice.group_increase']
     | NoticeHandler['notice.notify']
     | NoticeHandler['notice.group_recall']
     | NoticeHandler['notice.group_upload']

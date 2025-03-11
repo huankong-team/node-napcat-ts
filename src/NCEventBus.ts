@@ -232,6 +232,8 @@ export class NCEventBus {
   notice(json: NoticeHandler[keyof NoticeHandler]) {
     const notice_type = json['notice_type']
     switch (notice_type) {
+      case 'bot_offline':
+        return this.emit('notice.bot_offline', json)
       case 'friend_add':
         return this.emit('notice.friend_add', json)
       case 'friend_recall':
@@ -244,18 +246,18 @@ export class NCEventBus {
         return this.emit('notice.group_card', json)
       case 'group_decrease':
         return this.notice_group_decrease(json)
+      case 'essence':
+        return this.notice_essence(json)
       case 'group_increase':
         return this.notice_group_increase(json)
+      case 'notify':
+        return this.notice_notify(json)
       case 'group_recall':
         return this.emit('notice.group_recall', json)
       case 'group_upload':
         return this.emit('notice.group_upload', json)
       case 'group_msg_emoji_like':
         return this.emit('notice.group_msg_emoji_like', json)
-      case 'essence':
-        return this.notice_essence(json)
-      case 'notify':
-        return this.notice_notify(json)
       default:
         logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_type: ${notice_type}`)
         return false
@@ -321,6 +323,8 @@ export class NCEventBus {
     switch (subType) {
       case 'add':
         return this.emit('notice.essence.add', json)
+      case 'delete':
+        return this.emit('notice.essence.delete', json)
       default:
         logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_essence_type: ${subType}`)
         return false
@@ -330,15 +334,35 @@ export class NCEventBus {
   notice_notify(json: NoticeHandler['notice.notify']) {
     const sub_type = json['sub_type']
     switch (sub_type) {
-      case 'poke':
-        return this.emit('group_id' in json ? 'notice.notify.poke.group' : 'notice.notify.poke.friend', json)
+      case 'group_name':
+        return this.emit('notice.notify.group_name', json)
+      case 'title':
+        return this.emit('notice.notify.title', json)
       case 'input_status':
-        return this.emit('group_id' in json && json.group_id !== 0 ? 'notice.notify.input_status.group' : 'notice.notify.input_status.friend', json)
+        return this.notice_notify_input_status(json)
+      case 'poke':
+        return this.notice_notify_poke(json)
       case 'profile_like':
         return this.emit('notice.notify.profile_like', json)
       default:
         logger.warn('[node-napcat-ts]', '[eventBus]', `unknown notice_notify_type: ${sub_type}`)
         return false
+    }
+  }
+
+  notice_notify_input_status(json: NoticeHandler['notice.notify.input_status']) {
+    if (json.group_id !== 0) {
+      return this.emit('notice.notify.input_status.group', json)
+    } else {
+      return this.emit('notice.notify.input_status.friend', json as NoticeHandler['notice.notify.input_status.friend'])
+    }
+  }
+
+  notice_notify_poke(json: NoticeHandler['notice.notify.poke']) {
+    if ('group_id' in json) {
+      return this.emit('notice.notify.poke.group', json)
+    } else {
+      return this.emit('notice.notify.poke.friend', json)
     }
   }
 }
