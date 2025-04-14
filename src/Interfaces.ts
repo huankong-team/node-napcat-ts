@@ -1146,7 +1146,7 @@ export type WSSendReturn = {
     role: 'owner' | 'admin' | 'member'
     title: string
   }
-  get_group_member_list: WSSendReturn['get_group_info'][]
+  get_group_member_list: WSSendReturn['get_group_member_info'][]
   get_group_honor_info: {
     group_id: string
     current_talkative: {
