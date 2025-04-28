@@ -146,159 +146,119 @@ export interface Receive {
   }
 }
 
-export interface Send {
-  text: {
-    type: 'text'
-    data: {
-      text: string
-    }
-  }
-  at: {
-    type: 'at'
-    data: {
-      qq: string | 'all'
-    }
-  }
-  reply: {
-    type: 'reply'
-    data: {
-      id: string
-    }
-  }
-  face: {
-    type: 'face'
-    data: {
-      id: string
-    }
-  }
-  mface: {
-    type: 'mface'
-    data: {
-      emoji_id: string
-      emoji_package_id: string
-      key: string
-      summary?: string
-    }
-  }
-  image: {
-    type: 'image'
-    data: {
-      file: string
-      summary?: string
-      sub_type?: string
-    }
-  }
-  file: {
-    type: 'file'
-    data: {
-      file: string
-      name?: string
-    }
-  }
-  video: {
-    type: 'video'
-    data: {
-      file: string
-      name?: string
-      thumb?: string
-    }
-  }
-  record: {
-    type: 'record'
-    data: {
-      file: string
-    }
-  }
-  json: {
-    type: 'json'
-    data: {
-      data: string
-    }
-  }
-  dice: {
-    type: 'dice'
-    data: {}
-  }
-  rps: {
-    type: 'rps'
-    data: {}
-  }
-  markdown: {
-    type: 'markdown'
-    data: {
-      content: string
-    }
-  }
-  music: {
-    type: 'music'
-    data:
-      | {
-          type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu'
-          id: string
-        }
-      | {
-          type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu' | 'custom'
-          url: string
-          image: string
-          audio?: string
-          title?: string
-          singer?: string
-        }
-  }
-  node: {
-    type: 'node'
-    data: (
-      | {
-          content: Send[keyof Send][]
-        }
-      | {
-          id: string
-        }
-    ) & {
-      user_id?: string
-      nickname?: string
-      // 群聊的聊天记录
-      source?: string
-      // 聊天记录预览部分
-      news?: { text: string }[]
-      // 查看 100 条转发消息
-      summary?: string
-      // [聊天记录]
-      prompt?: string
-      // 发送时间 (时间戳)
-      time?: string
-    }
-  }
-  forward: {
-    type: 'forward'
-    data: {
-      id: string
-    }
-  }
-  // xml: {
-  //   type: 'xml'
-  //   data: {}
-  // }
-  // poke: {
-  //   type: 'poke'
-  //   data: {}
-  // }
-  // location: {
-  //   type: 'location'
-  //   data: {}
-  // }
-  // miniapp: {
-  //   type: 'miniapp'
-  //   data: {}
-  // }
-  contact: {
-    type: 'contact'
-    data: {
-      type: 'qq' | 'group'
-      id: string
-    }
-  }
+// 泛型基类，包含通用的 type 和 data 字段
+interface BaseSegment<T extends string, D> {
+  type: T
+  data: D
 }
+
+// 各种具体消息类型，继承自 BaseSegment
+export interface TextSegment extends BaseSegment<'text', { text: string }> {}
+
+export interface AtSegment extends BaseSegment<'at', { qq: string | 'all' }> {}
+
+export interface ReplySegment extends BaseSegment<'reply', { id: string }> {}
+
+export interface FaceSegment extends BaseSegment<'face', { id: string }> {}
+
+export interface MFaceSegment extends BaseSegment<
+  'mface',
+  {
+    emoji_id: string
+    emoji_package_id: string
+    key: string
+    summary?: string
+  }
+> {}
+
+export interface ImageSegment extends BaseSegment<
+  'image',
+  {
+    file: string
+    summary?: string
+    sub_type?: string
+  }
+> {}
+
+export interface FileSegment extends BaseSegment<'file', { file: string, name?: string }> {}
+
+export interface VideoSegment extends BaseSegment<
+  'video',
+  { file: string, name?: string, thumb?: string }
+> {}
+
+export interface RecordSegment extends BaseSegment<'record', { file: string }> {}
+
+export interface JsonSegment extends BaseSegment<'json', { data: string }> {}
+
+export interface DiceSegment extends BaseSegment<'dice', any> {}
+
+export interface RPSSegment extends BaseSegment<'rps', any> {}
+
+export interface MarkdownSegment extends BaseSegment<'markdown', { content: string }> {}
+
+export interface CloudMusicSegment extends BaseSegment<
+  'music',
+  { type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu', id: string }
+> {}
+
+export interface MusicSegmentCustom extends BaseSegment<
+  'music',
+  {
+    type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu' | 'custom'
+    url: string
+    image: string
+    audio?: string
+    title?: string
+    singer?: string
+  }
+> {}
+
+export type MusicSegment = CloudMusicSegment | MusicSegmentCustom
+
+export interface NodeSegment extends BaseSegment<
+  'node',
+  (
+    | { content: SendMessageSegment[] }
+    | { id: string }
+  ) & {
+    user_id?: string
+    nickname?: string
+    source?: string
+    news?: { text: string }[]
+    summary?: string
+    prompt?: string
+    time?: string
+  }
+> {}
+
+export interface ForwardSegment extends BaseSegment<'forward', { id: string }> {}
+
+export interface ContactSegment extends BaseSegment<
+  'contact',
+  { type: 'qq' | 'group', id: string }
+> {}
+
+// 联合类型
+export type SendMessageSegment =
+  | TextSegment
+  | AtSegment
+  | ReplySegment
+  | FaceSegment
+  | MFaceSegment
+  | ImageSegment
+  | FileSegment
+  | VideoSegment
+  | RecordSegment
+  | JsonSegment
+  | DiceSegment
+  | RPSSegment
+  | MarkdownSegment
+  | MusicSegment
+  | NodeSegment
+  | ForwardSegment
+  | ContactSegment
+
 
 export const Structs = {
   /**
@@ -306,7 +266,7 @@ export const Structs = {
    * @param text 要发送的文字
    * @returns { type: 'text', data: { text } }
    */
-  text: function (text: string): Send['text'] {
+  text: function (text: string): TextSegment {
     return { type: 'text', data: { text } }
   },
   /**
@@ -314,7 +274,7 @@ export const Structs = {
    * @param qq at的QQ号
    * @returns { type: 'at', data: { qq } }
    */
-  at: function (qq: string | 'all' | number): Send['at'] {
+  at: function (qq: string | 'all' | number): AtSegment {
     return { type: 'at', data: { qq: qq.toString() } }
   },
   /**
@@ -322,7 +282,7 @@ export const Structs = {
    * @param id 回复的消息id
    * @returns { type: 'reply', data: { id } }
    */
-  reply: function (id: string | number): Send['reply'] {
+  reply: function (id: string | number): ReplySegment {
     return { type: 'reply', data: { id: id.toString() } }
   },
   /**
@@ -330,7 +290,7 @@ export const Structs = {
    * @param id QQ 表情 ID
    * @returns { type: 'face', data: { id, resultId, chainCount } }
    */
-  face: function (id: string | number): Send['face'] {
+  face: function (id: string | number): FaceSegment {
     return { type: 'face', data: { id: id.toString() } }
   },
   /**
@@ -341,7 +301,7 @@ export const Structs = {
    * @param summary 表情简介,可选
    * @returns { type: 'mface', data: { summary, emoji_id, emoji_package_id, key } }
    */
-  mface: function (emoji_id: string | number, emoji_package_id: string | number, key: string, summary?: string): Send['mface'] {
+  mface: function (emoji_id: string | number, emoji_package_id: string | number, key: string, summary?: string): MFaceSegment {
     return {
       type: 'mface',
       data: {
@@ -360,7 +320,7 @@ export const Structs = {
    * @param sub_type 图片类型
    * @returns { type: 'image', data: { file, summary, sub_type } }
    */
-  image: function (file: string | Buffer, summary?: string, sub_type?: string | number): Send['image'] {
+  image: function (file: string | Buffer, summary?: string, sub_type?: string | number): ImageSegment {
     return {
       type: 'image',
       data: {
@@ -376,7 +336,7 @@ export const Structs = {
    * @param name 文件名
    * @returns { type: 'file', data: { file, name } }
    */
-  file: function (file: string | Buffer, name?: string): Send['file'] {
+  file: function (file: string | Buffer, name?: string): FileSegment {
     return {
       type: 'file',
       data: {
@@ -392,7 +352,7 @@ export const Structs = {
    * @param thumb 预览图
    * @returns { type: 'video', data: { file, name, thumb } }
    */
-  video: function (file: string | Buffer, name?: string, thumb?: string): Send['video'] {
+  video: function (file: string | Buffer, name?: string, thumb?: string): VideoSegment {
     return {
       type: 'video',
       data: {
@@ -408,7 +368,7 @@ export const Structs = {
    * @param name 语音备注
    * @returns { type: 'record', data: { file, name } }
    */
-  record: function (file: string | Buffer): Send['record'] {
+  record: function (file: string | Buffer): RecordSegment {
     return {
       type: 'record',
       data: {
@@ -421,21 +381,21 @@ export const Structs = {
    * @param data json信息(序列化后)
    * @returns { type: 'json', data: { data } }
    */
-  json: function (data: string): Send['json'] {
+  json: function (data: string): JsonSegment {
     return { type: 'json', data: { data } }
   },
   /**
    * 发送骰子魔法表情
    * @returns { type: 'dice', data: {} }
    */
-  dice: function (): Send['dice'] {
+  dice: function (): DiceSegment {
     return { type: 'dice', data: {} }
   },
   /**
    * 发送猜拳魔法
    * @returns { type: 'rps', data: {} }
    */
-  rps: function (): Send['rps'] {
+  rps: function (): RPSSegment {
     return { type: 'rps', data: {} }
   },
   /**
@@ -443,7 +403,7 @@ export const Structs = {
    * @param data markdown内容
    * @returns { type: 'markdown', data: {} }
    */
-  markdown: function (content: string): Send['markdown'] {
+  markdown: function (content: string): MarkdownSegment {
     return { type: 'markdown', data: { content } }
   },
   /**
@@ -452,7 +412,7 @@ export const Structs = {
    * @param id 音乐id
    * @returns { type: 'music', data: { type, id } }
    */
-  music: function (type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo', id: string | number): Send['music'] {
+  music: function (type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo', id: string | number): CloudMusicSegment {
     return { type: 'music', data: { type, id: id.toString() } }
   },
   /**
@@ -464,7 +424,7 @@ export const Structs = {
    * @param singer 发送时可选，图片 URL
    * @returns { type: 'music', data: { type: 'custom', url, audio, title, image, singer } }
    */
-  customMusic: function (type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo' | 'custom', url: string, image: string, audio?: string, title?: string, singer?: string): Send['music'] {
+  customMusic: function (type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo' | 'custom', url: string, image: string, audio?: string, title?: string, singer?: string): MusicSegmentCustom {
     return { type: 'music', data: { type, url, audio, title, image, singer } }
   },
   /**
@@ -486,7 +446,7 @@ export const Structs = {
     summary?: string,
     prompt?: string,
     time?: string | number,
-  ): Send['node'] {
+  ): NodeSegment {
     return {
       type: 'node',
       data: {
@@ -507,7 +467,7 @@ export const Structs = {
    * @returns { type: 'node', data: { content } }
    */
   customNode: function (
-    content: Send[keyof Send][],
+    content: SendMessageSegment[],
     user_id?: number | string,
     nickname?: string,
     source?: string,
@@ -515,7 +475,7 @@ export const Structs = {
     summary?: string,
     prompt?: string,
     time?: string | number,
-  ): Send['node'] {
+  ): NodeSegment {
     return {
       type: 'node',
       data: {
@@ -535,7 +495,7 @@ export const Structs = {
    * @param message_id 消息id
    * @return { type: 'forward', data: { id }}
    */
-  forward: function (message_id: number): Send['forward'] {
+  forward: function (message_id: number): ForwardSegment {
     return { type: 'forward', data: { id: message_id.toString() } }
   },
   /**
@@ -544,7 +504,7 @@ export const Structs = {
    * @param id 联系人QQ号
    * @returns { type: 'contact', data: { id } }
    */
-  contact: function (type: 'qq' | 'group', id: number | string): Send['contact'] {
+  contact: function (type: 'qq' | 'group', id: number | string): ContactSegment {
     return { type: 'contact', data: { type, id: id.toString() } }
   },
 }
