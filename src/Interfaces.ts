@@ -1,4 +1,4 @@
-import { Receive, Send } from './Structs.js'
+import { NodeSegment, Receive, SendMessageSegment } from './Structs.js'
 
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
@@ -191,7 +191,7 @@ export type PrivateFriendMessage = {
   font: number
   sub_type: 'friend'
   post_type: 'message'
-  quick_action: (reply: Send[keyof Send][]) => Promise<null>
+  quick_action: (reply: SendMessageSegment[]) => Promise<null>
 } & MessageType
 
 export type PrivateGroupMessage = {
@@ -211,7 +211,7 @@ export type PrivateGroupMessage = {
   font: number
   sub_type: 'group'
   post_type: 'message'
-  quick_action: (reply: Send[keyof Send][], at_sender?: boolean) => Promise<null>
+  quick_action: (reply: SendMessageSegment[], at_sender?: boolean) => Promise<null>
 } & MessageType
 
 // 群消息
@@ -234,7 +234,7 @@ export type GroupMessage = {
   sub_type: 'normal'
   post_type: 'message'
   group_id: number
-  quick_action: (reply: Send[keyof Send][], at_sender?: boolean) => Promise<null>
+  quick_action: (reply: SendMessageSegment[], at_sender?: boolean) => Promise<null>
 } & MessageType
 
 export interface MessageHandler {
@@ -725,9 +725,9 @@ export type EventHandleMap = {
 
 export type WSSendParam = {
   // onebot 11
-  send_private_msg: { user_id: number; message: Send[keyof Send][] }
-  send_group_msg: { group_id: number; message: Send[keyof Send][] }
-  send_msg: ({ user_id: number } | { group_id: number }) & { message: Send[keyof Send][] }
+  send_private_msg: { user_id: number; message: SendMessageSegment[] }
+  send_group_msg: { group_id: number; message: SendMessageSegment[] }
+  send_msg: ({ user_id: number } | { group_id: number }) & { message: SendMessageSegment[] }
   delete_msg: { message_id: number }
   get_msg: { message_id: number }
   get_forward_msg: { message_id: string }
@@ -781,8 +781,8 @@ export type WSSendParam = {
   delete_friend: { user_id: number; temp_block?: boolean; temp_both_del?: boolean }
   // delete_unidirectional_friend: {}
   mark_msg_as_read: { user_id: number } | { group_id: number } | { message_id: number }
-  send_group_forward_msg: { group_id: number; message: Send['node'][] }
-  send_private_forward_msg: { user_id: number; message: Send['node'][] }
+  send_group_forward_msg: { group_id: number; message: NodeSegment[] }
+  send_private_forward_msg: { user_id: number; message: NodeSegment[] }
   get_group_msg_history: {
     group_id: number
     message_seq?: number
@@ -837,11 +837,11 @@ export type WSSendParam = {
   '.handle_quick_operation':
     | {
         context: MessageHandler['message.private']
-        operation: { reply?: Send[keyof Send][] }
+        operation: { reply?: SendMessageSegment[] }
       }
     | {
         context: MessageHandler['message.group']
-        operation: { reply?: Send[keyof Send][]; at_sender?: boolean }
+        operation: { reply?: SendMessageSegment[]; at_sender?: boolean }
       }
     | { context: RequestHandler['request.friend']; operation: { approve?: boolean } }
     | {
@@ -863,7 +863,7 @@ export type WSSendParam = {
   forward_group_single_msg: { message_id: number; group_id: number }
   translate_en2zh: { words: string[] }
   set_msg_emoji_like: { message_id: number; emoji_id: string; set?: boolean }
-  send_forward_msg: ({ user_id: number } | { group_id: number }) & { message: Send['node'][] }
+  send_forward_msg: ({ user_id: number } | { group_id: number }) & { message: NodeSegment[] }
   mark_private_msg_as_read: { user_id: number }
   mark_group_msg_as_read: { group_id: number }
   get_friend_msg_history: {

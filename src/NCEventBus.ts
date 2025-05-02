@@ -10,7 +10,7 @@ import {
   type WSReceiveHandler,
 } from './Interfaces.js'
 import type { NCWebsocketBase } from './NCWebsocketBase.js'
-import type { Send } from './Structs.js'
+import type { SendMessageSegment } from './Structs.js'
 import { logger } from './Utils.js'
 
 export class NCEventBus {
@@ -136,7 +136,7 @@ export class NCEventBus {
   }
 
   message_private(json: MessageHandler['message.private']) {
-    json.quick_action = (reply: Send[keyof Send][]) => this.#ws.send('.handle_quick_operation', { context: json, operation: { reply } })
+    json.quick_action = (reply: SendMessageSegment[]) => this.#ws.send('.handle_quick_operation', { context: json, operation: { reply } })
 
     const subType = json['sub_type']
     switch (subType) {
@@ -151,7 +151,7 @@ export class NCEventBus {
   }
 
   message_group(json: MessageHandler['message.group']) {
-    json.quick_action = (reply: Send[keyof Send][], at_sender = false) => this.#ws.send('.handle_quick_operation', { context: json, operation: { reply, at_sender } })
+    json.quick_action = (reply: SendMessageSegment[], at_sender = false) => this.#ws.send('.handle_quick_operation', { context: json, operation: { reply, at_sender } })
 
     const subType = json['sub_type']
     switch (subType) {
