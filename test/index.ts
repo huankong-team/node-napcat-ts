@@ -42,13 +42,16 @@ bot.on('api.preSend', function (params) {
 })
 
 bot.on('message', async (context) => {
-  console.log('\n收到了一条信息')
+  console.log('\n机器人收到了一条信息\n')
   console.dir(context, { depth: null })
 
   context.message.forEach(async (item) => {
     if (item.type !== 'text') return
 
-    if (item.data.text === '233') {
+    if (item.data.text === 'echo') {
+      // 收到echo消息时，回复"hi 我是小皮"
+      await bot.send_msg({ ...context, message: [Structs.text("hi 我是小皮")] })
+    } else if (item.data.text === '233') {
       await bot.send_msg({ ...context, message: [Structs.face(172)] })
     } else if (item.data.text.startsWith('!')) {
       const arr = item.data.text.slice(1).split(' ')
