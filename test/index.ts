@@ -1,19 +1,20 @@
 import 'dotenv/config'
-import { NCWebsocket, Structs } from '../src/index.js'
+import { NCWebsocket, Structs, NCWebsocketOptions } from '../src/index.js'
 
-const bot = new NCWebsocket(
-  {
-    protocol: 'ws',
-    host: 'localhost',
-    port: 3001,
-    accessToken: process.env.NC_ACCESS_TOKEN, // 请填写你的access_token
-    throwPromise: false,
-    reconnection: {
-      enable: true,
-      attempts: 10,
-      delay: 5000,
-    },
+const WsConfig: NCWebsocketOptions = {
+  protocol: 'ws',
+  host: '127.0.0.1',
+  port: 4040,
+  accessToken: process.env.NC_ACCESS_TOKEN, // 请填写你的access_token
+  throwPromise: false,
+  reconnection: {
+    enable: true,
+    attempts: 10,
+    delay: 5000,
   },
+}
+const bot = new NCWebsocket(
+  WsConfig,
   true,
 )
 

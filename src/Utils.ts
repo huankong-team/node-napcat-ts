@@ -53,7 +53,10 @@ export function convertJSONToCQCode(json: UnSafeStruct | UnSafeStruct[]): string
   }
 }
 
-export function CQCodeDecode(str: string): string {
+export function CQCodeDecode(str: string | any): string {
+  if (typeof str !== 'string') {
+    return String(str || ''); // 尝试转换为字符串，或返回空字符串
+  }
   return str.replace(/&#44;/g, ',').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&')
 }
 

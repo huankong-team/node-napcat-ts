@@ -113,62 +113,72 @@ export class NCWebsocketBase {
   }
 
   #message(data: Data) {
-    let json
+    let strData: string
     try {
-      json = JSON.parse(data.toString())
+      strData = data.toString()
+
+      // 检查数据是否看起来像有效的JSON (以 { 或 [ 开头)
+      if (!(strData.trim().startsWith('{') || strData.trim().startsWith('['))) {
+        logger.warn('[node-napcat-ts]', '[socket]', 'received non-JSON data:', strData)
+        return
+      }
+
+      let json = JSON.parse(strData)
       if (json.post_type === 'message' || json.post_type === 'message_sent') {
         if (json.message_format === 'string') {
-          json = JSON.parse(CQCodeDecode(json))
-          json.message = convertCQCodeToJSON(json.message)
+          // 直接处理message字段，而不是整个json对象
+          json.message = convertCQCodeToJSON(CQCodeDecode(json.message))
           json.message_format = 'array'
         }
-        json.raw_message = CQCodeDecode(json.raw_message)
+        if (typeof json.raw_message === 'string') {
+          json.raw_message = CQCodeDecode(json.raw_message)
+        }
+      }
+
+      if (this.#debug) {
+        logger.debug('[node-napcat-ts]', '[socket]', 'receive data')
+        logger.dir(json)
+      }
+
+      if (json.echo) {
+        const handler = this.#echoMap.get(json.echo)
+
+        if (handler) {
+          if (json.retcode === 0) {
+            this.#eventBus.emit('api.response.success', json)
+            handler.onSuccess(json)
+          } else {
+            this.#eventBus.emit('api.response.failure', json)
+            handler.onFailure(json)
+          }
+        }
+      } else {
+        if (json?.status === 'failed' && json?.echo === null) {
+          this.#reconnection.enable = false
+
+          this.#eventBus.emit('socket.error', {
+            reconnection: this.#reconnection,
+            error_type: 'response_error',
+            info: {
+              url: this.#baseUrl,
+              errno: json.retcode,
+              message: json.message,
+            },
+          })
+
+          if (this.#throwPromise) throw new Error(json.message)
+
+          this.disconnect()
+
+          return
+        }
+
+        this.#eventBus.parseMessage(json)
       }
     } catch (error) {
       logger.warn('[node-napcat-ts]', '[socket]', 'failed to parse JSON')
       logger.dir(error)
       return
-    }
-
-    if (this.#debug) {
-      logger.debug('[node-napcat-ts]', '[socket]', 'receive data')
-      logger.dir(json)
-    }
-
-    if (json.echo) {
-      const handler = this.#echoMap.get(json.echo)
-
-      if (handler) {
-        if (json.retcode === 0) {
-          this.#eventBus.emit('api.response.success', json)
-          handler.onSuccess(json)
-        } else {
-          this.#eventBus.emit('api.response.failure', json)
-          handler.onFailure(json)
-        }
-      }
-    } else {
-      if (json?.status === 'failed' && json?.echo === null) {
-        this.#reconnection.enable = false
-
-        this.#eventBus.emit('socket.error', {
-          reconnection: this.#reconnection,
-          error_type: 'response_error',
-          info: {
-            url: this.#baseUrl,
-            errno: json.retcode,
-            message: json.message,
-          },
-        })
-
-        if (this.#throwPromise) throw new Error(json.message)
-
-        this.disconnect()
-
-        return
-      }
-
-      this.#eventBus.parseMessage(json)
     }
   }
 
