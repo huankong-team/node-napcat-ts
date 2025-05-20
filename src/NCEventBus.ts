@@ -222,7 +222,7 @@ export class NCEventBus {
       case 'add':
         return this.emit('request.group.add', json)
       case 'invite':
-        return this.emit('request.group.invte', json)
+        return this.emit('request.group.invite', json)
       default:
         logger.warn('[node-napcat-ts]', '[eventBus]', `unknown request_group_type: ${subType}`)
         return false
