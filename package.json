@@ -1,6 +1,6 @@
 {
   "name": "node-napcat-ts",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "description": "napcat SDK for Node",
   "license": "MIT",
   "type": "module",
@@ -43,24 +43,28 @@
     "build": "tsc",
     "dev": "nodemon",
     "test": "tsx test/index.ts",
-    "unit-test": "tsx unit-test/index.ts",
     "typecheck": "tsc --noEmit",
     "docs:dev": "pnpm -C docs run dev",
     "docs:build": "pnpm -C docs run build",
     "docs:preview": "pnpm -C docs run preview"
   },
   "dependencies": {
-    "axios": "^1.9.0",
     "isomorphic-ws": "^5.0.0",
-    "nanoid": "^5.0.9",
-    "ws": "^8.18.0"
+    "nanoid": "^5.1.5",
+    "ws": "^8.18.2"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
-    "@types/ws": "^8.5.13",
-    "dotenv": "^16.4.7",
-    "nodemon": "^3.1.9",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "@types/node": "^22.15.19",
+    "@types/ws": "^8.18.1",
+    "dotenv": "^16.5.0",
+    "nodemon": "^3.1.10",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "vue-demi"
+    ]
   }
 }
