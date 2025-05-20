@@ -359,8 +359,8 @@ export interface RequestFriend {
 
 export interface RequestHandler {
   'request.friend': RequestFriend
-  'request.group': RequestHandler['request.group.invte'] | RequestHandler['request.group.add']
-  'request.group.invte': RequestGroupInvite
+  'request.group': RequestHandler['request.group.invite'] | RequestHandler['request.group.add']
+  'request.group.invite': RequestGroupInvite
   'request.group.add': RequestGroupAdd
   request: RequestHandler['request.friend'] | RequestHandler['request.group']
 }
