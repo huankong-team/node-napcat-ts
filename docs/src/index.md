@@ -18,8 +18,8 @@ hero:
       text: GitHub
       link: https://github.com/huankong233/node-napcat-ts
   image:
-      src: https://avatars.githubusercontent.com/u/165024194
-      alt: Logo
+    src: https://napneko.github.io/assets/newnewlogo.png
+    alt: Logo
 
 features:
   - icon: 📝
@@ -32,3 +32,4 @@ features:
     title: 适配真的很快！
     details: 有事没事就看一眼 雪雪 更新了没。
 ---
+
