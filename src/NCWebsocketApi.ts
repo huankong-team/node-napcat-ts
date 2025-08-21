@@ -1,7 +1,7 @@
 import type { WSSendParam } from './Interfaces.js'
 import { NCWebsocketBase } from './NCWebsocketBase.js'
 
-export class NCWebsocketApi extends NCWebsocketBase {
+export class NCWebsocket extends NCWebsocketBase {
   /**
    * @onebot11
    * 发送私聊消息
@@ -144,6 +144,14 @@ export class NCWebsocketApi extends NCWebsocketBase {
    */
   set_friend_add_request(params: WSSendParam['set_friend_add_request']) {
     return this.send('set_friend_add_request', params)
+  }
+
+  /**
+   * @onebot11
+   * 设置好友备注
+   */
+  set_friend_remark(params: WSSendParam['set_friend_remark']) {
+    return this.send('set_friend_remark', params)
   }
 
   /**
@@ -302,9 +310,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @onebot11
    * 清理缓存
    */
-  // clean_cache() {
-  //   return this.send('clean_cache', {})
-  // }
+  clean_cache() {
+    return this.send('clean_cache', {})
+  }
 
   /**
    * @onebot11
@@ -358,9 +366,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @gocqhttp
    * 获取单向好友列表
    */
-  // get_unidirectional_friend_list() {
-  //   return this.send('get_unidirectional_friend_list', {})
-  // }
+  get_unidirectional_friend_list() {
+    return this.send('get_unidirectional_friend_list', {})
+  }
 
   /**
    * @gocqhttp
@@ -422,8 +430,8 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @gocqhttp
    * 获取群系统消息
    */
-  get_group_system_msg() {
-    return this.send('get_group_system_msg', {})
+  get_group_system_msg(params?: WSSendParam['get_group_system_msg']) {
+    return this.send('get_group_system_msg', params ?? {})
   }
 
   /**
@@ -596,6 +604,14 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   /**
    * @napcat
+   * 留空占位符
+   */
+  // unknown() {
+  //   return this.send('unknown', {})
+  // }
+
+  /**
+   * @napcat
    * 设置自定义在线状态
    */
   set_diy_online_status(params: WSSendParam['set_diy_online_status']) {
@@ -742,9 +758,9 @@ export class NCWebsocketApi extends NCWebsocketBase {
    * @napcat
    * 获取收藏
    */
-  // get_collection_list(params: WSSendParam['get_collection_list']) {
-  //   return this.send('get_collection_list', params)
-  // }
+  get_collection_list(params: WSSendParam['get_collection_list']) {
+    return this.send('get_collection_list', params)
+  }
 
   /**
    * @napcat
@@ -812,11 +828,19 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   /**
    * @napcat
+   * 获取群详细信息
+   */
+  get_group_detail_info(params: WSSendParam['get_group_detail_info']) {
+    return this.send('get_group_detail_info', params)
+  }
+
+  /**
+   * @napcat
    * 获取群忽略添加请求
    */
-  // get_group_ignore_add_request(params: WSSendParam['get_group_ignore_add_request']) {
-  //   return this.send('get_group_ignore_add_request', params)
-  // }
+  get_group_ignore_add_request(params: WSSendParam['get_group_ignore_add_request']) {
+    return this.send('get_group_ignore_add_request', params)
+  }
 
   /**
    * @napcat
@@ -825,14 +849,6 @@ export class NCWebsocketApi extends NCWebsocketBase {
   _del_group_notice(params: WSSendParam['_del_group_notice']) {
     return this.send('_del_group_notice', params)
   }
-
-  /**
-   * @napcat
-   * 获取用户个人资料
-   */
-  // fetch_user_profile_like(params: WSSendParam['fetch_user_profile_like']) {
-  //   return this.send('fetch_user_profile_like', params)
-  // }
 
   /**
    * @napcat
@@ -884,6 +900,30 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   /**
    * @napcat
+   * 移动群文件
+   */
+  move_group_file(params: WSSendParam['move_group_file']) {
+    return this.send('move_group_file', params)
+  }
+
+  /**
+   * @napcat
+   * 转移群文件
+   */
+  trans_group_file(params: WSSendParam['trans_group_file']) {
+    return this.send('trans_group_file', params)
+  }
+
+  /**
+   * @napcat
+   * 重命名群文件
+   */
+  rename_group_file(params: WSSendParam['rename_group_file']) {
+    return this.send('rename_group_file', params)
+  }
+
+  /**
+   * @napcat
    * 获取频道列表
    */
   // get_guild_list(params: WSSendParam['get_guild_list']) {
@@ -908,18 +948,10 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   /**
    * @napcat
-   * 设置群签到
+   * 发送群签到
    */
   set_group_sign(params: WSSendParam['set_group_sign']) {
     return this.send('set_group_sign', params)
-  }
-
-  /**
-   * @napcat
-   * 发送群签到
-   */
-  send_group_sign(params: WSSendParam['send_group_sign']) {
-    return this.send('send_group_sign', params)
   }
 
   /**
@@ -940,7 +972,7 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   /**
    * @napcat
-   * 获取 AI 记录
+   * 获取 AI 语音
    */
   get_ai_record(params: WSSendParam['get_ai_record']) {
     return this.send('get_ai_record', params)
@@ -980,7 +1012,79 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   /**
    * @napcat
-   * 获取私密文件 URL
+   * 设置群踢人
+   */
+  set_group_kick_members(params: WSSendParam['set_group_kick_members']) {
+    return this.send('set_group_kick_members', params)
+  }
+
+  /**
+   * @napcat
+   * 设置群机器人添加选项
+   */
+  set_group_robot_add_option(params: WSSendParam['set_group_robot_add_option']) {
+    return this.send('set_group_robot_add_option', params)
+  }
+
+  /**
+   * @napcat
+   * 设置群添加选项
+   */
+  set_group_add_option(params: WSSendParam['set_group_add_option']) {
+    return this.send('set_group_add_option', params)
+  }
+
+  /**
+   * @napcat
+   * 设置群搜索选项
+   */
+  set_group_search(params: WSSendParam['set_group_search']) {
+    return this.send('set_group_search', params)
+  }
+
+  /**
+   * @napcat
+   * 获取可疑好友添加请求
+   */
+  get_doubt_friends_add_request(params: WSSendParam['get_doubt_friends_add_request']) {
+    return this.send('get_doubt_friends_add_request', params)
+  }
+
+  /**
+   * @napcat
+   * 设置可疑好友添加请求
+   */
+  set_doubt_friends_add_request(params: WSSendParam['set_doubt_friends_add_request']) {
+    return this.send('set_doubt_friends_add_request', params)
+  }
+
+  /**
+   * @napcat
+   * 获取 RKey
+   */
+  get_rkey(params: WSSendParam['get_rkey']) {
+    return this.send('get_rkey', params)
+  }
+
+  /**
+   * @napcat
+   * 获取 RKey 服务器
+   */
+  get_rkey_server(params: WSSendParam['get_rkey_server']) {
+    return this.send('get_rkey_server', params)
+  }
+
+  /**
+   * @napcat
+   * 设置群备注
+   */
+  set_group_remark(params: WSSendParam['set_group_remark']) {
+    return this.send('set_group_remark', params)
+  }
+
+  /**
+   * @napcat
+   * 获取私聊文件链接
    */
   get_private_file_url(params: WSSendParam['get_private_file_url']) {
     return this.send('get_private_file_url', params)
@@ -988,7 +1092,7 @@ export class NCWebsocketApi extends NCWebsocketBase {
 
   /**
    * @napcat
-   * 点击内联键盘按钮
+   * 点击消息中的按钮
    */
   click_inline_keyboard_button(params: WSSendParam['click_inline_keyboard_button']) {
     return this.send('click_inline_keyboard_button', params)
