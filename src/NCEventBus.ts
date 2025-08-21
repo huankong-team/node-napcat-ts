@@ -151,7 +151,7 @@ export class NCEventBus {
   }
 
   message_group(json: MessageHandler['message.group']) {
-    json.quick_action = (reply: SendMessageSegment[], at_sender = false) => this.#ws.send('.handle_quick_operation', { context: json, operation: { reply, at_sender } })
+    json.quick_action = (reply: SendMessageSegment[], at_sender?: boolean) => this.#ws.send('.handle_quick_operation', { context: json, operation: { reply, at_sender } })
 
     const subType = json['sub_type']
     switch (subType) {
@@ -204,7 +204,7 @@ export class NCEventBus {
     const request_type = json['request_type']
     switch (request_type) {
       case 'friend':
-        json.quick_action = (approve = true) => this.#ws.send('.handle_quick_operation', { context: json, operation: { approve } })
+        json.quick_action = (approve?: boolean) => this.#ws.send('.handle_quick_operation', { context: json, operation: { approve } })
         return this.emit('request.friend', json)
       case 'group':
         return this.request_group(json)
@@ -215,7 +215,7 @@ export class NCEventBus {
   }
 
   request_group(json: RequestHandler['request.group']) {
-    json.quick_action = (approve = true, reason?: string) => this.#ws.send('.handle_quick_operation', { context: json, operation: { approve, reason } })
+    json.quick_action = (approve?: boolean, reason?: string) => this.#ws.send('.handle_quick_operation', { context: json, operation: { approve, reason } })
 
     const subType = json['sub_type']
     switch (subType) {
