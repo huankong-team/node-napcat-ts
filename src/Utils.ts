@@ -20,7 +20,7 @@ export const CQ_TAG_REGEXP = /^\[CQ:([a-z]+)(?:,([^\]]+))?]$/
 /**
  * CQ码转JSON
  */
-export function convertCQCodeToJSON(msg: string): Receive[keyof Receive] {
+export function convertCQCodeToJSON(msg: string): Receive[keyof Receive][] {
   return CQCodeDecode(msg)
     .split(SPLIT)
     .map((tagStr) => {
@@ -32,7 +32,7 @@ export function convertCQCodeToJSON(msg: string): Receive[keyof Receive] {
 
       const data = Object.fromEntries(value.split(',').map((item) => item.split('=')))
       return { type: tagName, data }
-    }) as unknown as Receive[keyof Receive]
+    }) as Receive[keyof Receive][]
 }
 
 const _conver = (json: any) => {
