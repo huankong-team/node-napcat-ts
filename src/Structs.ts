@@ -72,29 +72,29 @@ export interface Receive {
     data: {
       id: string
       raw: {
-        faceIndex: number
-        faceText: string
-        faceType: number
-        packId: string
-        stickerId: string
-        sourceType: number
-        stickerType: number
-        resultId: string
-        surpriseId: string
-        randomType: number
-        imageType: null
-        pokeType: null
-        spokeSummary: null
-        doubleHit: null
-        vaspokeId: null
-        vaspokeName: null
-        vaspokeMinver: null
-        pokeStrength: null
-        msgType: null
-        faceBubbleCount: null
-        oldVersionStr: null
-        pokeFlag: null
-        chainCount: number
+        faceIndex?: number
+        faceText?: string
+        faceType?: number
+        packId?: string
+        stickerId?: string
+        sourceType?: number
+        stickerType?: number
+        resultId?: string
+        surpriseId?: string
+        randomType?: number
+        imageType?: number
+        pokeType?: number
+        spokeSummary?: string
+        doubleHit?: number
+        vaspokeId?: number
+        vaspokeName?: string
+        vaspokeMinver?: number
+        pokeStrength?: number
+        msgType?: number
+        faceBubbleCount?: number
+        oldVersionStr?: string
+        pokeFlag?: number
+        chainCount?: number
       }
       // 超级表情固定 ''
       // 黄豆固定 null
@@ -161,31 +161,31 @@ export interface ReplySegment extends BaseSegment<'reply', { id: string }> {}
 
 export interface FaceSegment extends BaseSegment<'face', { id: string }> {}
 
-export interface MFaceSegment extends BaseSegment<
-  'mface',
-  {
-    emoji_id: string
-    emoji_package_id: string
-    key: string
-    summary?: string
-  }
-> {}
+export interface MFaceSegment
+  extends BaseSegment<
+    'mface',
+    {
+      emoji_id: string
+      emoji_package_id: string
+      key: string
+      summary?: string
+    }
+  > {}
 
-export interface ImageSegment extends BaseSegment<
-  'image',
-  {
-    file: string
-    summary?: string
-    sub_type?: string
-  }
-> {}
+export interface ImageSegment
+  extends BaseSegment<
+    'image',
+    {
+      file: string
+      summary?: string
+      sub_type?: string
+    }
+  > {}
 
-export interface FileSegment extends BaseSegment<'file', { file: string, name?: string }> {}
+export interface FileSegment extends BaseSegment<'file', { file: string; name?: string }> {}
 
-export interface VideoSegment extends BaseSegment<
-  'video',
-  { file: string, name?: string, thumb?: string }
-> {}
+export interface VideoSegment
+  extends BaseSegment<'video', { file: string; name?: string; thumb?: string }> {}
 
 export interface RecordSegment extends BaseSegment<'record', { file: string }> {}
 
@@ -197,47 +197,42 @@ export interface RPSSegment extends BaseSegment<'rps', any> {}
 
 export interface MarkdownSegment extends BaseSegment<'markdown', { content: string }> {}
 
-export interface CloudMusicSegment extends BaseSegment<
-  'music',
-  { type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu', id: string }
-> {}
+export interface CloudMusicSegment
+  extends BaseSegment<'music', { type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu'; id: string }> {}
 
-export interface MusicSegmentCustom extends BaseSegment<
-  'music',
-  {
-    type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu' | 'custom'
-    url: string
-    image: string
-    audio?: string
-    title?: string
-    singer?: string
-  }
-> {}
+export interface MusicSegmentCustom
+  extends BaseSegment<
+    'music',
+    {
+      type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu' | 'custom'
+      url: string
+      image: string
+      audio?: string
+      title?: string
+      singer?: string
+    }
+  > {}
 
 export type MusicSegment = CloudMusicSegment | MusicSegmentCustom
 
-export interface NodeSegment extends BaseSegment<
-  'node',
-  (
-    | { content: SendMessageSegment[] }
-    | { id: string }
-  ) & {
-    user_id?: string
-    nickname?: string
-    source?: string
-    news?: { text: string }[]
-    summary?: string
-    prompt?: string
-    time?: string
-  }
-> {}
+export interface NodeSegment
+  extends BaseSegment<
+    'node',
+    ({ content: SendMessageSegment[] } | { id: string }) & {
+      user_id?: string
+      nickname?: string
+      source?: string
+      news?: { text: string }[]
+      summary?: string
+      prompt?: string
+      time?: string
+    }
+  > {}
 
 export interface ForwardSegment extends BaseSegment<'forward', { id: string }> {}
 
-export interface ContactSegment extends BaseSegment<
-  'contact',
-  { type: 'qq' | 'group', id: string }
-> {}
+export interface ContactSegment
+  extends BaseSegment<'contact', { type: 'qq' | 'group'; id: string }> {}
 
 // 联合类型
 export type SendMessageSegment =
@@ -258,7 +253,6 @@ export type SendMessageSegment =
   | NodeSegment
   | ForwardSegment
   | ContactSegment
-
 
 export const Structs = {
   /**
@@ -301,7 +295,12 @@ export const Structs = {
    * @param summary 表情简介,可选
    * @returns { type: 'mface', data: { summary, emoji_id, emoji_package_id, key } }
    */
-  mface: function (emoji_id: string | number, emoji_package_id: string | number, key: string, summary?: string): MFaceSegment {
+  mface: function (
+    emoji_id: string | number,
+    emoji_package_id: string | number,
+    key: string,
+    summary?: string,
+  ): MFaceSegment {
     return {
       type: 'mface',
       data: {
@@ -320,7 +319,11 @@ export const Structs = {
    * @param sub_type 图片类型
    * @returns { type: 'image', data: { file, summary, sub_type } }
    */
-  image: function (file: string | Buffer, summary?: string, sub_type?: string | number): ImageSegment {
+  image: function (
+    file: string | Buffer,
+    summary?: string,
+    sub_type?: string | number,
+  ): ImageSegment {
     return {
       type: 'image',
       data: {
@@ -412,7 +415,10 @@ export const Structs = {
    * @param id 音乐id
    * @returns { type: 'music', data: { type, id } }
    */
-  music: function (type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo', id: string | number): CloudMusicSegment {
+  music: function (
+    type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo',
+    id: string | number,
+  ): CloudMusicSegment {
     return { type: 'music', data: { type, id: id.toString() } }
   },
   /**
@@ -424,7 +430,14 @@ export const Structs = {
    * @param singer 发送时可选，图片 URL
    * @returns { type: 'music', data: { type: 'custom', url, audio, title, image, singer } }
    */
-  customMusic: function (type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo' | 'custom', url: string, image: string, audio?: string, title?: string, singer?: string): MusicSegmentCustom {
+  customMusic: function (
+    type: 'qq' | '163' | 'kugou' | 'migu' | 'kuwo' | 'custom',
+    url: string,
+    image: string,
+    audio?: string,
+    title?: string,
+    singer?: string,
+  ): MusicSegmentCustom {
     return { type: 'music', data: { type, url, audio, title, image, singer } }
   },
   /**
