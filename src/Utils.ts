@@ -1,4 +1,4 @@
-import type { Receive, UnSafeStruct } from './Structs.js'
+import type { Receive, SendMessageSegment, UnSafeStruct } from './Structs.js'
 
 const getTime = () => new Date().toLocaleString()
 
@@ -20,7 +20,7 @@ export const CQ_TAG_REGEXP = /^\[CQ:([a-z]+)(?:,([^\]]+))?]$/
 /**
  * CQ码转JSON
  */
-export function convertCQCodeToJSON(msg: string): Receive[keyof Receive][] {
+export function convertCQCodeToJSON(msg: string): Receive[keyof Receive][] | SendMessageSegment[] {
   return CQCodeDecode(msg)
     .split(SPLIT)
     .map((tagStr) => {
@@ -32,7 +32,7 @@ export function convertCQCodeToJSON(msg: string): Receive[keyof Receive][] {
 
       const data = Object.fromEntries(value.split(',').map((item) => item.split('=')))
       return { type: tagName, data }
-    }) as Receive[keyof Receive][]
+    }) as Receive[keyof Receive][] | SendMessageSegment[]
 }
 
 const _conver = (json: any) => {
@@ -55,9 +55,17 @@ export function convertJSONToCQCode(json: UnSafeStruct | UnSafeStruct[]): string
 
 export function CQCodeDecode(str: string | any): string {
   if (typeof str !== 'string') return String(str || '') // 尝试转换为字符串，或返回空字符串
-  return str.replace(/&#44;/g, ',').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&')
+  return str
+    .replace(/&#44;/g, ',')
+    .replace(/&#91;/g, '[')
+    .replace(/&#93;/g, ']')
+    .replace(/&amp;/g, '&')
 }
 
 export function CQCodeEncode(str: string): string {
-  return str.replace(/,/g, '&#44;').replace(/\[/g, '&#91;').replace(/]/g, '&#93;').replace(/&/g, '&amp;')
+  return str
+    .replace(/,/g, '&#44;')
+    .replace(/\[/g, '&#91;')
+    .replace(/]/g, '&#93;')
+    .replace(/&/g, '&amp;')
 }
