@@ -21,7 +21,7 @@ await napcat.send_msg({
 ## 结构体大全
 
 ::: tip 注意
-如有缺少或类型错误请提交 [pr](https://github.com/huankong233/node-napcat-ts/compare)
+如有缺少或类型错误请提交 [pr](https://github.com/HkTeamX/node-napcat-ts/compare)
 :::
 
 以 [NapCatQQ 文档](https://napneko.github.io/develop/msg) 为准
