@@ -19,4 +19,4 @@
 
 ## ⭐ 星星
 
-[![Stargazers over time](https://starchart.cc/huankong233/node-napcat-ts.svg)](https://starchart.cc/huankong233/node-napcat-ts)
+[![Stargazers over time](https://starchart.cc/HkTeamX/node-napcat-ts.svg)](https://starchart.cc/HkTeamX/node-napcat-ts)

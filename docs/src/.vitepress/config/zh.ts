@@ -8,34 +8,34 @@ export const zh = defineConfig({
     nav: nav(),
 
     sidebar: {
-      '/guide/': { base: '/guide/', items: sidebarGuide() }
+      '/guide/': { base: '/guide/', items: sidebarGuide() },
     },
 
     editLink: {
-      pattern: 'https://github.com/huankong233/node-napcat-ts/edit/main/docs/:path',
-      text: '在 GitHub 上编辑此页面'
+      pattern: 'https://github.com/HkTeamX/node-napcat-ts/edit/main/docs/:path',
+      text: '在 GitHub 上编辑此页面',
     },
 
     footer: {
       message: '基于 MIT 许可发布',
-      copyright: `版权所有 © 2024-${new Date().getFullYear()} huankong233`
+      copyright: `版权所有 © 2024-${new Date().getFullYear()} huankong233`,
     },
 
     docFooter: {
       prev: '上一页',
-      next: '下一页'
+      next: '下一页',
     },
 
     outline: {
-      label: '页面导航'
+      label: '页面导航',
     },
 
     lastUpdated: {
       text: '最后更新于',
       formatOptions: {
         dateStyle: 'short',
-        timeStyle: 'medium'
-      }
+        timeStyle: 'medium',
+      },
     },
 
     langMenuLabel: '多语言',
@@ -43,8 +43,8 @@ export const zh = defineConfig({
     sidebarMenuLabel: '菜单',
     darkModeSwitchLabel: '主题',
     lightModeSwitchTitle: '切换到浅色模式',
-    darkModeSwitchTitle: '切换到深色模式'
-  }
+    darkModeSwitchTitle: '切换到深色模式',
+  },
 })
 
 function nav(): DefaultTheme.NavItem[] {
@@ -52,8 +52,8 @@ function nav(): DefaultTheme.NavItem[] {
     {
       text: '指南',
       link: '/guide/getting-started',
-      activeMatch: '/guide/'
-    }
+      activeMatch: '/guide/',
+    },
   ]
 }
 
@@ -68,8 +68,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         { text: '如何使用', link: 'how-to-use' },
         { text: '绑定事件', link: 'bind-event' },
         { text: '调用接口', link: 'call-api' },
-        { text: '结构体构造器', link: 'struct-maker' }
-      ]
-    }
+        { text: '结构体构造器', link: 'struct-maker' },
+      ],
+    },
   ]
 }

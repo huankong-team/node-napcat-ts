@@ -15,7 +15,7 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BUILD_SCRIPT: cd docs && npm install pnpm -g && pnpm install && pnpm run build
           BUILD_DIR: src/.vitepress/dist
-          TARGET_REPO: huankong-team/node-napcat-ts
+          TARGET_REPO: HkTeamX/node-napcat-ts
           TARGET_BRANCH: docs
           COMMIT_MESSAGE: 自动打包完成
           CNAME: node-napcat-ts.huankong.top
