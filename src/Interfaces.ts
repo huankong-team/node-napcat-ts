@@ -77,7 +77,11 @@ export interface SocketHandler {
   'socket.open': WSOpenRes
   'socket.close': WSCloseRes
   'socket.error': WSErrorRes
-  socket: SocketHandler['socket.connecting'] | SocketHandler['socket.open'] | SocketHandler['socket.close'] | SocketHandler['socket.error']
+  socket:
+    | SocketHandler['socket.connecting']
+    | SocketHandler['socket.open']
+    | SocketHandler['socket.close']
+    | SocketHandler['socket.error']
 }
 
 export interface APIRequest<T extends keyof WSSendParam> {
@@ -158,7 +162,10 @@ export interface LifeCycleConnect {
 }
 
 export interface MetaEventHandler {
-  'meta_event.lifecycle': MetaEventHandler['meta_event.lifecycle.enable'] | MetaEventHandler['meta_event.lifecycle.disable'] | MetaEventHandler['meta_event.lifecycle.connect']
+  'meta_event.lifecycle':
+    | MetaEventHandler['meta_event.lifecycle.enable']
+    | MetaEventHandler['meta_event.lifecycle.disable']
+    | MetaEventHandler['meta_event.lifecycle.connect']
   'meta_event.lifecycle.enable': LifeCycleEnable
   'meta_event.lifecycle.disable': LifeCycleDisable
   'meta_event.lifecycle.connect': LifeCycleConnect
@@ -238,7 +245,9 @@ export type GroupMessage = {
 } & MessageType
 
 export interface MessageHandler {
-  'message.private': MessageHandler['message.private.friend'] | MessageHandler['message.private.group']
+  'message.private':
+    | MessageHandler['message.private.friend']
+    | MessageHandler['message.private.group']
   'message.private.friend': PrivateFriendMessage
   'message.private.group': PrivateGroupMessage
   'message.group': MessageHandler['message.group.normal']
@@ -308,12 +317,16 @@ export type GroupMessageSelf = {
 } & MessageType
 
 export interface MessageSentHandler {
-  'message_sent.private': MessageSentHandler['message_sent.private.friend'] | MessageSentHandler['message_sent.private.group']
+  'message_sent.private':
+    | MessageSentHandler['message_sent.private.friend']
+    | MessageSentHandler['message_sent.private.group']
   'message_sent.private.friend': PrivateFriendMessageSelf
   'message_sent.private.group': PrivateGroupMessageSelf
   'message_sent.group': MessageSentHandler['message_sent.group.normal']
   'message_sent.group.normal': GroupMessageSelf
-  message_sent: MessageSentHandler['message_sent.private'] | MessageSentHandler['message_sent.group']
+  message_sent:
+    | MessageSentHandler['message_sent.private']
+    | MessageSentHandler['message_sent.group']
 }
 
 // =====================================================================================
@@ -619,7 +632,10 @@ export interface NotifyPokeFriend {
   sub_type: 'poke'
   target_id: number
   user_id: number
-  raw_info: [{ col: string; nm: string; type: 'qq'; uid: string }, { col: string; nm: string; tp: string; type: 'qq'; uid: string }]
+  raw_info: [
+    { col: string; nm: string; type: 'qq'; uid: string },
+    { col: string; nm: string; tp: string; type: 'qq'; uid: string },
+  ]
 }
 
 export interface NotifyPokeGroup {
@@ -654,21 +670,30 @@ export interface NoticeHandler {
   'notice.bot_offline': BotOffline
   'notice.friend_add': FriendAdd
   'notice.friend_recall': FriendRecall
-  'notice.group_admin': NoticeHandler['notice.group_admin.set'] | NoticeHandler['notice.group_admin.unset']
+  'notice.group_admin':
+    | NoticeHandler['notice.group_admin.set']
+    | NoticeHandler['notice.group_admin.unset']
   'notice.group_admin.set': GroupAdminSet
   'notice.group_admin.unset': GroupAdminUnset
-  'notice.group_ban': NoticeHandler['notice.group_ban.ban'] | NoticeHandler['notice.group_ban.lift_ban']
+  'notice.group_ban':
+    | NoticeHandler['notice.group_ban.ban']
+    | NoticeHandler['notice.group_ban.lift_ban']
   'notice.group_ban.ban': GroupBanBan
   'notice.group_ban.lift_ban': GroupBanLiftBan
   'notice.group_card': GroupCard
-  'notice.group_decrease': NoticeHandler['notice.group_decrease.leave'] | NoticeHandler['notice.group_decrease.kick'] | NoticeHandler['notice.group_decrease.kick_me']
+  'notice.group_decrease':
+    | NoticeHandler['notice.group_decrease.leave']
+    | NoticeHandler['notice.group_decrease.kick']
+    | NoticeHandler['notice.group_decrease.kick_me']
   'notice.group_decrease.leave': GroupDecreaseLeave
   'notice.group_decrease.kick': GroupDecreaseKick
   'notice.group_decrease.kick_me': GroupDecreaseKickMe
   'notice.essence': NoticeHandler['notice.essence.add'] | NoticeHandler['notice.essence.delete']
   'notice.essence.add': GroupEssenceAdd
   'notice.essence.delete': GroupEssenceDelete
-  'notice.group_increase': NoticeHandler['notice.group_increase.approve'] | NoticeHandler['notice.group_increase.invite']
+  'notice.group_increase':
+    | NoticeHandler['notice.group_increase.approve']
+    | NoticeHandler['notice.group_increase.invite']
   'notice.group_increase.approve': GroupIncreaseApprove
   'notice.group_increase.invite': GroupIncreaseInvite
   'notice.notify':
@@ -681,10 +706,14 @@ export interface NoticeHandler {
     | NoticeHandler['notice.notify.profile_like']
   'notice.notify.group_name': NotifyGroupName
   'notice.notify.title': NotifyTitle
-  'notice.notify.input_status': NoticeHandler['notice.notify.input_status.group'] | NoticeHandler['notice.notify.input_status.friend']
+  'notice.notify.input_status':
+    | NoticeHandler['notice.notify.input_status.group']
+    | NoticeHandler['notice.notify.input_status.friend']
   'notice.notify.input_status.group': NotifyInputStatusGroup
   'notice.notify.input_status.friend': NotifyInputStatusFriend
-  'notice.notify.poke': NoticeHandler['notice.notify.poke.friend'] | NoticeHandler['notice.notify.poke.group']
+  'notice.notify.poke':
+    | NoticeHandler['notice.notify.poke.friend']
+    | NoticeHandler['notice.notify.poke.group']
   'notice.notify.poke.friend': NotifyPokeFriend
   'notice.notify.poke.group': NotifyPokeGroup
   'notice.notify.profile_like': NotifyProfileLike
@@ -709,9 +738,19 @@ export interface NoticeHandler {
 
 // =====================================================================================
 
-export type AllHandlers = SocketHandler & ApiHandler & MessageHandler & MessageSentHandler & MetaEventHandler & RequestHandler & NoticeHandler
+export type AllHandlers = SocketHandler &
+  ApiHandler &
+  MessageHandler &
+  MessageSentHandler &
+  MetaEventHandler &
+  RequestHandler &
+  NoticeHandler
 
-export type WSReceiveHandler = MessageHandler & MessageSentHandler & MetaEventHandler & RequestHandler & NoticeHandler
+export type WSReceiveHandler = MessageHandler &
+  MessageSentHandler &
+  MetaEventHandler &
+  RequestHandler &
+  NoticeHandler
 
 export type EventKey = keyof AllHandlers
 export type HandlerResMap = {
@@ -851,7 +890,10 @@ export type WSSendParam = {
           ban_duration?: number
         }
       }
-    | { context: RequestHandler['request.friend']; operation: { approve?: boolean; remark?: string } }
+    | {
+        context: RequestHandler['request.friend']
+        operation: { approve?: boolean; remark?: string }
+      }
     | {
         context: RequestHandler['request.group']
         operation: { approve?: boolean; reason?: string }
@@ -905,9 +947,19 @@ export type WSSendParam = {
   nc_get_user_status: { user_id: number }
   nc_get_rkey: {}
   get_group_shut_list: { group_id: number }
-  move_group_file: { group_id: number; file_id: string; current_parent_directory: string; target_parent_directory: string }
+  move_group_file: {
+    group_id: number
+    file_id: string
+    current_parent_directory: string
+    target_parent_directory: string
+  }
   trans_group_file: { group_id: number; file_id: string }
-  rename_group_file: { group_id: number; file_id: string; current_parent_directory: string; new_name: string }
+  rename_group_file: {
+    group_id: number
+    file_id: string
+    current_parent_directory: string
+    new_name: string
+  }
   // get_guild_list: {}
   // get_guild_service_profile: {}
   get_group_ignored_notifies: {}
@@ -959,7 +1011,11 @@ export type WSSendParam = {
   get_clientkey: {}
   send_poke: { group_id: number; user_id: number } | { user_id: number }
   set_group_kick_members: { group_id: string; user_id: number[]; reject_add_request?: boolean }
-  set_group_robot_add_option: { group_id: string; robot_member_switch?: number; robot_member_examine?: number }
+  set_group_robot_add_option: {
+    group_id: string
+    robot_member_switch?: number
+    robot_member_examine?: number
+  }
   set_group_add_option: {
     group_id: string
     add_type: number
@@ -971,7 +1027,13 @@ export type WSSendParam = {
   get_rkey_server: {}
   set_group_remark: { group_id: string; remark: string }
   get_private_file_url: { file_id: string }
-  click_inline_keyboard_button: { group_id: number; bot_appid: string; button_id?: string; callback_data?: string; msg_seq?: string }
+  click_inline_keyboard_button: {
+    group_id: number
+    bot_appid: string
+    button_id?: string
+    callback_data?: string
+    msg_seq?: string
+  }
 }
 
 type Buffer<T = string> = { [key: string]: T }
@@ -1244,7 +1306,13 @@ export type WSSendReturn = {
   _get_model_show: { variants: { model_show: string; need_pay: boolean } }[]
   // _set_model_show: null
   // get_online_clients: null
-  get_unidirectional_friend_list: { uin: number; uid: string; nick_name: string; age: number; source: string }[]
+  get_unidirectional_friend_list: {
+    uin: number
+    uid: string
+    nick_name: string
+    age: number
+    source: string
+  }[]
   delete_friend: { result: 0; errMsg: string }
   // delete_unidirectional_friend: null
   mark_msg_as_read: null
@@ -1985,5 +2053,12 @@ export type WSSendReturn = {
   }
   set_group_remark: null
   get_private_file_url: WSSendReturn['get_group_file_url']
-  click_inline_keyboard_button: { result: 0; errMsg: string; status: number; promptText: string; promptType: number; promptIcon: number }
+  click_inline_keyboard_button: {
+    result: 0
+    errMsg: string
+    status: number
+    promptText: string
+    promptType: number
+    promptIcon: number
+  }
 }
