@@ -1,6 +1,16 @@
 import WebSocket, { type Data } from 'isomorphic-ws'
 import { nanoid } from 'nanoid'
-import type { AllHandlers, APIRequest, EventHandleMap, EventKey, NCWebsocketOptions, ResponseHandler, WSReconnection, WSSendParam, WSSendReturn } from './Interfaces.js'
+import type {
+  APIRequest,
+  EventHandleMap,
+  EventKey,
+  HandlerResMap,
+  NCWebsocketOptions,
+  ResponseHandler,
+  WSReconnection,
+  WSSendParam,
+  WSSendReturn,
+} from './Interfaces.js'
 import { NCEventBus } from './NCEventBus.js'
 import { convertCQCodeToJSON, CQCodeDecode, logger } from './Utils.js'
 
@@ -22,11 +32,17 @@ export class NCWebsocketBase {
 
     if ('baseUrl' in NCWebsocketOptions) {
       this.#baseUrl = NCWebsocketOptions.baseUrl
-    } else if ('protocol' in NCWebsocketOptions && 'host' in NCWebsocketOptions && 'port' in NCWebsocketOptions) {
+    } else if (
+      'protocol' in NCWebsocketOptions &&
+      'host' in NCWebsocketOptions &&
+      'port' in NCWebsocketOptions
+    ) {
       const { protocol, host, port } = NCWebsocketOptions
       this.#baseUrl = protocol + '://' + host + ':' + port
     } else {
-      throw new Error('NCWebsocketOptions must contain either "protocol && host && port" or "baseUrl"')
+      throw new Error(
+        'NCWebsocketOptions must contain either "protocol && host && port" or "baseUrl"',
+      )
     }
 
     // 整理重连参数
@@ -61,7 +77,10 @@ export class NCWebsocketBase {
           reason: event.reason,
           reconnection: this.#reconnection,
         })
-        if (this.#reconnection.enable && this.#reconnection.nowAttempts < this.#reconnection.attempts) {
+        if (
+          this.#reconnection.enable &&
+          this.#reconnection.nowAttempts < this.#reconnection.attempts
+        ) {
           this.#reconnection.nowAttempts++
           setTimeout(async () => {
             try {
@@ -83,7 +102,10 @@ export class NCWebsocketBase {
         })
 
         if (this.#throwPromise) {
-          if (this.#reconnection.enable && this.#reconnection.nowAttempts < this.#reconnection.attempts) {
+          if (
+            this.#reconnection.enable &&
+            this.#reconnection.nowAttempts < this.#reconnection.attempts
+          ) {
             // 重连未到最后一次，等待继续重连，不抛出错误
             return
           }
@@ -269,7 +291,7 @@ export class NCWebsocketBase {
    * @param event
    * @param handle
    */
-  off<T extends keyof AllHandlers>(event: T, handle: EventHandleMap[T]) {
+  off<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
     this.#eventBus.off(event, handle)
     return this
   }
@@ -279,7 +301,7 @@ export class NCWebsocketBase {
    * @param type
    * @param context
    */
-  emit<T extends keyof AllHandlers>(type: T, context: AllHandlers[T]) {
+  emit<T extends EventKey>(type: T, context: HandlerResMap[T]) {
     this.#eventBus.emit(type, context)
     return this
   }
